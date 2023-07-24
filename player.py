@@ -4,17 +4,14 @@ from ENUMS import CharaterAliveEnum
 
 class Player:
     def __init__(self, cha: Charater):
-        pass
+        self.health = cha.health
+
+    
 
     @property
     def base_health(self,cha):
         return cha.health
     
-    @property
-    def health(self):
-        a = self.base_health
-        return a
-
     @property
     def living_status(self):
         if self.health > 0:
