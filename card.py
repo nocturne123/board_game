@@ -16,11 +16,11 @@ class Card(metaclass=abc.ABCMeta):
 #物理攻击卡牌类
 class PhysicalAttackCard(Card):
     
-    @property
+    
     def card_type(self):
         return CardTypeEnum.physical_attack
     
-    @property
-    def take_effect(self,attack,target):
-        damage = attack[1]
-        target.get_damage((damage,attack))
+    
+    def take_effect(self,card_user,target):
+        damage = card_user.attack[1]
+        target.get_damage((damage,card_user))
