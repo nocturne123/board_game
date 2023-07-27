@@ -3,6 +3,7 @@ from card import PhysicalAttackCard
 from charaters import Charater
 from ENUMS import CardTypeEnum
 from pprint import pprint
+from game import DrawPile
 
 big_mac = Charater(15, 0, 3, 0, 1)
 mac_player = Player(big_mac)
@@ -21,3 +22,6 @@ pprint(mac_player.hand_sequence)
 mac_player.use_card(mac_player.hand_sequence[0],dummy_player)
 pprint(mac_player.hand_sequence)
 pprint(dummy_player.health)
+
+card_pile1 = DrawPile()
+pprint(card_pile1.card_list)
