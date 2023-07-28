@@ -17,6 +17,7 @@ class Player:
         self.mental_attack = cha.mental_attack
         self.base_health = cha.health
         self.max_health = cha.health
+        self.draw_stage_card_number = 2
 
     @property
     def living_status(self):

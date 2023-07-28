@@ -23,8 +23,9 @@ class DrawStage(BaseStage):
 
     def start_stage(self, drawpile, player):
         a = []
-        a.append(drawpile.pop())
-        a.append(drawpile.pop())
+        for i in range(player.draw_stage_card_number):
+            a.append(drawpile.pop())
+        
         player.hand_sequence.extend(a)
 
 
