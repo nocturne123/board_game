@@ -9,24 +9,29 @@ class BaseStage(metaclass=abc.ABCMeta):
         self.player = player
 
     @abc.abstractclassmethod
-    def start_stage(self, player):
+    def start_stage(self, player, game):
         pass
 
     @abc.abstractclassmethod
-    def end_stage(self, palyer):
+    def end_stage(self, player, game):
         pass
 
 
 # 摸牌阶段实现
 class DrawStage(BaseStage):
-    super().__init__()
+    def __init__(self, player):
+        super().__init__(player)
 
+# start_stage函数由game类调用，启动摸牌阶段，回合结束时调用game类的end_stage,通知game类该阶段以结束
     def start_stage(self, drawpile, player):
+
         a = []
         for i in range(player.draw_stage_card_number):
             a.append(drawpile.pop())
-        
         player.hand_sequence.extend(a)
+
+    def end_stage(self, player, game):
+        game.end_stage(self, player)
 
 
 # 牌堆类
@@ -55,3 +60,9 @@ class Round:
 class Game:
     def __init__(self, *players):
         self.player_list = [*players]
+
+    def start_stage(self, stage, player):
+        pass
+
+    def end_stage(self, stage, player):
+        pass
