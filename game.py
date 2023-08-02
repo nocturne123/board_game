@@ -35,19 +35,20 @@ class DrawStage(BaseStage):
 
 
 # 牌堆类
-class CardPile:
-    def __init__(self):
-        self.card_list = []
+class CardPile(list):
+    pass
 
 
 class DrawPile(CardPile):
-    def __init__(self) :
-        self.card_list = [
+    
+
+    def test_draw_pile(self):
+        self .extend( [
             PhysicalAttackCard(),
             MagicAttackCard(),
             MentalAttackCard(),
-        ] * 5
-        shuffle(self.card_list)
+        ] * 5)
+        shuffle(self)
 
 
 # 回合类
