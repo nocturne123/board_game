@@ -1,13 +1,16 @@
 from player import Player
-from card import PhysicalAttackCard
 from charaters import Charater
-from ENUMS import CardTypeEnum
 from pprint import pprint
 from game import DrawPile,Game
 
+#这个测试例模拟了大麦和一个木头人对战的情形，game类初始化后为玩家发手牌
+#然后大麦将手里的4张牌全部打出，打在木头人身上
+
+#大麦
 big_mac = Charater(15, 0, 3, 0, 1)
 mac_player = Player(big_mac)
 
+#木头人
 injury_test_dummy = Charater(15, 0, 3, 0, 1)
 dummy_player = Player(injury_test_dummy)
 

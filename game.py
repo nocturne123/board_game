@@ -22,16 +22,24 @@ class DrawStage(BaseStage):
     def __init__(self, player):
         super().__init__(player)
 
-# start_stage函数由game类调用，启动摸牌阶段，回合结束时调用game类的end_stage,通知game类该阶段以结束
+# start_stage函数由game类调用，启动摸牌阶段，玩家进行抽牌，
+# 回合结束时调用game类的end_stage,通知game类该阶段以结束
     def start_stage(self, drawpile, player):
 
-        a = []
-        for i in range(player.draw_stage_card_number):
-            a.append(drawpile.pop())
-        player.hand_sequence.extend(a)
+        player.draw_card(drawpile)
 
     def end_stage(self, player, game):
         game.end_stage(self, player)
+
+class UseStage(BaseStage):
+    def __init__(self, player):
+        super().__init__(player)
+
+    def start_stage(self,player):
+        pass
+
+    def end_stage(self,player):
+        pass
 
 
 # 牌堆类
@@ -40,7 +48,6 @@ class CardPile(list):
 
 
 class DrawPile(CardPile):
-    
 
     def test_draw_pile(self):
         self .extend( [
@@ -53,8 +60,12 @@ class DrawPile(CardPile):
 
 # 回合类
 class Round:
-    def __init__(self):
-        pass
+    def __init__(self,game:Game):
+        for player in game.player_list:
+            if player.have_draw_card_stage:
+                yield DrawStage(player)
+            if player.have_use_card_stage:
+                yield UseStage(player)
 
 
 # 游戏类
@@ -72,7 +83,4 @@ class Game:
 
     def game_start_dealing(self):
         for player in self.player_list:
-            a=[]
-            for i in range(player.start_game_draw):
-                a.append(self.draw_pile.pop())
-            player.hand_sequence.extend(a)
+            player.first_round_draw(self.draw_pile)
