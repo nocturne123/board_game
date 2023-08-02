@@ -41,7 +41,7 @@ class CardPile:
 
 
 class DrawPile(CardPile):
-    def __init__(self) -> None:
+    def __init__(self) :
         self.card_list = [
             PhysicalAttackCard(),
             MagicAttackCard(),
@@ -58,11 +58,20 @@ class Round:
 
 # 游戏类
 class Game:
-    def __init__(self, *players):
+    def __init__(self, map, draw_pile, *players):
         self.player_list = [*players]
+        self.draw_pile = draw_pile
+        self.map = map
 
     def start_stage(self, stage, player):
         pass
 
     def end_stage(self, stage, player):
         pass
+
+    def game_start_dealing(self):
+        for player in self.player_list:
+            a=[]
+            for i in range(player.start_game_draw):
+                a.append(self.draw_pile.pop())
+            player.hand_sequence.extend(a)
