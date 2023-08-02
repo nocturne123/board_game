@@ -18,6 +18,7 @@ class Player:
         self.base_health = cha.health
         self.max_health = cha.health
         self.draw_stage_card_number = 2
+        self.start_game_draw = 4
 
     @property
     def living_status(self):
