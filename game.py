@@ -58,14 +58,6 @@ class DrawPile(CardPile):
         shuffle(self)
 
 
-# 回合类
-class Round:
-    def __init__(self,game:Game):
-        for player in game.player_list:
-            if player.have_draw_card_stage:
-                yield DrawStage(player)
-            if player.have_use_card_stage:
-                yield UseStage(player)
 
 
 # 游戏类
@@ -84,3 +76,12 @@ class Game:
     def game_start_dealing(self):
         for player in self.player_list:
             player.first_round_draw(self.draw_pile)
+
+# 回合类
+class Round:
+    def __init__(self,game:Game):
+        for player in game.player_list:
+            if player.have_draw_card_stage:
+                yield DrawStage(player)
+            if player.have_use_card_stage:
+                yield UseStage(player)
