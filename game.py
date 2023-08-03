@@ -41,6 +41,13 @@ class UseStage(BaseStage):
     def end_stage(self,player):
         pass
 
+class DiscardStage(BaseStage):
+    def __init__(self, player):
+        super().__init__(player)
+
+    def start_stage(self,player):
+        if len(player.hand_sequance) <= player.max_hand_sequence:
+            pass
 
 # 牌堆类
 class CardPile(list):
