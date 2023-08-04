@@ -5,13 +5,17 @@ import toml
 
 
 class Charater:
-    def __init__(self, health, magic_attack, physical_attack, mental_attack, speed):
+    def __init__(
+        self, health, magic_attack, physical_attack, mental_attack, speed, name, species
+    ):
         self.health = health
         self.magic_attack = magic_attack
         self.physical_attack = physical_attack
         self.mental_attack = mental_attack
         self.speed = speed
         self.collect_items = tuple()
+        self.name = name
+        self.species = species
 
 
 # 测试代码：实例化一个big_mac

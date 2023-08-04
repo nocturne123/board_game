@@ -1,4 +1,4 @@
-'''
+"""
 def index_words_iter(text):
     if text:
         yield 0
@@ -33,10 +33,13 @@ def animate_composed():
     yield from move(2,3.0)
 
 run(animate_composed)
-'''
+"""
+
+
 def count_from1():
     for i in range(10):
         yield i
+
 
 it = iter(count_from1())
 
@@ -49,4 +52,3 @@ it.send(30)
 
 print(next(it))
 print(next(it))
-

@@ -1,5 +1,5 @@
 from charaters import Charater
-from ENUMS import CharaterAliveEnum
+from ENUMS import CharaterAliveEnum, SpeciesEnum
 
 
 class Player:
@@ -7,49 +7,54 @@ class Player:
         self.health = cha.health
         self.speed = cha.speed
         self.skills = None
+        self.name = cha.name
+        self.species = cha.species
 
-        #玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
+        # 玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
         self.armor = []
         self.weapon = []
 
-        #玩家手牌
+        # 玩家手牌
         self.hand_sequence = []
 
-        #玩家收集品
+        # 玩家收集品
         self.colloctions = []
 
-        #玩家可否被选中，主要针对特殊状态，例如晕眩、针线提供的无敌、余晖烁烁的无敌、王冠提供的无敌
+        # 玩家可否被选中，主要针对特殊状态，例如晕眩、针线提供的无敌、余晖烁烁的无敌、王冠提供的无敌
+        # 根据技能描述，线轴为不会受到伤害，余晖烁烁、王冠为不能成为攻击牌目标，增加不可被攻击选中的属性
+        # 攻击不可被选中在攻击牌类种实现，玩家类仅提供属性
         self.is_selectable = True
+        self.immune_from_attack = False
 
-        #玩家id，未来看是否会用到
+        # 玩家id，未来看是否会用到
         self.id = 0
 
-        #角色的三种基本攻击
+        # 角色的三种基本攻击
         self.physical_attack = cha.physical_attack
         self.magic_attack = cha.magic_attack
         self.mental_attack = cha.mental_attack
 
-        #角色的基础生命值和最大生命值
+        # 角色的基础生命值和最大生命值
         self.base_health = cha.health
         self.max_health = cha.health
 
-        #角色在回合开始时的抽牌数量
+        # 角色在回合开始时的抽牌数量
         self.draw_stage_card_number = 2
 
-        #角色初始手牌数量
+        # 角色初始手牌数量
         self.start_game_draw = 4
 
-        #以下4个属性为能否使用卡牌和能否装备卡牌，用来解决角色是否有出牌阶段和
-        #能否出牌的问题，玩家类里面对能否出牌进行判断，game类对是否有出牌阶段进行判断
-        self.able_to_use_card = True
-        self.able_to_equip = True
+        # 以下4个属性为能否使用卡牌和能否装备卡牌，用来解决角色是否有出牌阶段和
+        # 能否出牌的问题，玩家类里面对能否出牌进行判断，game类对是否有出牌阶段进行判断
+        self.able_to_use_card = False
+        self.able_to_equip = False
         self.have_draw_card_stage = True
         self.have_use_card_stage = True
 
-        #角色最大手牌数量
+        # 角色最大手牌数量
         self.max_hand_sequence = 6
 
-        #玩家移动次数
+        # 玩家移动次数
         self.move_chance = 1
 
     @property
@@ -74,19 +79,30 @@ class Player:
     # 这里是不经过game类的实现
     def use_card(self, card, target):
         if self.able_to_use_card:
-            pass
-        if target.is_selectable:
-            card.take_effect(self, target)
-            self.hand_sequence.remove(card)
+            if target.is_selectable:
+                self.hand_sequence.remove(card)
+                card.take_effect(self, target)
+        else:
+            print(f"{self.name}现在还不能出牌")
 
     def get_damage(self, damage_pack):
         self.health -= damage_pack[0]
 
-    def draw_card(self,pile):
-        
-        for i in range(self.draw_stage_card_number):
+    # 角色抽牌
+    def draw_card(self, pile, num=1):
+        if num <= 0:
+            pass
+        elif num == 1:
             self.hand_sequence.append(pile.pop())
+        elif num > 1:
+            for i in range(num):
+                self.hand_sequence.append(pile.pop())
 
-    def first_round_draw(self,pile):
-        for i in range(self.start_game_draw):
-            self.hand_sequence.append(pile.pop())
+    # 角色弃牌
+    def discard(self, discard_pile, card):
+        if card in self.hand_sequence:
+            self.hand_sequence.remove(card)
+            discard_pile.append(card)
+
+    def first_round_draw(self, pile):
+        self.draw_card(pile, num=self.start_game_draw)

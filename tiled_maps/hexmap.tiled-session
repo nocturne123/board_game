@@ -1,0 +1,77 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "example01.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "全部文件 (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "G:/Dropbox/Art - itch.io/hextilemap/fantasyhextiles_randr_4_v1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "baseyiled.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "board_map.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 324.66666666666663,
+                "y": 374.66666666666663
+            }
+        },
+        "example01.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 670,
+                "y": 587
+            }
+        },
+        "example01.tmx#fantasyhextiles": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "fantasyhextiles.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tiled1.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        }
+    },
+    "last.externalTilesetPath": "E:/pythonproject/board_game/tiled_maps",
+    "last.imagePath": "E:/pythonproject/board_game/tiled_maps",
+    "map.height": 30,
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": null,
+    "map.orientation": null,
+    "map.renderOrder": null,
+    "openFiles": [
+        "board_map.tmx",
+        "example01.tmx"
+    ],
+    "project": "hexmap.tiled-project",
+    "recentFiles": [
+        "board_map.tmx",
+        "example01.tmx",
+        "tiled1.tsx",
+        "baseyiled.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 31,
+        "width": 35
+    }
+}
