@@ -8,7 +8,7 @@ from ENUMS import SpeciesEnum
 # 然后大麦将手里的4张牌全部打出，打在木头人身上
 
 # 大麦
-big_mac = Charater(15, 0, 3, 0, 1, "big_mac", SpeciesEnum.earth_pony)
+big_mac = Charater(15, 0, 3, 0, 1, "Big Mac", SpeciesEnum.earth_pony)
 mac_player = Player(big_mac)
 
 # 木头人

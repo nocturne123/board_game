@@ -4,6 +4,7 @@ import abc
 from player import Player
 
 
+# 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
 # 基础阶段类
 class BaseStage(metaclass=abc.ABCMeta):
     def __init__(self, player):
@@ -24,34 +25,38 @@ class DrawStage(BaseStage):
         super().__init__(player)
 
     # start_stage函数由game类调用，启动摸牌阶段，玩家进行抽牌，
+    # 玩家回合结束时通知game类
+    # 回合开始由game类主导开启回合，回合结束由player主导结束
     # 回合结束时调用game类的end_stage,通知game类该阶段以结束
 
-    # 现阶段的轮次由round类主持
+    # 现阶段的轮次由turn类主持
     def start_stage(self, drawpile, player: Player):
         player.draw_card(drawpile, num=player.draw_stage_card_number)
 
-    def end_stage(self, player, round):
-        round.end_stage(self, player)
+    def end_stage(self, player, turn):
+        turn.end_stage(self, player)
 
 
 class UseStage(BaseStage):
     def __init__(self, player):
         super().__init__(player)
 
-    def start_stage(self, player):
-        pass
+    def start_stage(self, player: Player):
+        player.able_to_use_card = True
+        player.able_to_equip = True
 
-    def end_stage(self, player):
-        pass
+    def end_stage(self, player: Player):
+        player.able_to_use_card = False
+        player.able_to_equip = False
 
 
 class DiscardStage(BaseStage):
     def __init__(self, player):
         super().__init__(player)
 
-    def start_stage(self, player):
-        if len(player.hand_sequance) <= player.max_hand_sequence:
-            pass
+    def start_stage(self, player: Player):
+        while len(player.hand_sequance) <= player.max_hand_sequence:
+            print(f"你的手牌数大于{player.max_hand_sequence}，请弃牌")
 
 
 # 牌堆类
@@ -102,7 +107,8 @@ class Game:
 
 
 # 回合类
-class Round:
+# 这个回合是角色的一个完整回合
+class Turn:
     def __init__(self, game: Game):
         for player in game.player_list:
             if player.have_draw_card_stage:
@@ -110,3 +116,9 @@ class Round:
             if player.have_use_card_stage:
                 yield UseStage(player)
             yield DiscardStage(player)
+
+
+# 轮次类，里面包含多个回合
+class Round:
+    def __init__(self) -> None:
+        pass

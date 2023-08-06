@@ -6,7 +6,7 @@ class Player:
     def __init__(self, cha: Charater):
         self.health = cha.health
         self.speed = cha.speed
-        self.skills = None
+        self.skills = []
         self.name = cha.name
         self.species = cha.species
 
@@ -23,8 +23,10 @@ class Player:
         # 玩家可否被选中，主要针对特殊状态，例如晕眩、针线提供的无敌、余晖烁烁的无敌、王冠提供的无敌
         # 根据技能描述，线轴为不会受到伤害，余晖烁烁、王冠为不能成为攻击牌目标，增加不可被攻击选中的属性
         # 攻击不可被选中在攻击牌类种实现，玩家类仅提供属性
+        # 玩家可否被偷窃，也写在这里
         self.is_selectable = True
         self.immune_from_attack = False
+        self.immune_from_steal = False
 
         # 玩家id，未来看是否会用到
         self.id = 0
@@ -77,11 +79,15 @@ class Player:
     # 打出卡牌，卡牌对目标生效，需要经过game类吗？
     # 如果需要经过game类，会不会太复杂了？game类职责是主持回合，需不需要经手卡牌的检测？应该是需要的
     # 这里是不经过game类的实现
+    # TODO 使用卡牌的逻辑需要详细设计
     def use_card(self, card, target):
         if self.able_to_use_card:
             if target.is_selectable:
                 self.hand_sequence.remove(card)
-                card.take_effect(self, target)
+                card.get_used(target)
+
+            else:
+                print(f"{target}无法被选中")
         else:
             print(f"{self.name}现在还不能出牌")
 
@@ -102,7 +108,7 @@ class Player:
     def discard(self, discard_pile, card):
         if card in self.hand_sequence:
             self.hand_sequence.remove(card)
-            discard_pile.append(card)
+            return card
 
     def first_round_draw(self, pile):
         self.draw_card(pile, num=self.start_game_draw)

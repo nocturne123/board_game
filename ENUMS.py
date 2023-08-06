@@ -19,8 +19,10 @@ class CardTypeEnum(enum.Enum):
     armor = 5
     weapon = 6
     status = 7
-    event_trigger = 8
-    element = 9
+    healing = 8
+    event_trigger = 9
+    element = 10
+    anti_element = 11
 
 
 class SpeciesEnum(enum.Enum):

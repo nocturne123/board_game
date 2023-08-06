@@ -1,0 +1,14 @@
+["Big Mac"]
+health = 15
+magic_attack = 0
+physical_attack = 3
+mental_attack = 0
+speed = 1
+species = "earth pony"
+[dummy]
+health = 15
+magic_attack = 0
+physical_attack = 3
+mental_attack = 0
+speed = 1
+species = "earth pony"
