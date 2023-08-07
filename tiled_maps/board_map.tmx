@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="hexagonal" renderorder="left-down" width="30" height="30" tilewidth="32" tileheight="28" infinite="0" hexsidelength="16" staggeraxis="x" staggerindex="odd" nextlayerid="2" nextobjectid="1">
- <tileset firstgid="1" source="fantasyhextiles.tsx"/>
- <layer id="1" name="图块层 1" width="30" height="30">
-  <data encoding="base64" compression="zlib">
-   eJzt0DEKAEAIBDHv/5+2tbhSFCGBxXLACAC6vbKN5lT719zsTv+7XgC4KAHAVAAY
-  </data>
- </layer>
-</map>
