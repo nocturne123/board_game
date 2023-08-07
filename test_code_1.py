@@ -1,6 +1,3 @@
-import toml
-
-a = toml.load("new_toml_file.toml")
+a=4
+a += 1
 print(a)
-b = toml.load("new_toml_file.toml")
-print(b)

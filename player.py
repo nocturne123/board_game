@@ -56,8 +56,9 @@ class Player:
         # 角色最大手牌数量
         self.max_hand_sequence = 6
 
-        # 玩家移动次数
+        # 玩家移动次数和攻击次数
         self.move_chance = 1
+        self.attack_chance = 1
 
     @property
     def living_status(self):
@@ -84,7 +85,7 @@ class Player:
         if self.able_to_use_card:
             if target.is_selectable:
                 self.hand_sequence.remove(card)
-                card.get_used(target)
+                card.get_used(self,target)
 
             else:
                 print(f"{target}无法被选中")
@@ -108,6 +109,7 @@ class Player:
     def discard(self, discard_pile, card):
         if card in self.hand_sequence:
             self.hand_sequence.remove(card)
+            discard_pile.append(card)
             return card
 
     def first_round_draw(self, pile):
