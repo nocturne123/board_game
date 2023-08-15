@@ -2,7 +2,7 @@ from collections import deque
 
 
 
-class Camp(deque):
+class Team(deque):
     def __init__(self,maxlen):
         super().__init__(maxlen=maxlen)
 
@@ -16,7 +16,7 @@ class Camp(deque):
 
 
 
-a=Camp(maxlen=3)
+a=Team(maxlen=3)
 a.extend(["a","b","c"])
 print(a)
 a.append("d")
