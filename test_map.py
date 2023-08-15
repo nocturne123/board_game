@@ -98,7 +98,7 @@ class MyGame(arcade.Window):
 
         # Draw our Scene
         # Note, if you a want pixelated look, add pixelated=True to the parameters
-        self.scene.draw()
+        self.scene.draw(pixelated=True)
 
         # Activate the GUI camera before drawing GUI elements
         self.camera_gui.use()
