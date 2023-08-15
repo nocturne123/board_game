@@ -31,3 +31,8 @@ class SpeciesEnum(enum.Enum):
     unicorn = 2
     pegasi = 3
     alicon = 4
+
+class SpecialNumberEnum(enum.Enum):
+    #特殊数字，无限大和强制0
+    infinity = 1
+    forced_zero = 0
