@@ -2,6 +2,10 @@ from random import shuffle
 from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 import abc
 from player import Player
+from collections import deque
+from ENUMS import GameModeEnum, CharaterAliveEnum
+from team import Team
+from random import shuffle
 
 
 # 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
@@ -90,10 +94,52 @@ class DiscardPile(CardPile):
 # 游戏的回合分为已经进行的回合，正在进行的回合，将要生成的回合
 # 回合和轮次不同
 class Game:
-    def __init__(self, map, draw_pile, *players):
-        self.player_list = [*players]
+    def __init__(self, gamemode, map, draw_pile, *players):
+        self.player_list = shuffle([*players])
         self.draw_pile = draw_pile
         self.map = map
+        self.game_mode = gamemode
+        self.team_list = []
+        # 最开始的玩家
+        self.current_player = self.player_list[0]
+
+    # 队伍基础分配
+    def set_team(self):
+        if self.game_mode == GameModeEnum.FFA:
+            for player in self.player_list:
+                solo_team = Team(maxlen=1)
+                solo_team.append(player)
+                self.team_list.append(solo_team)
+
+        elif self.game_mode == GameModeEnum.two_vs_two:
+            team1_member = self.player_list[0:2]
+            team2_member = self.player_list[2:4]
+            team1 = Team(maxlen=2)
+            team2 = Team(maxlen=2)
+            team1.extend(team1_member)
+            team2.extend(team2_member)
+            self.team_list.extend([team1, team2])
+
+        elif self.game_mode == GameModeEnum.FFA_two:
+            team1_member = self.player_list[0:2]
+            team2_member = self.player_list[2:4]
+            team3_member = self.player_list[4:6]
+            team1 = Team(maxlen=2)
+            team2 = Team(maxlen=2)
+            team3 = Team(maxlen=2)
+            team1.extend(team1_member)
+            team2.extend(team2_member)
+            team3.extend(team3_member)
+            self.team_list.extend([team1, team2, team3])
+
+        elif self.game_mode == GameModeEnum.three_vs_three:
+            team1_member = self.player_list[0:3]
+            team2_member = self.player_list[3:6]
+            team1 = Team(maxlen=3)
+            team2 = Team(maxlen=3)
+            team1.extend(team1_member)
+            team2.extend(team2_member)
+            self.team_list.extend([team1, team2])
 
     def start_stage(self, stage, player):
         pass
@@ -118,7 +164,19 @@ class Turn:
             yield DiscardStage(player)
 
 
-# 轮次类，里面包含多个回合
-class Round:
-    def __init__(self) -> None:
-        pass
+# 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现
+# 优先级序列由game类计算并提供，round类内部只做保存
+# 轮次类储存上轮伤害来源、弃牌造成伤害的信息
+class Round(list):
+    def __init__(self, game):
+        super().__init__
+        # 只储存还能进行游戏的玩家
+        self.player_list = [
+            player
+            for player in game.player_list
+            if player.living_status != CharaterAliveEnum.dead
+        ]
+
+    def round_update(self):
+        while tuple(self) != tuple(self.player_list):
+            pass

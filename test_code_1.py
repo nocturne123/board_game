@@ -1,13 +1,4 @@
-class A:
-    def __init__(self):
-        self.name = None
-        self.able = None
-
-    def setup(self):
-        self.add_add =1
-
-a = A()
-print(a.name)
-
-a.setup()
-print(a.add_add)
+b=[1,2,3,4]
+c=b[0:2]
+d=b[2:4]
+print(c,d)

@@ -62,11 +62,11 @@ class Player:
 
     @property
     def living_status(self):
-        '''
+        """
         存活状态是玩家的最顶级状态，由游戏类进行相关的指定、判断、改变。
         TODO:现有的实现为玩家判定，后续需要改写为game类判定。
         这样会更加符合ecs架构
-        '''
+        """
         if self.health > 0:
             return CharaterAliveEnum.alive
         else:
@@ -90,7 +90,7 @@ class Player:
         if self.able_to_use_card:
             if target.is_selectable:
                 self.hand_sequence.remove(card)
-                card.get_used(self,target)
+                card.get_used(self, target)
 
             else:
                 print(f"{target}无法被选中")
@@ -117,5 +117,6 @@ class Player:
             discard_pile.append(card)
             return card
 
+    # 游戏开始时的默认抽牌
     def first_round_draw(self, pile):
         self.draw_card(pile, num=self.start_game_draw)

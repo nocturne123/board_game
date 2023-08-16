@@ -36,3 +36,9 @@ class SpecialNumberEnum(enum.Enum):
     #特殊数字，无限大和强制0
     infinity = 1
     forced_zero = 0
+
+class GameModeEnum(enum.Enum):
+    FFA = 0
+    two_vs_two = 1
+    three_vs_three = 2
+    FFA_two = 3
