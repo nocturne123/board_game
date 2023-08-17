@@ -6,6 +6,7 @@ from collections import deque
 from ENUMS import GameModeEnum, CharaterAliveEnum
 from team import Team
 from random import shuffle
+from itertools import chain, zip_longest
 
 
 # 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
@@ -101,7 +102,7 @@ class Game:
         self.game_mode = gamemode
         self.team_list = []
         # 最开始的玩家
-        self.current_player = self.player_list[0]
+        self.current_player = self.team_list[0][0]
 
     # 队伍基础分配
     def set_team(self):
@@ -150,6 +151,14 @@ class Game:
     def game_start_dealing(self):
         for player in self.player_list:
             player.first_round_draw(self.draw_pile)
+
+    # 返回当前玩家的优先级序列，可以视作玩家观察到的轮次
+    def set_round_list(self):
+        return [
+            player
+            for player in chain.from_iterable(zip_longest(*self.team_list))
+            if player.living_status != CharaterAliveEnum.dead
+        ]
 
 
 # 回合类
