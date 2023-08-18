@@ -1,14 +1,16 @@
 from charaters import Charater
 from ENUMS import CharaterAliveEnum, SpeciesEnum
+from game import Game
 
 
 class Player:
-    def __init__(self, cha: Charater):
+    def __init__(self, cha: Charater, game: Game):
         self.health = cha.health
         self.speed = cha.speed
         self.skills = []
         self.name = cha.name
         self.species = cha.species
+        self.game = game
 
         # 玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
         self.armor = []
@@ -60,6 +62,9 @@ class Player:
         self.move_chance = 1
         self.attack_chance = 1
 
+        # 玩家是否为当前活动玩家
+        self.on_turn = False
+
     @property
     def living_status(self):
         """
@@ -72,6 +77,7 @@ class Player:
         else:
             return CharaterAliveEnum.dead
 
+    # 角色攻击力
     @property
     def attack(self):
         if self.weapon:
@@ -120,3 +126,6 @@ class Player:
     # 游戏开始时的默认抽牌
     def first_round_draw(self, pile):
         self.draw_card(pile, num=self.start_game_draw)
+
+    def end_stage(self, game):
+        pass

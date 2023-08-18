@@ -35,11 +35,12 @@ class DrawStage(BaseStage):
     # 回合结束时调用game类的end_stage,通知game类该阶段以结束
 
     # 现阶段的轮次由turn类主持
+    # turn类被取消了
     def start_stage(self, drawpile, player: Player):
         player.draw_card(drawpile, num=player.draw_stage_card_number)
 
-    def end_stage(self, player, turn):
-        turn.end_stage(self, player)
+    def end_stage(self, player):
+        player.end_stage(self)
 
 
 class UseStage(BaseStage):
@@ -146,6 +147,9 @@ class Game:
         pass
 
     def end_stage(self, stage, player):
+        pass
+
+    def start_turn(self, player):
         pass
 
     def game_start_dealing(self):
