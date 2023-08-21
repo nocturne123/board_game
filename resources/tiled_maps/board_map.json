@@ -16,9 +16,80 @@
          "width":13,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":2,
+         "name":"\u5bf9\u8c61\u5c42 1",
+         "objects":[
+                {
+                 "gid":41,
+                 "height":48,
+                 "id":2,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":120,
+                 "y":322.272727272727
+                }, 
+                {
+                 "gid":6,
+                 "height":48,
+                 "id":3,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":95.9090909090909,
+                 "y":307.909090909091
+                }, 
+                {
+                 "gid":3,
+                 "height":48,
+                 "id":4,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":72.0909090909091,
+                 "y":294.181818181818
+                }, 
+                {
+                 "gid":3,
+                 "height":48,
+                 "id":5,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":144.090909090909,
+                 "y":308.090909090909
+                }, 
+                {
+                 "gid":3,
+                 "height":48,
+                 "id":6,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":143.8125,
+                 "y":279.875
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":2,
- "nextobjectid":1,
+ "nextlayerid":3,
+ "nextobjectid":7,
  "orientation":"hexagonal",
  "renderorder":"left-down",
  "staggeraxis":"x",
@@ -28,7 +99,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"../images/fantasyhextiles.tsx"
+         "source":"..\/images\/fantasyhextiles.tsx"
         }],
  "tilewidth":32,
  "type":"map",
