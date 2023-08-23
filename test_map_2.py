@@ -18,13 +18,13 @@ pprint(map)
 
 block_sprite = arcade.Sprite(
     filename="resources/images/fantasyhextiles_v3.png",
-    scale=3,
-    image_x=0,
+    scale=1,
+    image_x=64,
     image_y=0,
     image_width=32,
     image_height=64,
-    center_x=128,
-    center_y=128,
+    center_x=300,
+    center_y=300,
 )
 
 
