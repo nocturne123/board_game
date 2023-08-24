@@ -7,7 +7,7 @@ SCREEN_TITLE = "Test Map"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
-TILE_SCALING = 3
+TILE_SCALING = 1
 
 map_path = Path("resources/tiled_maps/board_map.json")
 
@@ -16,14 +16,25 @@ map = pytiled_parser.parse_map(map_path)
 pprint(map)
 
 
-block_sprite = arcade.Sprite(
+block_sprite_grass = arcade.Sprite(
     filename="resources/images/fantasyhextiles_v3.png",
-    scale=1,
-    image_x=64,
+    scale=TILE_SCALING,
+    image_x=0,
     image_y=0,
     image_width=32,
-    image_height=64,
+    image_height=48,
     center_x=300,
+    center_y=300,
+)
+
+block_sprite_little_forest = arcade.Sprite(
+    filename="resources/images/fantasyhextiles_v3.png",
+    scale=TILE_SCALING,
+    image_x=32,
+    image_y=0,
+    image_width=32,
+    image_height=48,
+    center_x=332,
     center_y=300,
 )
 
@@ -39,9 +50,9 @@ class MyGame(arcade.Window):
         self.player_list = None
 
     def setup(self):
-        self.player_sprite = block_sprite
         self.player_list = arcade.SpriteList()
-        self.player_list.append(self.player_sprite)
+        self.player_list.append(block_sprite_grass)
+        self.player_list.append(block_sprite_little_forest)
 
     def on_draw(self):
         """Draw everything"""
