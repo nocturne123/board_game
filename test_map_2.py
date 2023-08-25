@@ -34,8 +34,8 @@ block_sprite_little_forest = arcade.Sprite(
     image_y=0,
     image_width=32,
     image_height=48,
-    center_x=332,
-    center_y=300,
+    center_x=324,
+    center_y=288,
 )
 
 
