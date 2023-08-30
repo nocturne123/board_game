@@ -1,242 +1,26 @@
-from hexutil import Hex, HexPathFinder
 import arcade
-from pathlib import Path
-from pprint import pprint
 from ENUMS import BlockTypeEnum
+from pyglet.math import Vec2
+
+from map_block import (
+    grass_block,
+    mountain_block,
+    shallow_water_block,
+    dense_forest_block,
+    snow_block,
+    snow_castle_block,
+    our_town_block,
+    town_block_no_fence,
+    town_block_high_fence,
+    town_block_with_fence,
+    tree_of_harmony_block,
+)
 
 SCREEN_TITLE = "Test Map"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
 TILE_SCALING = 1
-
-
-def hex_to_pixel(hex: Hex) -> tuple:
-    """Converts a hex coordinate to a pixel coordinate
-    将六边形坐标转换为像素坐标
-    """
-    hex_x = hex[0]
-    hex_y = hex[1]
-    return (hex_y * 24, hex_x * 13)
-
-
-class map_block(arcade.Sprite):
-    def __init__(
-        self,
-        block_type: BlockTypeEnum = BlockTypeEnum.grass,
-        image_x=0,
-        image_y=0,
-        hex_x=0,
-        hex_y=0,
-    ):
-        super().__init__(
-            filename="resources/images/fantasyhextiles_v3.png",
-            image_width=32,
-            image_height=48,
-            scale=TILE_SCALING,
-            image_x=image_x,
-            image_y=image_y,
-            center_x=300 + hex_to_pixel(Hex(hex_x, hex_y))[0],
-            center_y=300 + hex_to_pixel(Hex(hex_x, hex_y))[1],
-        )
-        self.hex_position = Hex(hex_x, hex_y)
-        self.type: BlockTypeEnum = block_type
-
-
-# 下面是具体的地图图块定义，除了具体城镇，其他图块不用传入block_type参数
-class grass_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.grass,
-            image_x=0,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class little_forest_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            image_x=32,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class dense_forest_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.dense_forest,
-            image_x=64,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class rock_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            image_x=96,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class spruce_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            image_x=128,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class mountain_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.mountain,
-            image_x=160,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class shallow_water_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.water,
-            image_x=192,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class deep_water_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.water,
-            image_x=224,
-            image_y=0,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class town_block_no_fence(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=0,
-            image_y=48,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class town_block_with_fence(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=32,
-            image_y=48,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class town_block_high_fence(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=64,
-            image_y=48,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class snow_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.snow,
-            image_x=0,
-            image_y=96,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class snow_little_forest_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.snow,
-            image_x=32,
-            image_y=96,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class snow_dense_forest_block(map_block):
-    def __init__(self, hex_x, hex_y):
-        super().__init__(
-            block_type=BlockTypeEnum.snow,
-            image_x=64,
-            image_y=96,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class snow_town_block(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=192,
-            image_y=96,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class snow_castle_block(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=224,
-            image_y=96,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class our_town_block(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=0,
-            image_y=240,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
-
-
-class tree_of_harmony_block(map_block):
-    def __init__(self, block_type, hex_x, hex_y):
-        super().__init__(
-            block_type=block_type,
-            image_x=128,
-            image_y=48,
-            hex_x=hex_x,
-            hex_y=hex_y,
-        )
 
 
 # 手动录入的所有草方块
@@ -459,23 +243,78 @@ class MyGame(arcade.Window):
         # Call the parent class initializer
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.player_sprite = None
-        self.player_list = None
+        self.block_list = None
+        self.camera_map = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
 
     def setup(self):
-        self.player_list = arcade.SpriteList()
-        self.player_list.extend(grass_block_list)
-        self.player_list.extend(mountain_block_list)
-        self.player_list.extend(dense_forest_block_list)
-        self.player_list.extend(snow_block_list)
-        self.player_list.extend(water_block_list)
-        self.player_list.extend(town_block_list)
+        self.block_list = arcade.SpriteList()
+        self.block_list.extend(grass_block_list)
+        self.block_list.extend(mountain_block_list)
+        self.block_list.extend(dense_forest_block_list)
+        self.block_list.extend(snow_block_list)
+        self.block_list.extend(water_block_list)
+        self.block_list.extend(town_block_list)
 
-        self.player_list.sort(key=lambda x: x.center_y, reverse=True)
+        self.block_list.sort(key=lambda x: x.center_y, reverse=True)
 
     def on_draw(self):
         """Draw everything"""
         self.clear()
-        self.player_list.draw(pixelated=True)
+        self.camera_map.use()
+        self.block_list.draw(pixelated=True)
+
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed."""
+
+        if key == arcade.key.UP:
+            self.up_pressed = True
+        elif key == arcade.key.DOWN:
+            self.down_pressed = True
+        elif key == arcade.key.LEFT:
+            self.left_pressed = True
+        elif key == arcade.key.RIGHT:
+            self.right_pressed = True
+
+    def on_key_release(self, key, modifiers):
+        """Called when the user releases a key."""
+
+        if key == arcade.key.UP:
+            self.up_pressed = False
+        elif key == arcade.key.DOWN:
+            self.down_pressed = False
+        elif key == arcade.key.LEFT:
+            self.left_pressed = False
+        elif key == arcade.key.RIGHT:
+            self.right_pressed = False
+
+    # TODO，需要更改移动到相机中心
+    def scroll_to_player(self):
+        """
+        Scroll the window to the player.
+
+        if CAMERA_SPEED is 1, the camera will immediately move to the desired position.
+        Anything between 0 and 1 will have the camera move to the location with a smoother
+        pan.
+        """
+
+        position = Vec2(
+            self.player_sprite.center_x - self.width / 2,
+            self.player_sprite.center_y - self.height / 2,
+        )
+        self.camera_sprites.move_to(position, 1.0)
+
+    def on_resize(self, width, height):
+        """
+        Resize window
+        Handle the user grabbing the edge and resizing the window.
+        """
+        self.camera_sprites.resize(int(width), int(height))
+        self.camera_gui.resize(int(width), int(height))
 
 
 window = MyGame()
