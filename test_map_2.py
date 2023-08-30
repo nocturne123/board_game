@@ -22,7 +22,7 @@ SCREEN_HEIGHT = 650
 
 TILE_SCALING = 1
 
-
+"""
 # 手动录入的所有草方块
 grass_block1 = grass_block(0, 0)
 grass_block2 = grass_block(-1, 1)
@@ -124,6 +124,113 @@ town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, 2, 6)
 town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -4, 4)
 town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -2, 6)
 town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -1, 7)
+"""
+
+
+# 根据新的坐标系统录入的所有方块
+
+# 手动录入的所有草方块
+grass_block1 = grass_block(-4, 4)
+grass_block2 = grass_block(-5, 3)
+grass_block3 = grass_block(-4, 2)
+grass_block4 = grass_block(-3, 1)
+grass_block5 = grass_block(-2, 0)
+grass_block6 = grass_block(1, 3)
+grass_block7 = grass_block(3, 3)
+grass_block8 = grass_block(5, 3)
+grass_block9 = grass_block(7, 3)
+grass_block10 = grass_block(0, 2)
+grass_block11 = grass_block(4, 2)
+grass_block12 = grass_block(-1, 1)
+grass_block13 = grass_block(1, 1)
+grass_block14 = grass_block(3, 1)
+grass_block15 = grass_block(5, 1)
+grass_block16 = grass_block(7, 1)
+grass_block17 = grass_block(-3, -1)
+grass_block18 = grass_block(-1, -1)
+grass_block19 = grass_block(1, -1)
+grass_block20 = grass_block(3, -1)
+grass_block21 = grass_block(7, -1)
+grass_block22 = grass_block(2, 0)
+grass_block23 = grass_block(0, -2)
+grass_block24 = grass_block(3, -3)
+grass_block25 = grass_block(-3, -5)
+grass_block26 = grass_block(-1, -5)
+grass_block27 = grass_block(1, -5)
+grass_block28 = grass_block(3, -5)
+grass_block29 = grass_block(5, -5)
+grass_block30 = grass_block(7, -5)
+grass_block31 = grass_block(-2, -6)
+grass_block32 = grass_block(2, -6)
+grass_block33 = grass_block(6, -6)
+
+# 手动录入的所有高山方块
+mountain_block1 = mountain_block(-2, 4)
+mountain_block2 = mountain_block(4, 4)
+mountain_block3 = mountain_block(8, 4)
+mountain_block4 = mountain_block(9, 3)
+mountain_block5 = mountain_block(10, 2)
+mountain_block6 = mountain_block(9, 1)
+mountain_block7 = mountain_block(4, -2)
+mountain_block8 = mountain_block(12, 0)
+mountain_block9 = mountain_block(11, -1)
+mountain_block10 = mountain_block(7, -3)
+mountain_block11 = mountain_block(5, -3)
+mountain_block12 = mountain_block(6, -4)
+mountain_block13 = mountain_block(-5, 1)
+mountain_block14 = mountain_block(-7, 1)
+
+# 手动录入的所有森林方块
+dense_forest_block1 = dense_forest_block(6, 4)
+dense_forest_block2 = dense_forest_block(2, 4)
+dense_forest_block3 = dense_forest_block(-3, 3)
+dense_forest_block4 = dense_forest_block(-6, 2)
+dense_forest_block5 = dense_forest_block(-6, 0)
+dense_forest_block6 = dense_forest_block(-5, -1)
+dense_forest_block7 = dense_forest_block(-7, -1)
+dense_forest_block8 = dense_forest_block(-4, -2)
+dense_forest_block9 = dense_forest_block(-3, -3)
+dense_forest_block10 = dense_forest_block(-1, -3)
+dense_forest_block11 = dense_forest_block(4, -4)
+dense_forest_block12 = dense_forest_block(2, -4)
+dense_forest_block13 = dense_forest_block(-2, -4)
+dense_forest_block14 = dense_forest_block(-4, -4)
+
+# 手动录入的所有雪地方块
+snow_block1 = snow_block(8, 2)
+snow_block2 = snow_block(11, 1)
+snow_block3 = snow_block(8, 0)
+snow_block4 = snow_block(9, -1)
+snow_block5 = snow_block(10, -2)
+snow_block6 = snow_block(9, -3)
+
+# 手动录入的所有水方块
+water_block1 = shallow_water_block(-1, 3)
+water_block2 = shallow_water_block(0, 4)
+water_block3 = shallow_water_block(6, 0)
+water_block4 = shallow_water_block(8, -2)
+water_block5 = shallow_water_block(-1, -3)
+water_block6 = shallow_water_block(0, -4)
+water_block7 = shallow_water_block(5, -1)
+
+# 手动录入的所有城镇方块
+town_block1 = snow_castle_block(BlockTypeEnum.crystal_empire, 10, 0)
+town_block2 = our_town_block(BlockTypeEnum.our_town, 8, -4)
+town_block3 = town_block_no_fence(BlockTypeEnum.cloudsdale, 6, 2)
+town_block4 = town_block_high_fence(BlockTypeEnum.canterlot, 6, -2)
+town_block5 = town_block_with_fence(BlockTypeEnum.castle_of_friendship, 4, 0)
+town_block6 = town_block_no_fence(BlockTypeEnum.manehattan, 4, -6)
+town_block7 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, 2, 2)
+town_block8 = town_block_no_fence(BlockTypeEnum.rainbow_dash_house, 2, -2)
+town_block9 = town_block_no_fence(BlockTypeEnum.town_hall, 0, 0)
+town_block10 = town_block_with_fence(BlockTypeEnum.baltimare, 0, -6)
+town_block11 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, -2, 2)
+town_block12 = town_block_no_fence(BlockTypeEnum.carousel_boutique, -4, 0)
+town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, -2, -2)
+town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -8, 0)
+town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -6, -2)
+town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -5, -3)
+
 
 # 将所有地图块放入列表
 grass_block_list = [

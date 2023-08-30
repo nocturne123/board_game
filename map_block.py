@@ -2,6 +2,8 @@ from ENUMS import BlockTypeEnum
 from hexutil import Hex
 import arcade
 
+TILE_SCALING = 1
+
 
 def hex_to_pixel(hex: Hex) -> tuple:
     """Converts a hex coordinate to a pixel coordinate
@@ -9,7 +11,7 @@ def hex_to_pixel(hex: Hex) -> tuple:
     """
     hex_x = hex[0]
     hex_y = hex[1]
-    return (hex_y * 24, hex_x * 13)
+    return (hex_y * -24, hex_x * 13)
 
 
 class map_block(arcade.Sprite):
