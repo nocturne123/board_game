@@ -1,6 +1,16 @@
 import enum
 
-"""该文件主要保存一些enum类"""
+"""该文件主要保存一些enum类
+现阶段的ENUM类有：
+    CharaterAliveEnum: 用于表示角色的存活状态
+    CardTypeEnum: 用于表示卡牌的类型
+    SpeciesEnum: 用于表示角色的种族
+    SpecialNumberEnum: 用于表示一些特殊的数字，如无限大和强制0
+    GameModeEnum: 用于表示游戏的模式，如FFA，2v2，3v3等
+    BlockTypeEnum: 用于表示地图块的类型
+    PlayerStateEnum: 用于表示玩家的状态类型
+
+"""
 
 
 class CharaterAliveEnum(enum.Enum):
@@ -94,3 +104,14 @@ class BlockTypeEnum(enum.Enum):
     old_castle = 20
     # 谐律之树
     tree_of_harmony = 21
+
+
+class PlayerStateEnum(enum.Enum):
+    """玩家的阶段状态，包括准备阶段，抽牌阶段，出牌阶段，弃牌阶段，结束阶段，等待阶段"""
+
+    wait = 0
+    ready = 1
+    draw = 2
+    play = 3
+    discard = 4
+    end = 5
