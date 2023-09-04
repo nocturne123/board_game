@@ -3,6 +3,12 @@ from ENUMS import BlockTypeEnum
 from pyglet.math import Vec2
 import toml
 
+"""
+这个文件是最主要的地图测试文件，现阶段所有的地图都在这里测试
+已实现：基础地图的绘制
+待实现：相机-包括相机的移动和缩放
+"""
+
 from map_block import (
     grass_block,
     mountain_block,

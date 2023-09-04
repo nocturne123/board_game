@@ -7,6 +7,8 @@ from ENUMS import SpeciesEnum
 # 这个测试例模拟了大麦和一个木头人对战的情形，game类初始化后为玩家发手牌
 # 然后大麦将手里的4张牌全部打出，打在木头人身上
 
+# 2023.9.4注释：此测试写时没有使用状态机系统
+
 # 大麦
 big_mac = Charater(15, 0, 3, 0, 1, "Big Mac", SpeciesEnum.earth_pony)
 mac_player = Player(big_mac)

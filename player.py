@@ -71,6 +71,8 @@ class Player:
         存活状态是玩家的最顶级状态，由游戏类进行相关的指定、判断、改变。
         TODO:现有的实现为玩家判定，后续需要改写为game类判定。
         这样会更加符合ecs架构
+
+        2023.9.4更新：改为state_machine实现
         """
         if self.health > 0:
             return CharaterAliveEnum.alive

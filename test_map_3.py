@@ -2,6 +2,14 @@ import arcade
 from ENUMS import BlockTypeEnum
 from pyglet.math import Vec2
 
+"""
+这个文件为不用的地图测试，不用于游戏中。
+arcade模块在3.0.0dev版本中会出现问题，回退到2.6.17版本即可。
+问题描述：1、相机的默认参数发生变化，不再接受width和height参数。
+         2、抛开相机，以前的代码在渲染时，地图图块会出现错位，并变为紫色。
+
+等3.0.0正式版发布后，再进行测试。
+"""
 from map_block import (
     grass_block,
     mountain_block,

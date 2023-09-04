@@ -110,7 +110,8 @@ class PlayerStateEnum(enum.Enum):
     """玩家的阶段状态，包括准备阶段，抽牌阶段，出牌阶段，弃牌阶段，结束阶段，等待阶段"""
 
     wait = 0
-    ready = 1
+
+    prepare = 1
     draw = 2
     play = 3
     discard = 4

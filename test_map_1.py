@@ -5,6 +5,9 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
 TILE_SCALING = 3
+"""
+这个文件什么用都没有，是最开始用于熟悉代码的文件
+"""
 
 
 class MyGame(arcade.Window):
