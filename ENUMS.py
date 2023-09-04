@@ -22,15 +22,17 @@ class CharaterAliveEnum(enum.Enum):
 
 
 class CardTypeEnum(enum.Enum):
-    # 基础牌堆
+    # 基础抽牌牌堆
     magic_attack = 1
     physical_attack = 2
     mental_attack = 3
     steal = 4
+
     armor = 5
     weapon = 6
-    status = 7
+    effect = 7
     healing = 8
+
     event_trigger = 9
     element = 10
     anti_element = 11
@@ -116,3 +118,18 @@ class PlayerStateEnum(enum.Enum):
     play = 3
     discard = 4
     end = 5
+
+
+class CardStateEnum(enum.Enum):
+    """卡牌的状态，包括在牌堆里，抽牌时，手牌里，打出时，产生效果，弃牌堆里"""
+
+    in_draw_pile = 0
+    on_draw = 1  # 被抽取时刻
+    in_hand = 2  # 在手牌里
+
+    on_use = 3  # 被打出时刻
+    taking_effect = 4  # 产生效果时刻
+    on_equipment = 5  # 被装备时刻
+    get_stolen = 6  # 被偷窃时刻
+    on_discard = 7  # 被弃置时刻
+    in_discard_pile = 8  # 在弃牌堆里

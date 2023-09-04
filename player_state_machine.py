@@ -5,6 +5,59 @@ from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum
 
 from transitions import Machine
 
+transitions = [
+    {
+        "trigger": "start_round",
+        "source": PlayerStateEnum.wait,
+        "dest": PlayerStateEnum.prepare,
+    },
+    {
+        "trigger": "end_prepare",
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.draw,
+    },
+    {
+        "trigger": "end_draw",
+        "source": PlayerStateEnum.draw,
+        "dest": PlayerStateEnum.play,
+    },
+    {
+        "trigger": "end_play",
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.discard,
+    },
+    {
+        "trigger": "end_discard",
+        "source": PlayerStateEnum.discard,
+        "dest": PlayerStateEnum.end,
+    },
+    {
+        "trigger": "end_round",  # 用于结束回合
+        "source": PlayerStateEnum.end,
+        "dest": PlayerStateEnum.wait,
+    },
+    {
+        "trigger": "skip_turn",  # 用于跳过回合
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.end,
+    },
+    {
+        "trigger": "skip_draw",  # 用于跳过抽牌阶段
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.play,
+    },
+    {
+        "trigger": "skip_play",  # 用于跳过出牌阶段
+        "source": PlayerStateEnum.draw,
+        "dest": PlayerStateEnum.discard,
+    },
+    {
+        "trigger": "skip_discard",  # 用于跳过弃牌阶段
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.end,
+    },
+]
+
 
 class Player:
     def __init__(self, cha: Charater, game: Game):
@@ -66,30 +119,12 @@ class Player:
         # 玩家生存状态，先为空，同上
         self.living_state = None
 
-    def stage_state_init(self):
+    def stage_state_init(self, transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
         # 基础状态机，初始化为等待状态
-        self.stage_state = Machine(states=PlayerStateEnum, initial=PlayerStateEnum.wait)
-        transitions = [
-            {
-                "trigger": "end_prepare",
-                "source": PlayerStateEnum.prepare,
-                "dest": PlayerStateEnum.draw,
-            },
-            {
-                "trigger": "end_draw",
-                "source": PlayerStateEnum.draw,
-                "dest": PlayerStateEnum.play,
-            },
-            {
-                "trigger": "end_play",
-                "source": PlayerStateEnum.play,
-                "dest": PlayerStateEnum.discard,
-            },
-            {
-                "trigger": "end_discard",
-                "source": PlayerStateEnum.discard,
-                "dest": PlayerStateEnum.end,
-            },
-        ]
+        self.stage_state = Machine(
+            states=PlayerStateEnum,
+            transitions=transitions,
+            initial=PlayerStateEnum.wait,
+        )

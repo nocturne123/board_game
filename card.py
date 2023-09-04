@@ -8,6 +8,7 @@ from player import Player
 # get为被调用、on为打出、弃掉那一刻发生的事情、可被技能响应
 # 例如被抽起来、被打出、被弃掉
 #
+# 2023.9.4设计更新，全面采用状态机
 
 
 class Card(metaclass=abc.ABCMeta):
@@ -40,6 +41,7 @@ class Card(metaclass=abc.ABCMeta):
     # 卡牌被弃置，对应get_used()
     def get_discard(self, card_user):
         self.on_discard(card_user)
+
     # 卡牌在被弃置时发生的事情
 
     def on_discard(self, card_user):
@@ -63,10 +65,9 @@ class PhysicalAttackCard(Card):
             self.take_effect(card_user, target)
             card_user.attack_chance -= 1
         else:
-            print(f'{card_user.name}，你本回合内没有攻击次数了')
+            print(f"{card_user.name}，你本回合内没有攻击次数了")
 
     def take_effect(self, card_user: Player, target):
-
         damage = card_user.attack[1]
 
         target.get_damage((damage, card_user))
@@ -89,7 +90,7 @@ class MagicAttackCard(Card):
             self.take_effect(card_user, target)
             card_user.attack_chance -= 1
         else:
-            print(f'{card_user.name}，你本回合内没有攻击次数了')
+            print(f"{card_user.name}，你本回合内没有攻击次数了")
 
     def take_effect(self, card_user, target):
         damage = card_user.attack[0]
@@ -113,7 +114,7 @@ class MentalAttackCard(Card):
             self.take_effect(card_user, target)
             card_user.attack_chance -= 1
         else:
-            print(f'{card_user.name}，你本回合内没有攻击次数了')
+            print(f"{card_user.name}，你本回合内没有攻击次数了")
 
     def take_effect(self, card_user, target):
         damage = card_user.attack[2]
