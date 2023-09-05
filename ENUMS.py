@@ -126,7 +126,6 @@ class CardStateEnum(enum.Enum):
     in_draw_pile = 0
     on_draw = 1  # 被抽取时刻
     in_hand = 2  # 在手牌里
-
     on_use = 3  # 被打出时刻
     taking_effect = 4  # 产生效果时刻
     on_equipment = 5  # 被装备时刻
