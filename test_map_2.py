@@ -135,6 +135,8 @@ class MyGame(arcade.Window):
         self.block_list.extend(town_block_list)
 
         self.block_list.sort(key=lambda x: x.center_y, reverse=True)
+        self.view_left = 0
+        self.view_bottom = 0
 
     def on_draw(self):
         """Draw everything"""
@@ -167,7 +169,7 @@ class MyGame(arcade.Window):
             self.right_pressed = False
 
     # TODO，需要更改移动到相机中心
-    def scroll_to_player(self):
+    def camera_scroll(self):
         """
         Scroll the window to the player.
 
@@ -182,14 +184,23 @@ class MyGame(arcade.Window):
         )
         self.camera_sprites.move_to(position, 1.0)
 
+    def on_update(self, delta_time: float):
+        if self.up_pressed and not self.down_pressed:
+            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+        elif self.down_pressed and not self.up_pressed:
+            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+        if self.left_pressed and not self.right_pressed:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        elif self.right_pressed and not self.left_pressed:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEE
+
     def on_resize(self, width, height):
         """
         Resize window
         Handle the user grabbing the edge and resizing the window.
         """
-        # self.camera_sprites.resize(int(width), int(height))
-        # self.camera_gui.resize(int(width), int(height))
-        pass
+        self.camera_map.resize(int(width), int(height))
+        self.camera_map.resize(int(width), int(height))
 
 
 window = MyGame()
