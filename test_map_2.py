@@ -186,13 +186,16 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         if self.up_pressed and not self.down_pressed:
-            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+            self.view_bottom += 1
         elif self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+            self.view_bottom -= 1
         if self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+            self.view_left += 1
         elif self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEE
+            self.view_left -= 1
+
+        position = self.view_left, self.view_bottom
+        self.camera_map.move_to(position, 1)
 
     def on_resize(self, width, height):
         """
