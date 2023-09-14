@@ -37,6 +37,24 @@ transtions = [
         "source": CardStateEnum.on_choose_target,
         "dest": CardStateEnum.on_equipment,
     },
+    {
+        "trigger": "get_discarded",
+        "source": CardStateEnum.in_hand,
+        "dest": CardStateEnum.on_discard,
+    },
+    {
+        "trigger": "get_stolen",
+        "source": CardStateEnum.in_hand,
+        "dest": CardStateEnum.in_hand,
+    },
+    {
+        "trigger": "get_unmounted",
+        "source": CardStateEnum.on_equipment,
+        "dest": CardStateEnum.on_discard,
+    },
+    {
+        "trigger": "get_unequipped",
+    },
 ]
 
 
