@@ -9,6 +9,7 @@ import enum
     GameModeEnum: 用于表示游戏的模式，如FFA，2v2，3v3等
     BlockTypeEnum: 用于表示地图块的类型
     PlayerStateEnum: 用于表示玩家的状态类型
+    CardStateMachine: 用于表示卡牌的状态机
 
 """
 
@@ -74,38 +75,37 @@ class BlockTypeEnum(enum.Enum):
 
     # 特殊地点
 
-    # 水晶帝国
-    crystal_empire = 6
-    # 云中城
-    cloudsdale = 7
-    # 平等镇
-    our_town = 8
-    # 中心城
-    canterlot = 9
-    # 暮光城堡
-    castle_of_friendship = 10
-    # 马哈顿
-    manehattan = 11
-    # 甜苹果园
-    sweet_apple_acres = 12
-    # 云宝家
-    rainbow_dash_house = 13
-    # 市镇厅
-    town_hall = 14
-    # 巴尔的马
-    baltimare = 15
-    # 方糖屋
-    sugar_cube_corner = 16
-    # 柔柔家
-    fluttershy_house = 17
-    # 珍奇时装店
-    carousel_boutique = 18
-    # 泽科拉小屋
-    zecora_house = 19
-    # 旧城堡
-    old_castle = 20
-    # 谐律之树
-    tree_of_harmony = 21
+    crystal_empire = 6  # 水晶帝国
+
+    cloudsdale = 7  # 云中城
+
+    our_town = 8  # 平等镇
+
+    canterlot = 9  # 中心城
+
+    castle_of_friendship = 10  # 暮光城堡
+
+    manehattan = 11  # 马哈顿
+
+    sweet_apple_acres = 12  # 甜苹果园
+
+    rainbow_dash_house = 13  # 云宝家
+
+    town_hall = 14  # 市镇厅
+
+    baltimare = 15  # 巴尔的马
+
+    sugar_cube_corner = 16  # 方糖屋
+
+    fluttershy_house = 17  # 柔柔家
+
+    carousel_boutique = 18  # 珍奇时装店
+
+    zecora_house = 19  # 泽科拉小屋
+
+    old_castle = 20  # 旧城堡
+
+    tree_of_harmony = 21  # 谐律之树
 
 
 class PlayerStateEnum(enum.Enum):
@@ -127,8 +127,9 @@ class CardStateEnum(enum.Enum):
     on_draw = 1  # 被抽取时刻
     in_hand = 2  # 在手牌里
     on_use = 3  # 被打出时刻
-    taking_effect = 4  # 产生效果时刻
-    on_equipment = 5  # 被装备时刻
-    get_stolen = 6  # 被偷窃时刻
-    on_discard = 7  # 被弃置时刻
-    in_discard_pile = 8  # 在弃牌堆里
+    on_choose_target = 4  # 选择目标时刻
+    taking_effect = 5  # 产生效果时刻
+    on_equipment = 6  # 被装备时刻
+    get_stolen = 7  # 被偷窃时刻
+    on_discard = 8  # 被弃置时刻
+    in_discard_pile = 9  # 在弃牌堆里
