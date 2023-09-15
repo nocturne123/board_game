@@ -53,7 +53,9 @@ transtions = [
         "dest": CardStateEnum.on_discard,
     },
     {
-        "trigger": "get_unequipped",
+        "trigger": "get_into_discard_pile",
+        "source": CardStateEnum.on_discard,
+        "dest": CardStateEnum.in_discard_pile,
     },
 ]
 
