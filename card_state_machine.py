@@ -1,6 +1,7 @@
 from ENUMS import CardTypeEnum, CardStateEnum
 import abc
-from player import Player
+
+# from player import Player
 
 from transitions import Machine
 
@@ -63,9 +64,29 @@ transtions = [
 class Card(metaclass=abc.ABCMeta):
     """卡牌的基类，所有摸牌堆里的卡牌继承于此类"""
 
-    def __init__(self, draw_pile, discard_pile, card_type: CardTypeEnum):
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
         self.distance_limited = True
         self.draw_pile = draw_pile
         self.discard_pile = discard_pile
-        self.state_machine = None
+        self.machine = Machine(
+            model=self,
+            states=states,
+            transitions=transitions,
+            initial=CardStateEnum.in_draw_pile,
+        )
         self.card_type = card_type
+
+
+if __name__ == "__main__":
+    card1 = Card(None, None, CardTypeEnum.magic_attack)
+
+    print(card1.state)
+    card1.get_draw()
+    print(card1.state)
