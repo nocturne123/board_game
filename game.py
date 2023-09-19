@@ -1,12 +1,14 @@
 from random import shuffle
-from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 import abc
-from player import Player
+
+# from player import Player
 from collections import deque
 from ENUMS import GameModeEnum, CharaterAliveEnum
 from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
+
+from card_pile import DrawPile, DiscardPile
 
 
 # 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
@@ -63,33 +65,6 @@ class DiscardStage(BaseStage):
     def start_stage(self, player: Player):
         while len(player.hand_sequance) <= player.max_hand_sequence:
             print(f"你的手牌数大于{player.max_hand_sequence}，请弃牌")
-
-
-# 牌堆类
-class CardPile(list):
-    def __init__(self):
-        super().__init__()
-
-
-class DrawPile(CardPile):
-    def __init__(self):
-        super().__init__()
-
-    def test_draw_pile(self):
-        self.extend(
-            [
-                PhysicalAttackCard(),
-                MagicAttackCard(),
-                MentalAttackCard(),
-            ]
-            * 5
-        )
-        shuffle(self)
-
-
-class DiscardPile(CardPile):
-    def __init__(self):
-        super().__init__()
 
 
 # 游戏类

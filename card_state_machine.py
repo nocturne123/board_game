@@ -1,7 +1,8 @@
 from ENUMS import CardTypeEnum, CardStateEnum
 import abc
 
-# from player import Player
+from player_state_machine import Player
+from card_pile import DrawPile, DiscardPile
 
 from transitions import Machine
 
@@ -32,6 +33,7 @@ transtions = [
         "trigger": "take_effect",
         "source": CardStateEnum.on_choose_target,
         "dest": CardStateEnum.on_taking_effect,
+        "after": "take_effect",
     },
     {
         "trigger": "end_effect",
@@ -102,6 +104,10 @@ class PhysicalCard(Card):
     ):
         super().__init__(draw_pile, discard_pile, card_type, states, transitions)
         self.distance_limited = True
+
+    def take_effect(self, user: Player, target: Player):
+        """对目标造成物理伤害"""
+        target.health -= user.physical_attack
 
 
 if __name__ == "__main__":

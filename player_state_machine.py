@@ -1,4 +1,3 @@
-from game import Game
 from charaters import Charater
 
 from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum
@@ -60,7 +59,7 @@ transitions = [
 
 
 class Player:
-    def __init__(self, cha: Charater, game: Game):
+    def __init__(self, cha: Charater, game):
         """以下属性直接来自于player.py文件"""
         self.health = cha.health
         self.speed = cha.speed

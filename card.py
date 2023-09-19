@@ -1,6 +1,6 @@
 from ENUMS import CardTypeEnum
 import abc
-from player import Player
+
 
 # 牌类简易实现，现阶段只实现了牌的类型分类
 # 卡牌在抽取、弃置、打出时都会产生效果
