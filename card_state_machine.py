@@ -31,7 +31,12 @@ transtions = [
     {
         "trigger": "take_effect",
         "source": CardStateEnum.on_choose_target,
-        "dest": CardStateEnum.taking_effect,
+        "dest": CardStateEnum.on_taking_effect,
+    },
+    {
+        "trigger": "end_effect",
+        "source": CardStateEnum.on_taking_effect,
+        "dest": CardStateEnum.on_discard,
     },
     {
         "trigger": "get_equipped",
@@ -82,6 +87,21 @@ class Card(metaclass=abc.ABCMeta):
             initial=CardStateEnum.in_draw_pile,
         )
         self.card_type = card_type
+
+
+class PhysicalCard(Card):
+    """物理攻击牌"""
+
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.physical_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
 
 
 if __name__ == "__main__":
