@@ -9,7 +9,9 @@ import enum
     GameModeEnum: 用于表示游戏的模式，如FFA，2v2，3v3等
     BlockTypeEnum: 用于表示地图块的类型
     PlayerStateEnum: 用于表示玩家的状态类型
-    CardStateMachine: 用于表示卡牌的状态机
+    CardStateEnum: 用于表示卡牌的状态机
+    DamageTypeEnum: 用于表示伤害的类型
+
 
 """
 
@@ -76,35 +78,20 @@ class BlockTypeEnum(enum.Enum):
     # 特殊地点
 
     crystal_empire = 6  # 水晶帝国
-
     cloudsdale = 7  # 云中城
-
     our_town = 8  # 平等镇
-
     canterlot = 9  # 中心城
-
     castle_of_friendship = 10  # 暮光城堡
-
     manehattan = 11  # 马哈顿
-
     sweet_apple_acres = 12  # 甜苹果园
-
     rainbow_dash_house = 13  # 云宝家
-
     town_hall = 14  # 市镇厅
-
     baltimare = 15  # 巴尔的马
-
     sugar_cube_corner = 16  # 方糖屋
-
     fluttershy_house = 17  # 柔柔家
-
     carousel_boutique = 18  # 珍奇时装店
-
     zecora_house = 19  # 泽科拉小屋
-
     old_castle = 20  # 旧城堡
-
     tree_of_harmony = 21  # 谐律之树
 
 
@@ -133,3 +120,13 @@ class CardStateEnum(enum.Enum):
     get_stolen = 7  # 被偷窃时刻
     on_discard = 8  # 被弃置时刻
     in_discard_pile = 9  # 在弃牌堆里
+
+
+class DamageTypeEnum(enum.Enum):
+    """伤害的类型，包括物理，魔法，精神，真实，治疗"""
+
+    physical = 1
+    magic = 2
+    mental = 3
+    real = 4
+    healing = 5

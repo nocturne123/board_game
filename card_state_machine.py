@@ -79,6 +79,7 @@ class Card(metaclass=abc.ABCMeta):
         states=CardStateEnum,
         transitions=transtions,
     ):
+        # 是否有距离限制
         self.distance_limited = True
         self.draw_pile = draw_pile
         self.discard_pile = discard_pile
@@ -89,6 +90,8 @@ class Card(metaclass=abc.ABCMeta):
             initial=CardStateEnum.in_draw_pile,
         )
         self.card_type = card_type
+        # 弃置后是否自动进入弃牌堆
+        self.auto_discard = True
 
 
 class PhysicalCard(Card):
