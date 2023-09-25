@@ -3,6 +3,7 @@ import abc
 
 from player_state_machine import Player
 from card_pile import DrawPile, DiscardPile
+from damage import Damage
 
 from transitions import Machine
 
@@ -28,6 +29,7 @@ transtions = [
         "trigger": "choose_target",
         "source": CardStateEnum.on_use,
         "dest": CardStateEnum.on_choose_target,
+        "after": "get_target",
     },
     {
         "trigger": "take_effect",
@@ -92,6 +94,8 @@ class Card(metaclass=abc.ABCMeta):
         self.card_type = card_type
         # 弃置后是否自动进入弃牌堆
         self.auto_discard = True
+        # 目标
+        self.target = None
 
 
 class PhysicalCard(Card):
@@ -111,6 +115,10 @@ class PhysicalCard(Card):
     def take_effect(self, user: Player, target: Player):
         """对目标造成物理伤害"""
         target.health -= user.physical_attack
+
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
 
 
 if __name__ == "__main__":

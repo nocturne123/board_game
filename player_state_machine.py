@@ -1,6 +1,7 @@
 from charaters import Charater
 
-from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum
+from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum, DamageTypeEnum
+from damage import Damage
 
 from transitions import Machine
 
@@ -94,6 +95,11 @@ class Player:
         self.magic_attack = cha.magic_attack
         self.mental_attack = cha.mental_attack
 
+        # 角色的三种基本防御
+        self.physical_defense = 0
+        self.magic_defense = 0
+        self.mental_defense = 0
+
         # 角色的基础生命值和最大生命值
         self.base_health = cha.health
         self.max_health = cha.health
@@ -127,3 +133,18 @@ class Player:
             transitions=transitions,
             initial=PlayerStateEnum.wait,
         )
+
+    def receive_damage(self, damage: Damage):
+        """玩家受到伤害"""
+        if damage.type == DamageTypeEnum.physical:
+            received_damage = damage.num - self.physical_defense
+        elif damage.type == DamageTypeEnum.magic:
+            received_damage = damage.num - self.magic_defense
+        elif damage.type == DamageTypeEnum.mental:
+            received_damage = damage.num - self.mental_defense
+        self.health -= received_damage
+        return received_damage
+
+    def choose_target(self, target):
+        """玩家选择目标"""
+        return target
