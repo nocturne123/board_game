@@ -30,10 +30,9 @@ class Team(deque):
         ]
 
 
-a = Team(maxlen=3)
-a.extend(["a", "b", "c"])
-print(a)
-a.append("d")
-print(a)
-a.next_player()
-print(a)
+if __name__ == "__main__":
+    a = Team(maxlen=3)
+    a.extend(["a", "b", "c"])
+    print(a)
+    a.append("d")
+    print(a)

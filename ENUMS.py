@@ -106,6 +106,9 @@ class PlayerStateEnum(enum.Enum):
     discard = 4
     end = 5
 
+    on_using_card = 6
+    on_choosing_target = 7
+
 
 class CardStateEnum(enum.Enum):
     """卡牌的状态，包括在牌堆里，抽牌时，手牌里，打出时，产生效果，弃牌堆里"""

@@ -19,33 +19,34 @@ class Charater:
         self.species = species
 
 
-# 测试代码：实例化一个big_mac
-# big_mac = Charater(15, 0, 3, 0, 1)
+if __name__ == "__main__":
+    # 测试代码：实例化一个big_mac
+    # big_mac = Charater(15, 0, 3, 0, 1)
 
-dst_file = "new_toml_file.toml"
+    dst_file = "new_toml_file.toml"
 
-big_mac = Charater(15, 0, 3, 0, 1, "big_mac", SpeciesEnum.earth_pony)
-dic_mac = {
-    "Big Mac": {
-        "health": 15,
-        "magic_attack": 0,
-        "physical_attack": 3,
-        "mental_attack": 0,
-        "speed": 1,
-        "species": "earth pony",
+    big_mac = Charater(15, 0, 3, 0, 1, "big_mac", SpeciesEnum.earth_pony)
+    dic_mac = {
+        "Big Mac": {
+            "health": 15,
+            "magic_attack": 0,
+            "physical_attack": 3,
+            "mental_attack": 0,
+            "speed": 1,
+            "species": "earth pony",
+        }
     }
-}
 
-dummy_dic = {
-    "dummy": {
-        "health": 15,
-        "magic_attack": 0,
-        "physical_attack": 3,
-        "mental_attack": 0,
-        "speed": 1,
-        "species": "earth pony",
+    dummy_dic = {
+        "dummy": {
+            "health": 15,
+            "magic_attack": 0,
+            "physical_attack": 3,
+            "mental_attack": 0,
+            "speed": 1,
+            "species": "earth pony",
+        }
     }
-}
-with open(dst_file, "w") as f:
-    r = toml.dump(dic_mac, f)
-    r1 = toml.dump(dummy_dic, f)
+    with open(dst_file, "w") as f:
+        r = toml.dump(dic_mac, f)
+        r1 = toml.dump(dummy_dic, f)

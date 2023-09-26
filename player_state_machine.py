@@ -22,6 +22,24 @@ transitions = [
         "dest": PlayerStateEnum.play,
     },
     {
+        "trigger": "use_card",
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.on_using_card,
+        "after": "set_on_using_card",
+    },
+    {
+        "trigger": "choose_target",
+        "source": PlayerStateEnum.on_using_card,
+        "dest": PlayerStateEnum.on_choosing_target,
+        "after": "pass_target",
+    },
+    {
+        "trigger": "end_choose_target",
+        "source": PlayerStateEnum.on_choosing_target,
+        "dest": PlayerStateEnum.play,
+        "after": "end_using_card",
+    },
+    {
         "trigger": "end_play",
         "source": PlayerStateEnum.play,
         "dest": PlayerStateEnum.discard,
@@ -60,14 +78,13 @@ transitions = [
 
 
 class Player:
-    def __init__(self, cha: Charater, game):
+    def __init__(self, cha: Charater):
         """以下属性直接来自于player.py文件"""
         self.health = cha.health
         self.speed = cha.speed
         self.skills = []
         self.name = cha.name
         self.species = cha.species
-        self.game = game
 
         # 玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
         self.armor = []
@@ -124,6 +141,9 @@ class Player:
         # 玩家生存状态，先为空，同上
         self.living_state = None
 
+        # 玩家正在使用的卡牌
+        self.on_using_card = None
+
     def stage_state_init(self, transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
@@ -145,6 +165,19 @@ class Player:
         self.health -= received_damage
         return received_damage
 
-    def choose_target(self, target):
-        """玩家选择目标"""
-        return target
+    def set_on_using_card(self, card):
+        """设置玩家正在使用的卡牌"""
+        self.on_using_card = card
+
+    def pass_target(self, target):
+        """将选择的目标传递给卡牌"""
+        self.on_using_card.get_target(target)
+
+    def end_using_card(self):
+        """结束使用卡牌"""
+        self.on_using_card = None
+
+    def draw_from_pile(self, num, pile):
+        """从牌堆抽牌"""
+        for i in range(num):
+            self.hand_sequence.append(pile.pop())

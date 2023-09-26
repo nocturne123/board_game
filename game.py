@@ -1,4 +1,3 @@
-from random import shuffle
 import abc
 
 # from player import Player
@@ -7,8 +6,6 @@ from ENUMS import GameModeEnum, CharaterAliveEnum
 from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
-
-from card_pile import DrawPile, DiscardPile
 
 
 # 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
@@ -38,7 +35,7 @@ class DrawStage(BaseStage):
 
     # 现阶段的轮次由turn类主持
     # turn类被取消了
-    def start_stage(self, drawpile, player: Player):
+    def start_stage(self, drawpile, player):
         player.draw_card(drawpile, num=player.draw_stage_card_number)
 
     def end_stage(self, player):
@@ -49,11 +46,11 @@ class UseStage(BaseStage):
     def __init__(self, player):
         super().__init__(player)
 
-    def start_stage(self, player: Player):
+    def start_stage(self, player):
         player.able_to_use_card = True
         player.able_to_equip = True
 
-    def end_stage(self, player: Player):
+    def end_stage(self, player):
         player.able_to_use_card = False
         player.able_to_equip = False
 
@@ -62,7 +59,7 @@ class DiscardStage(BaseStage):
     def __init__(self, player):
         super().__init__(player)
 
-    def start_stage(self, player: Player):
+    def start_stage(self, player):
         while len(player.hand_sequance) <= player.max_hand_sequence:
             print(f"你的手牌数大于{player.max_hand_sequence}，请弃牌")
 

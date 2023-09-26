@@ -1,4 +1,4 @@
-from ENUMS import CardTypeEnum, CardStateEnum
+from ENUMS import CardTypeEnum, CardStateEnum, DamageTypeEnum
 import abc
 
 from player_state_machine import Player
@@ -35,7 +35,7 @@ transtions = [
         "trigger": "take_effect",
         "source": CardStateEnum.on_choose_target,
         "dest": CardStateEnum.on_taking_effect,
-        "after": "take_effect",
+        "after": "on_taking_effect",
     },
     {
         "trigger": "end_effect",
@@ -98,7 +98,7 @@ class Card(metaclass=abc.ABCMeta):
         self.target = None
 
 
-class PhysicalCard(Card):
+class PhysicalAttackCard(Card):
     """物理攻击牌"""
 
     def __init__(
@@ -112,9 +112,57 @@ class PhysicalCard(Card):
         super().__init__(draw_pile, discard_pile, card_type, states, transitions)
         self.distance_limited = True
 
-    def take_effect(self, user: Player, target: Player):
+    def on_taking_effect(self, user: Player):
         """对目标造成物理伤害"""
-        target.health -= user.physical_attack
+        self.target.receive_damage(
+            Damage(user.physical_attack, DamageTypeEnum.physical)
+        )
+
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
+
+
+class MagicAttackCard(Card):
+    """魔法攻击牌"""
+
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.magic_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
+
+    def on_taking_effect(self, user: Player):
+        """对目标造成魔法伤害"""
+        self.target.receive_damage(Damage(user.magic_attack, DamageTypeEnum.magic))
+
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
+
+
+class MentalAttackCard(Card):
+    """心理攻击牌"""
+
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.mental_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
+
+    def on_taking_effect(self, user: Player):
+        """对目标造成魔法伤害"""
+        self.target.receive_damage(Damage(user.mental_attack, DamageTypeEnum.mental))
 
     def get_target(self, target):
         """选择目标"""
