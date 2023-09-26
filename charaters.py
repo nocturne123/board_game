@@ -10,5 +10,5 @@ class Charater:
     mental_attack: int
     speed: int
     name: str
-    collect_items: tuple = tuple()
+    collect_items: tuple
     species: SpeciesEnum

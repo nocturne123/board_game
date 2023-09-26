@@ -22,24 +22,6 @@ transitions = [
         "dest": PlayerStateEnum.play,
     },
     {
-        "trigger": "use_card",
-        "source": PlayerStateEnum.play,
-        "dest": PlayerStateEnum.on_using_card,
-        "after": "set_on_using_card",
-    },
-    {
-        "trigger": "choose_target",
-        "source": PlayerStateEnum.on_using_card,
-        "dest": PlayerStateEnum.on_choosing_target,
-        "after": "pass_target",
-    },
-    {
-        "trigger": "end_choose_target",
-        "source": PlayerStateEnum.on_choosing_target,
-        "dest": PlayerStateEnum.play,
-        "after": "end_using_card",
-    },
-    {
         "trigger": "end_play",
         "source": PlayerStateEnum.play,
         "dest": PlayerStateEnum.discard,
@@ -141,9 +123,6 @@ class Player:
         # 玩家生存状态，先为空，同上
         self.living_state = None
 
-        # 玩家正在使用的卡牌
-        self.on_using_card = None
-
     def stage_state_init(self, transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
@@ -164,10 +143,6 @@ class Player:
             received_damage = damage.num - self.mental_defense
         self.health -= received_damage
         return received_damage
-
-    def set_on_using_card(self, card):
-        """设置玩家正在使用的卡牌"""
-        self.on_using_card = card
 
     def pass_target(self, target):
         """将选择的目标传递给卡牌"""

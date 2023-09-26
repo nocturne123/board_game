@@ -1,7 +1,7 @@
 from ENUMS import CardTypeEnum, CardStateEnum, DamageTypeEnum
 import abc
 
-from player_state_machine import Player
+from player import Player
 from damage import Damage
 
 from transitions import Machine
@@ -74,16 +74,12 @@ class Card(metaclass=abc.ABCMeta):
 
     def __init__(
         self,
-        draw_pile,
-        discard_pile,
         card_type: CardTypeEnum,
         states=CardStateEnum,
         transitions=transtions,
     ):
         # 是否有距离限制
         self.distance_limited = True
-        self.draw_pile = draw_pile
-        self.discard_pile = discard_pile
         self.machine = Machine(
             model=self,
             states=states,
@@ -102,13 +98,11 @@ class PhysicalAttackCard(Card):
 
     def __init__(
         self,
-        draw_pile,
-        discard_pile,
         card_type: CardTypeEnum = CardTypeEnum.physical_attack,
         states=CardStateEnum,
         transitions=transtions,
     ):
-        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
     def on_taking_effect(self, user: Player):
@@ -127,13 +121,11 @@ class MagicAttackCard(Card):
 
     def __init__(
         self,
-        draw_pile,
-        discard_pile,
         card_type: CardTypeEnum = CardTypeEnum.magic_attack,
         states=CardStateEnum,
         transitions=transtions,
     ):
-        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
     def on_taking_effect(self, user: Player):
@@ -150,13 +142,11 @@ class MentalAttackCard(Card):
 
     def __init__(
         self,
-        draw_pile,
-        discard_pile,
         card_type: CardTypeEnum = CardTypeEnum.mental_attack,
         states=CardStateEnum,
         transitions=transtions,
     ):
-        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
     def on_taking_effect(self, user: Player):

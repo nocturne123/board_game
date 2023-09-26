@@ -1,6 +1,6 @@
 """牌堆的实现，继承自list，包含洗牌功能，对牌堆的操作在玩家类中实现"""
 from random import shuffle
-from card_state_machine import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
+from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 
 
 # TODO:实现抽牌，弃牌，洗牌等功能
