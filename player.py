@@ -1,16 +1,90 @@
 from charaters import Charater
-from ENUMS import CharaterAliveEnum, SpeciesEnum
-from game import Game
+
+from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum, DamageTypeEnum
+from damage import Damage
+
+from transitions import Machine
+
+transitions = [
+    {
+        "trigger": "start_round",
+        "source": PlayerStateEnum.wait,
+        "dest": PlayerStateEnum.prepare,
+    },
+    {
+        "trigger": "end_prepare",
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.draw,
+    },
+    {
+        "trigger": "end_draw",
+        "source": PlayerStateEnum.draw,
+        "dest": PlayerStateEnum.play,
+    },
+    {
+        "trigger": "use_card",
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.on_using_card,
+        "after": "set_on_using_card",
+    },
+    {
+        "trigger": "choose_target",
+        "source": PlayerStateEnum.on_using_card,
+        "dest": PlayerStateEnum.on_choosing_target,
+        "after": "pass_target",
+    },
+    {
+        "trigger": "end_choose_target",
+        "source": PlayerStateEnum.on_choosing_target,
+        "dest": PlayerStateEnum.play,
+        "after": "end_using_card",
+    },
+    {
+        "trigger": "end_play",
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.discard,
+    },
+    {
+        "trigger": "end_discard",
+        "source": PlayerStateEnum.discard,
+        "dest": PlayerStateEnum.end,
+    },
+    {
+        "trigger": "end_round",  # 用于结束回合
+        "source": PlayerStateEnum.end,
+        "dest": PlayerStateEnum.wait,
+    },
+    {
+        "trigger": "skip_turn",  # 用于跳过回合
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.end,
+    },
+    {
+        "trigger": "skip_draw",  # 用于跳过抽牌阶段
+        "source": PlayerStateEnum.prepare,
+        "dest": PlayerStateEnum.play,
+    },
+    {
+        "trigger": "skip_play",  # 用于跳过出牌阶段
+        "source": PlayerStateEnum.draw,
+        "dest": PlayerStateEnum.discard,
+    },
+    {
+        "trigger": "skip_discard",  # 用于跳过弃牌阶段
+        "source": PlayerStateEnum.play,
+        "dest": PlayerStateEnum.end,
+    },
+]
 
 
 class Player:
-    def __init__(self, cha: Charater, game: Game):
+    def __init__(self, cha: Charater):
+        """玩家类实现"""
         self.health = cha.health
         self.speed = cha.speed
         self.skills = []
         self.name = cha.name
         self.species = cha.species
-        self.game = game
 
         # 玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
         self.armor = []
@@ -38,6 +112,11 @@ class Player:
         self.magic_attack = cha.magic_attack
         self.mental_attack = cha.mental_attack
 
+        # 角色的三种基本防御
+        self.physical_defense = 0
+        self.magic_defense = 0
+        self.mental_defense = 0
+
         # 角色的基础生命值和最大生命值
         self.base_health = cha.health
         self.max_health = cha.health
@@ -48,13 +127,6 @@ class Player:
         # 角色初始手牌数量
         self.start_game_draw = 4
 
-        # 以下4个属性为能否使用卡牌和能否装备卡牌，用来解决角色是否有出牌阶段和
-        # 能否出牌的问题，玩家类里面对能否出牌进行判断，game类对是否有出牌阶段进行判断
-        self.able_to_use_card = False
-        self.able_to_equip = False
-        self.have_draw_card_stage = True
-        self.have_use_card_stage = True
-
         # 角色最大手牌数量
         self.max_hand_sequence = 6
 
@@ -62,72 +134,50 @@ class Player:
         self.move_chance = 1
         self.attack_chance = 1
 
-        # 玩家是否为当前活动玩家
-        self.on_turn = False
+        """以下属性为状态机相关属性"""
+        # 玩家阶段状态，先为空，在后面利用函数补充
+        self.stage_state = None
 
-    @property
-    def living_status(self):
-        """
-        存活状态是玩家的最顶级状态，由游戏类进行相关的指定、判断、改变。
-        TODO:现有的实现为玩家判定，后续需要改写为game类判定。
-        这样会更加符合ecs架构
+        # 玩家生存状态，先为空，同上
+        self.living_state = None
 
-        2023.9.4更新：改为state_machine实现
-        """
-        if self.health > 0:
-            return CharaterAliveEnum.alive
-        else:
-            return CharaterAliveEnum.dead
+        # 玩家正在使用的卡牌
+        self.on_using_card = None
 
-    # 角色攻击力
-    @property
-    def attack(self):
-        if self.weapon:
-            magic_attack = self.attack + self.weapon.magic_attack
-            physical_attack = self.weapon.physical_attack
-            mental_attack = self.weapon.mental_attack
-            return [magic_attack, physical_attack, mental_attack]
-        else:
-            return [self.magic_attack, self.physical_attack, self.mental_attack]
+    def stage_state_init(self, transitions):
+        """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
+        准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
+        # 基础状态机，初始化为等待状态
+        self.stage_state = Machine(
+            states=PlayerStateEnum,
+            transitions=transitions,
+            initial=PlayerStateEnum.wait,
+        )
 
-    # 打出卡牌，卡牌对目标生效，需要经过game类吗？
-    # 如果需要经过game类，会不会太复杂了？game类职责是主持回合，需不需要经手卡牌的检测？应该是需要的
-    # 这里是不经过game类的实现
-    # TODO 使用卡牌的逻辑需要详细设计
-    def use_card(self, card, target):
-        if self.able_to_use_card:
-            if target.is_selectable:
-                self.hand_sequence.remove(card)
-                card.get_used(self, target)
+    def receive_damage(self, damage: Damage):
+        """玩家受到伤害"""
+        if damage.type == DamageTypeEnum.physical:
+            received_damage = damage.num - self.physical_defense
+        elif damage.type == DamageTypeEnum.magic:
+            received_damage = damage.num - self.magic_defense
+        elif damage.type == DamageTypeEnum.mental:
+            received_damage = damage.num - self.mental_defense
+        self.health -= received_damage
+        return received_damage
 
-            else:
-                print(f"{target}无法被选中")
-        else:
-            print(f"{self.name}现在还不能出牌")
+    def set_on_using_card(self, card):
+        """设置玩家正在使用的卡牌"""
+        self.on_using_card = card
 
-    def get_damage(self, damage_pack):
-        self.health -= damage_pack[0]
+    def pass_target(self, target):
+        """将选择的目标传递给卡牌"""
+        self.on_using_card.get_target(target)
 
-    # 角色抽牌
-    def draw_card(self, pile, num=1):
-        if num <= 0:
-            pass
-        elif num == 1:
+    def end_using_card(self):
+        """结束使用卡牌"""
+        self.on_using_card = None
+
+    def draw_from_pile(self, num, pile):
+        """从牌堆抽牌"""
+        for i in range(num):
             self.hand_sequence.append(pile.pop())
-        elif num > 1:
-            for i in range(num):
-                self.hand_sequence.append(pile.pop())
-
-    # 角色弃牌
-    def discard(self, discard_pile, card):
-        if card in self.hand_sequence:
-            self.hand_sequence.remove(card)
-            discard_pile.append(card)
-            return card
-
-    # 游戏开始时的默认抽牌
-    def first_round_draw(self, pile):
-        self.draw_card(pile, num=self.start_game_draw)
-
-    def end_stage(self, game):
-        pass

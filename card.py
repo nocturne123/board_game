@@ -1,136 +1,176 @@
-from ENUMS import CardTypeEnum
+from ENUMS import CardTypeEnum, CardStateEnum, DamageTypeEnum
 import abc
 
+from player_state_machine import Player
+from damage import Damage
 
-# 牌类简易实现，现阶段只实现了牌的类型分类
-# 卡牌在抽取、弃置、打出时都会产生效果
-# 具体的实现为：get_xxx、on_xxx、xxx
-# get为被调用、on为打出、弃掉那一刻发生的事情、可被技能响应
-# 例如被抽起来、被打出、被弃掉
-#
-# 2023.9.4设计更新，全面采用状态机
+from transitions import Machine
+
+"""卡牌的状态机实现"""
+
+transtions = [
+    {
+        "trigger": "get_draw",
+        "source": CardStateEnum.in_draw_pile,
+        "dest": CardStateEnum.on_draw,
+    },
+    {
+        "trigger": "get_into_hand",
+        "source": CardStateEnum.on_draw,
+        "dest": CardStateEnum.in_hand,
+    },
+    {
+        "trigger": "get_played",
+        "source": CardStateEnum.in_hand,
+        "dest": CardStateEnum.on_use,
+    },
+    {
+        "trigger": "choose_target",
+        "source": CardStateEnum.on_use,
+        "dest": CardStateEnum.on_choose_target,
+        "after": "get_target",
+    },
+    {
+        "trigger": "take_effect",
+        "source": CardStateEnum.on_choose_target,
+        "dest": CardStateEnum.on_taking_effect,
+        "after": "on_taking_effect",
+    },
+    {
+        "trigger": "end_effect",
+        "source": CardStateEnum.on_taking_effect,
+        "dest": CardStateEnum.on_discard,
+    },
+    {
+        "trigger": "get_equipped",
+        "source": CardStateEnum.on_choose_target,
+        "dest": CardStateEnum.on_equipment,
+    },
+    {
+        "trigger": "get_discarded",
+        "source": CardStateEnum.in_hand,
+        "dest": CardStateEnum.on_discard,
+    },
+    {
+        "trigger": "get_stolen",
+        "source": CardStateEnum.in_hand,
+        "dest": CardStateEnum.in_hand,
+    },
+    {
+        "trigger": "get_unmounted",
+        "source": CardStateEnum.on_equipment,
+        "dest": CardStateEnum.on_discard,
+    },
+    {
+        "trigger": "get_into_discard_pile",
+        "source": CardStateEnum.on_discard,
+        "dest": CardStateEnum.in_discard_pile,
+    },
+]
 
 
 class Card(metaclass=abc.ABCMeta):
-    def __init__(self, draw_pile, discard_pile):
+    """卡牌的基类，所有摸牌堆里的卡牌继承于此类"""
+
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        # 是否有距离限制
         self.distance_limited = True
         self.draw_pile = draw_pile
         self.discard_pile = discard_pile
-
-    @abc.abstractclassmethod
-    def card_type(self) -> CardTypeEnum:
-        return CardTypeEnum
-
-    # 所有卡牌的核心机制
-    @abc.abstractclassmethod
-    def take_effect(self, target):
-        pass
-
-    # 卡牌被使用时调用的函数，此时卡牌在玩家手里，马上打出
-    def get_used(self, card_user, target):
-        self.on_use(card_user, target)
-
-    # 卡牌被打出，进入结算阶段,此时卡牌进入弃牌堆
-    def on_use(self, card_user, target):
-        self.take_effect(card_user, target)
-
-    # 卡牌在被抽起时发生的事情
-    def on_draw(self, card_user):
-        pass
-
-    # 卡牌被弃置，对应get_used()
-    def get_discard(self, card_user):
-        self.on_discard(card_user)
-
-    # 卡牌在被弃置时发生的事情
-
-    def on_discard(self, card_user):
-        self.get_into_discard_pile(card_user)
-
-    # 卡牌进入弃牌堆时发生的事情，角色收集品被弃置时，会抽取奖励牌，由此方法实现
-    def get_into_discard_pile(self, card_user):
-        self.discard_pile.append(self)
+        self.machine = Machine(
+            model=self,
+            states=states,
+            transitions=transitions,
+            initial=CardStateEnum.in_draw_pile,
+        )
+        self.card_type = card_type
+        # 弃置后是否自动进入弃牌堆
+        self.auto_discard = True
+        # 目标
+        self.target = None
 
 
-# 物理攻击卡牌类
 class PhysicalAttackCard(Card):
-    def __init__(self):
-        super().__init__()
+    """物理攻击牌"""
 
-    def card_type(self):
-        return CardTypeEnum.physical_attack
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.physical_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
 
-    def on_use(self, card_user: Player, target):
-        if card_user.attack_chance >= 1:
-            self.take_effect(card_user, target)
-            card_user.attack_chance -= 1
-        else:
-            print(f"{card_user.name}，你本回合内没有攻击次数了")
+    def on_taking_effect(self, user: Player):
+        """对目标造成物理伤害"""
+        self.target.receive_damage(
+            Damage(user.physical_attack, DamageTypeEnum.physical)
+        )
 
-    def take_effect(self, card_user: Player, target):
-        damage = card_user.attack[1]
-
-        target.get_damage((damage, card_user))
-        self.get_into_discard_pile(card_user)
-
-    def __repr__(self) -> str:
-        return "physical attack"
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
 
 
-# 魔法攻击类卡牌
 class MagicAttackCard(Card):
-    def __init__(self):
-        super().__init__()
+    """魔法攻击牌"""
 
-    def card_type(self):
-        return CardTypeEnum.magic_attack
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.magic_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
 
-    def on_use(self, card_user: Player, target):
-        if card_user.attack_chance >= 1:
-            self.take_effect(card_user, target)
-            card_user.attack_chance -= 1
-        else:
-            print(f"{card_user.name}，你本回合内没有攻击次数了")
+    def on_taking_effect(self, user: Player):
+        """对目标造成魔法伤害"""
+        self.target.receive_damage(Damage(user.magic_attack, DamageTypeEnum.magic))
 
-    def take_effect(self, card_user, target):
-        damage = card_user.attack[0]
-        target.get_damage((damage, card_user, self))
-        self.get_into_discard_pile(card_user)
-
-    def __repr__(self) -> str:
-        return "magic attack"
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
 
 
-# 心理攻击类卡牌
 class MentalAttackCard(Card):
-    def __init__(self):
-        super().__init__()
+    """心理攻击牌"""
 
-    def card_type(self):
-        return CardTypeEnum.mental_attack
+    def __init__(
+        self,
+        draw_pile,
+        discard_pile,
+        card_type: CardTypeEnum = CardTypeEnum.mental_attack,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(draw_pile, discard_pile, card_type, states, transitions)
+        self.distance_limited = True
 
-    def on_use(self, card_user: Player, target):
-        if card_user.attack_chance >= 1:
-            self.take_effect(card_user, target)
-            card_user.attack_chance -= 1
-        else:
-            print(f"{card_user.name}，你本回合内没有攻击次数了")
+    def on_taking_effect(self, user: Player):
+        """对目标造成魔法伤害"""
+        self.target.receive_damage(Damage(user.mental_attack, DamageTypeEnum.mental))
 
-    def take_effect(self, card_user, target):
-        damage = card_user.attack[2]
-        target.get_damage((damage, card_user, self))
-        self.get_into_discard_pile(card_user)
-
-    def __repr__(self) -> str:
-        return "mental attack"
+    def get_target(self, target):
+        """选择目标"""
+        self.target = target
 
 
-class StealCard(Card):
-    def __init__(self):
-        super().__init__()
+if __name__ == "__main__":
+    card1 = Card(None, None, CardTypeEnum.magic_attack)
 
-    def take_effect(self, card_user, target):
-        pass
-
-    def __repr__(self) -> str:
-        return "Steal"
+    print(card1.state)
+    card1.get_draw()
+    print(card1.state)
