@@ -12,7 +12,10 @@ class PlayerAction:
     def draw_card_from_pile(drawpile: DrawPile, player: Player, num: int = 1):
         """抽牌"""
         for _ in range(num):
-            player.hand_sequance.append(drawpile.pop())
+            card = drawpile.pop()
+            card.get_draw()
+            card.get_into_hand()
+            player.hand_sequance.append(card)
 
     @staticmethod
     def receive_damage(player: Player, damage: Damage):
@@ -25,3 +28,24 @@ class PlayerAction:
             received_damage = damage.num - player.mental_defense
         player.health -= received_damage
         return received_damage
+
+    @staticmethod
+    def discard_card(discardpile: DiscardPile, player: Player, card: Card):
+        """弃牌"""
+        pass
+
+    @staticmethod
+    def use_card(user: Player, card: Card):
+        """出牌"""
+        pass
+
+    @staticmethod
+    def card_choose_target(card: Card, target: Player | Card):
+        """卡牌选择目标，可以是玩家或者卡牌"""
+        if card.target is None:
+            card.target = target
+
+    @staticmethod
+    def card_cancel_target(card: Card):
+        """卡牌取消目标"""
+        card.target = None

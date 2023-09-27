@@ -132,27 +132,3 @@ class Player:
             transitions=transitions,
             initial=PlayerStateEnum.wait,
         )
-
-    def receive_damage(self, damage: Damage):
-        """玩家受到伤害"""
-        if damage.type == DamageTypeEnum.physical:
-            received_damage = damage.num - self.physical_defense
-        elif damage.type == DamageTypeEnum.magic:
-            received_damage = damage.num - self.magic_defense
-        elif damage.type == DamageTypeEnum.mental:
-            received_damage = damage.num - self.mental_defense
-        self.health -= received_damage
-        return received_damage
-
-    def pass_target(self, target):
-        """将选择的目标传递给卡牌"""
-        self.on_using_card.get_target(target)
-
-    def end_using_card(self):
-        """结束使用卡牌"""
-        self.on_using_card = None
-
-    def draw_from_pile(self, num, pile):
-        """从牌堆抽牌"""
-        for i in range(num):
-            self.hand_sequence.append(pile.pop())
