@@ -121,13 +121,14 @@ class Player:
         self.stage_state = None
 
         # 玩家生存状态，先为空，同上
-        self.living_state = None
+        self.living_stage = None
 
-    def stage_state_init(self, transitions):
+    def stage_state_init(self, transitions=transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
         # 基础状态机，初始化为等待状态
         self.stage_state = Machine(
+            model=self,
             states=PlayerStateEnum,
             transitions=transitions,
             initial=PlayerStateEnum.wait,

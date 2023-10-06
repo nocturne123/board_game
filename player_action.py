@@ -4,6 +4,15 @@ from card import Card
 from card_pile import DrawPile, DiscardPile
 from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum, DamageTypeEnum
 
+from player_exceptions import NotInPlayStateException
+from card_exceptions import NeedTargetException
+
+
+class ActionRecord:
+    """用于记录下玩家的操作，在什么时候使用了什么卡"""
+
+    pass
+
 
 class PlayerAction:
     """一些玩家的动作，如抽牌、出牌、弃牌等"""
@@ -15,7 +24,7 @@ class PlayerAction:
             card = drawpile.pop()
             card.get_draw()
             card.get_into_hand()
-            player.hand_sequance.append(card)
+            player.hand_sequence.append(card)
 
     @staticmethod
     def receive_damage(player: Player, damage: Damage):
@@ -37,7 +46,17 @@ class PlayerAction:
     @staticmethod
     def use_card(user: Player, card: Card):
         """出牌"""
-        pass
+        try:
+            if user.is_play() != True:
+                raise NotInPlayStateException("Player is not in play stage")
+            card.get_played()
+
+        except NotInPlayStateException:
+            print("Please wait until your turn")
+        except NeedTargetException:
+            print("Card need target")
+        else:
+            card.take_effect(user)
 
     @staticmethod
     def card_choose_target(card: Card, target: Player | Card):

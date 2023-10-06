@@ -23,6 +23,7 @@ transtions = [
         "trigger": "get_played",
         "source": CardStateEnum.in_hand,
         "dest": CardStateEnum.on_use,
+        "after": "check_target",  # 检查能否使用该卡牌，涉及
     },
     {
         "trigger": "choose_target",
@@ -92,6 +93,15 @@ class Card(metaclass=abc.ABCMeta):
         # 目标
         self.target = None
 
+    def __repr__(self) -> str:
+        return f"{self.card_type}"
+
+    def check_target(self):
+        """检查是否有目标"""
+        if self.distance_limited:
+            if self.target.distance > self.user.attack_range:
+                raise Exception("Target is too far away")
+
 
 class PhysicalAttackCard(Card):
     """物理攻击牌"""
@@ -115,6 +125,9 @@ class PhysicalAttackCard(Card):
         """选择目标"""
         self.target = target
 
+    def __repr__(self) -> str:
+        return "PhysicalAttack"
+
 
 class MagicAttackCard(Card):
     """魔法攻击牌"""
@@ -136,6 +149,9 @@ class MagicAttackCard(Card):
         """选择目标"""
         self.target = target
 
+    def __repr__(self) -> str:
+        return "MagicAttack"
+
 
 class MentalAttackCard(Card):
     """心理攻击牌"""
@@ -156,6 +172,9 @@ class MentalAttackCard(Card):
     def get_target(self, target):
         """选择目标"""
         self.target = target
+
+    def __repr__(self) -> str:
+        return "MentalAttack"
 
 
 if __name__ == "__main__":

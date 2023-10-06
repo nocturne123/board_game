@@ -1,6 +1,6 @@
 import abc
 
-# from player import Player
+from player import Player
 from collections import deque
 from ENUMS import GameModeEnum, CharaterAliveEnum
 from team import Team
@@ -8,74 +8,32 @@ from random import shuffle
 from itertools import chain, zip_longest
 
 
-# 阶段在结束时返回一个表示符，使turn类进入下一个阶段，类似的turn结束后返回一个表示符，使round进入下一个阶段
-# 基础阶段类
-class BaseStage(metaclass=abc.ABCMeta):
-    def __init__(self, player):
-        self.player = player
-
-    @abc.abstractclassmethod
-    def start_stage(self, player, game):
-        pass
-
-    @abc.abstractclassmethod
-    def end_stage(self, player, game):
-        pass
-
-
-# 摸牌阶段实现
-class DrawStage(BaseStage):
-    def __init__(self, player):
-        super().__init__(player)
-
-    # start_stage函数由game类调用，启动摸牌阶段，玩家进行抽牌，
-    # 玩家回合结束时通知game类
-    # 回合开始由game类主导开启回合，回合结束由player主导结束
-    # 回合结束时调用game类的end_stage,通知game类该阶段以结束
-
-    # 现阶段的轮次由turn类主持
-    # turn类被取消了
-    def start_stage(self, drawpile, player):
-        player.draw_card(drawpile, num=player.draw_stage_card_number)
-
-    def end_stage(self, player):
-        player.end_stage(self)
-
-
-class UseStage(BaseStage):
-    def __init__(self, player):
-        super().__init__(player)
-
-    def start_stage(self, player):
-        player.able_to_use_card = True
-        player.able_to_equip = True
-
-    def end_stage(self, player):
-        player.able_to_use_card = False
-        player.able_to_equip = False
-
-
-class DiscardStage(BaseStage):
-    def __init__(self, player):
-        super().__init__(player)
-
-    def start_stage(self, player):
-        while len(player.hand_sequance) <= player.max_hand_sequence:
-            print(f"你的手牌数大于{player.max_hand_sequence}，请弃牌")
-
-
 # 游戏类
 # 游戏的回合分为已经进行的回合，正在进行的回合，将要生成的回合
 # 回合和轮次不同
 class Game:
-    def __init__(self, gamemode, map, draw_pile, *players):
-        self.player_list = shuffle([*players])
-        self.draw_pile = draw_pile
-        self.map = map
-        self.game_mode = gamemode
+    def __init__(self):
+        self.player_list = None
+        self.draw_pile = None
+        self.map = None
+        self.game_mode = None
         self.team_list = []
         # 最开始的玩家
-        self.current_player = self.team_list[0][0]
+        self.current_player = None
+
+    def add_player(self, *players: Player):
+        self.player_list = [*players]
+        shuffle(self.player_list)
+
+    def game_set_gamemode(self, gamemode):
+        self.game_mode = gamemode
+
+    def game_set_map(self, map):
+        self.map = map
+
+    def game_set_pile(self, drawpile, discardpile):
+        self.draw_pile = drawpile
+        self.discard_pile = discardpile
 
     # 队伍基础分配
     def set_team(self):
@@ -126,27 +84,16 @@ class Game:
 
     def game_start_dealing(self):
         for player in self.player_list:
-            player.first_round_draw(self.draw_pile)
+            for i in range(player.start_game_draw):
+                player.hand_sequence.append(self.draw_pile.pop())
 
     # 返回当前玩家的优先级序列，可以视作玩家观察到的轮次
     def set_round_list(self):
         return [
             player
             for player in chain.from_iterable(zip_longest(*self.team_list))
-            if player.living_status != CharaterAliveEnum.dead
+            if player.living_stage != CharaterAliveEnum.dead
         ]
-
-
-# 回合类
-# 这个回合是角色的一个完整回合
-class Turn:
-    def __init__(self, game: Game):
-        for player in game.player_list:
-            if player.have_draw_card_stage:
-                yield DrawStage(player)
-            if player.have_use_card_stage:
-                yield UseStage(player)
-            yield DiscardStage(player)
 
 
 # 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现
