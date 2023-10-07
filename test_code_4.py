@@ -5,6 +5,7 @@ from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 from charaters import Charater
 from ENUMS import SpeciesEnum, GameModeEnum
 from player_action import PlayerAction
+from pprint import pprint
 
 """这个文件是经过状态机重构后的测试文件"""
 
@@ -47,11 +48,14 @@ game.game_start_dealing()
 
 for player in game.player_list:
     player.stage_state_init()
+    player.living_state_init()
 
-print(mac_player.hand_sequence)
+print(mac_player.stage_state.state)
+print(mac_player.living_state.state)
 
-print(mac_player.state)
+print(draw_pile)
 PlayerAction.draw_card_from_pile(
-    draw_pile, mac_player, mac_player.draw_stage_card_number
+    mac_player, draw_pile, mac_player.draw_stage_card_number
 )
 print(mac_player.hand_sequence)
+print(draw_pile)

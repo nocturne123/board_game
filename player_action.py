@@ -18,10 +18,10 @@ class PlayerAction:
     """一些玩家的动作，如抽牌、出牌、弃牌等"""
 
     @staticmethod
-    def draw_card_from_pile(drawpile: DrawPile, player: Player, num: int = 1):
+    def draw_card_from_pile(player: Player, drawpile: DrawPile, num: int = 1):
         """抽牌"""
         for _ in range(num):
-            card = drawpile.pop()
+            card: Card = drawpile.pop()
             card.get_draw()
             card.get_into_hand()
             player.hand_sequence.append(card)
@@ -44,9 +44,11 @@ class PlayerAction:
         pass
 
     @staticmethod
-    def use_card(user: Player, card: Card):
+    def use_card(user: Player, card: Card, target: Player | Card | None = None):
         """出牌"""
         try:
+            if target is not None:
+                PlayerAction.card_choose_target(card, target)
             if user.is_play() != True:
                 raise NotInPlayStateException("Player is not in play stage")
             card.get_played()

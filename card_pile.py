@@ -8,6 +8,9 @@ class CardPile(list):
     def __init__(self):
         super().__init__()
 
+    def __repr__(self) -> str:
+        return f"...{self[-3:]}({len(self)})"
+
 
 class DrawPile(CardPile):
     def __init__(self):
@@ -21,7 +24,7 @@ class DrawPile(CardPile):
                 MagicAttackCard(),
                 MentalAttackCard(),
             ]
-            * 5
+            * 16
         )
         shuffle(self)
 

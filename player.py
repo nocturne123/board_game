@@ -1,11 +1,17 @@
 from charaters import Charater
 
-from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum, DamageTypeEnum
+from ENUMS import (
+    PlayerStateEnum,
+    CharaterAliveEnum,
+    SpeciesEnum,
+    DamageTypeEnum,
+    CharaterAliveEnum,
+)
 from damage import Damage
 
 from transitions import Machine
 
-transitions = [
+stage_transitions = [
     {
         "trigger": "start_round",
         "source": PlayerStateEnum.wait,
@@ -55,6 +61,24 @@ transitions = [
         "trigger": "skip_discard",  # 用于跳过弃牌阶段
         "source": PlayerStateEnum.play,
         "dest": PlayerStateEnum.end,
+    },
+]
+
+living_stage_transitions = [
+    {
+        "trigger": "die",
+        "source": CharaterAliveEnum.alive,
+        "dest": CharaterAliveEnum.dead,
+    },
+    {
+        "trigger": "faint",
+        "source": CharaterAliveEnum.alive,
+        "dest": CharaterAliveEnum.fainted,
+    },
+    {
+        "trigger": "awake",
+        "source": CharaterAliveEnum.fainted,
+        "dest": CharaterAliveEnum.alive,
     },
 ]
 
@@ -121,15 +145,22 @@ class Player:
         self.stage_state = None
 
         # 玩家生存状态，先为空，同上
-        self.living_stage = None
+        self.living_state = None
 
-    def stage_state_init(self, transitions=transitions):
+    def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
         # 基础状态机，初始化为等待状态
         self.stage_state = Machine(
-            model=self,
             states=PlayerStateEnum,
             transitions=transitions,
             initial=PlayerStateEnum.wait,
+        )
+
+    def living_state_init(self, transitions=living_stage_transitions):
+        """玩家生存状态，用于表示玩家当前处于哪个状态，状态包括存活、昏迷、死亡"""
+        self.living_state = Machine(
+            states=CharaterAliveEnum,
+            transitions=transitions,
+            initial=CharaterAliveEnum.alive,
         )

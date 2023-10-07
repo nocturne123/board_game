@@ -20,7 +20,7 @@ class CharaterAliveEnum(enum.Enum):
     """一些基础的状态类，用于表示一些基础的状态，如存活，昏迷，死亡等"""
 
     alive = 2
-    faint = 1
+    fainted = 1
     dead = 0
 
 
