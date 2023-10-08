@@ -6,6 +6,7 @@ from ENUMS import GameModeEnum, CharaterAliveEnum
 from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
+from collections import deque
 
 
 # 游戏类
@@ -17,7 +18,7 @@ class Game:
         self.draw_pile = None
         self.map = None
         self.game_mode = None
-        self.team_list = []
+        self.team_deque: deque[Team] = deque()
         # 最开始的玩家
         self.current_player = None
 
@@ -41,7 +42,7 @@ class Game:
             for player in self.player_list:
                 solo_team = Team(maxlen=1)
                 solo_team.append(player)
-                self.team_list.append(solo_team)
+                self.team_deque.append(solo_team)
 
         elif self.game_mode == GameModeEnum.two_vs_two:
             team1_member = self.player_list[0:2]
@@ -50,7 +51,7 @@ class Game:
             team2 = Team(maxlen=2)
             team1.extend(team1_member)
             team2.extend(team2_member)
-            self.team_list.extend([team1, team2])
+            self.team_deque.extend([team1, team2])
 
         elif self.game_mode == GameModeEnum.FFA_two:
             team1_member = self.player_list[0:2]
@@ -62,7 +63,7 @@ class Game:
             team1.extend(team1_member)
             team2.extend(team2_member)
             team3.extend(team3_member)
-            self.team_list.extend([team1, team2, team3])
+            self.team_deque.extend([team1, team2, team3])
 
         elif self.game_mode == GameModeEnum.three_vs_three:
             team1_member = self.player_list[0:3]
@@ -71,7 +72,21 @@ class Game:
             team2 = Team(maxlen=3)
             team1.extend(team1_member)
             team2.extend(team2_member)
-            self.team_list.extend([team1, team2])
+            self.team_deque.extend([team1, team2])
+
+    @property
+    def alive_team_list(self):
+        return [team for team in self.team_deque if team.is_remaining]
+
+    def next_alive_team(self):
+        a = self.team_deque.popleft()
+        self.team_deque.append(a)
+        if self.is_remaining:
+            while self[0].living_stage == CharaterAliveEnum.dead:
+                a = self.popleft()
+                self.append(a)
+        else:
+            pass
 
     def start_stage(self, stage, player):
         pass
@@ -85,13 +100,16 @@ class Game:
     def game_start_dealing(self):
         for player in self.player_list:
             for i in range(player.start_game_draw):
-                player.hand_sequence.append(self.draw_pile.pop())
+                card = self.draw_pile.pop()
+                card.get_draw()
+                player.hand_sequence.append(card)
+                card.get_into_hand()
 
     # 返回当前玩家的优先级序列，可以视作玩家观察到的轮次
     def set_round_list(self):
         return [
             player
-            for player in chain.from_iterable(zip_longest(*self.team_list))
+            for player in chain.from_iterable(zip_longest(*self.team_deque))
             if player.living_stage != CharaterAliveEnum.dead
         ]
 

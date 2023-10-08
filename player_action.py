@@ -70,3 +70,8 @@ class PlayerAction:
     def card_cancel_target(card: Card):
         """卡牌取消目标"""
         card.target = None
+
+    @staticmethod
+    def player_end_play(player: Player):
+        """结束回合"""
+        player.stage_state.end_play()

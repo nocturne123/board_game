@@ -18,14 +18,12 @@ class DrawPile(CardPile):
 
     def test_draw_pile(self):
         """临时测试的牌堆"""
-        self.extend(
-            [
-                PhysicalAttackCard(),
-                MagicAttackCard(),
-                MentalAttackCard(),
-            ]
-            * 16
-        )
+        a = [PhysicalAttackCard() for i in range(16)]
+        b = [MagicAttackCard() for i in range(16)]
+        c = [MentalAttackCard() for i in range(16)]
+        self.extend(a)
+        self.extend(b)
+        self.extend(c)
         shuffle(self)
 
 
