@@ -23,7 +23,7 @@ transtions = [
         "trigger": "get_played",
         "source": CardStateEnum.in_hand,
         "dest": CardStateEnum.on_use,
-        "after": "check_target",  # 检查能否使用该卡牌，涉及
+        "after": "check_target",  # 检查目标，卡牌不负责检测目标是否超出范围、玩家是否有攻击机会，只检测是否有合法目标，检测范围、攻击机会的逻辑在player_action中实现
     },
     {
         "trigger": "choose_target",
@@ -71,7 +71,7 @@ transtions = [
 
 
 class Card(metaclass=abc.ABCMeta):
-    """卡牌的基类，所有摸牌堆里的卡牌继承于此类"""
+    """卡牌的基类，所有摸牌堆里的卡牌继承于此类，注意：卡牌不负责检查目标是否合理，检测目标的行为在player_action中实现"""
 
     def __init__(
         self,
@@ -96,12 +96,6 @@ class Card(metaclass=abc.ABCMeta):
     def __repr__(self) -> str:
         return f"{self.card_type}"
 
-    def check_target(self):
-        """检查是否有目标"""
-        if self.distance_limited:
-            if self.target.distance > self.user.attack_range:
-                raise Exception("Target is too far away")
-
 
 class PhysicalAttackCard(Card):
     """物理攻击牌"""
@@ -121,9 +115,13 @@ class PhysicalAttackCard(Card):
             Damage(user.physical_attack, DamageTypeEnum.physical)
         )
 
-    def get_target(self, target):
+    def get_target(self, target: Player):
         """选择目标"""
         self.target = target
+
+    def check_target(self):
+        """检查是否有目标"""
+        pass
 
     def __repr__(self) -> str:
         return "PhysicalAttack"
@@ -145,9 +143,13 @@ class MagicAttackCard(Card):
         """对目标造成魔法伤害"""
         self.target.receive_damage(Damage(user.magic_attack, DamageTypeEnum.magic))
 
-    def get_target(self, target):
+    def get_target(self, target: Player):
         """选择目标"""
         self.target = target
+
+    def check_target(self):
+        """检查是否有目标"""
+        pass
 
     def __repr__(self) -> str:
         return "MagicAttack"
@@ -169,7 +171,7 @@ class MentalAttackCard(Card):
         """对目标造成魔法伤害"""
         self.target.receive_damage(Damage(user.mental_attack, DamageTypeEnum.mental))
 
-    def get_target(self, target):
+    def get_target(self, target: Player):
         """选择目标"""
         self.target = target
 

@@ -28,11 +28,11 @@ class Team(deque[Player]):
 
     def alive_list(self: [Player]):
         return [
-            player for player in self if player.living_stage != CharaterAliveEnum.dead
+            player for player in self if player.living_state != CharaterAliveEnum.dead
         ]
 
     def __repr__(self) -> str:
-        return f"Team({[(player.name,player.living_stage) for player in self]})"
+        return f"Team({[(player.name,player.living_state) for player in self]})"
 
 
 if __name__ == "__main__":

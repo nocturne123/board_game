@@ -2,9 +2,15 @@ from player import Player
 from damage import Damage
 from card import Card
 from card_pile import DrawPile, DiscardPile
-from ENUMS import PlayerStateEnum, CharaterAliveEnum, SpeciesEnum, DamageTypeEnum
+from ENUMS import (
+    PlayerStateEnum,
+    CharaterAliveEnum,
+    SpeciesEnum,
+    DamageTypeEnum,
+    CardTypeEnum,
+)
 
-from player_exceptions import NotInPlayStateException
+from player_exceptions import NotInPlayStateException, NoChanceToAttackException
 from card_exceptions import NeedTargetException
 
 
@@ -39,9 +45,12 @@ class PlayerAction:
         return received_damage
 
     @staticmethod
-    def discard_card(discardpile: DiscardPile, player: Player, card: Card):
+    def discard_card(player: Player, card: Card, discardpile: DiscardPile):
         """弃牌"""
-        pass
+        player.hand_sequence.remove(card)
+        card.get_discarded()
+        discardpile.append(card)
+        card.get_into_discard_pile()
 
     @staticmethod
     def use_card(user: Player, card: Card, target: Player | Card | None = None):
@@ -51,6 +60,14 @@ class PlayerAction:
                 PlayerAction.card_choose_target(card, target)
             if user.is_play() != True:
                 raise NotInPlayStateException("Player is not in play stage")
+            if (
+                card.card_type
+                == CardTypeEnum.physical_attack
+                | CardTypeEnum.magic_attack
+                | CardTypeEnum.mental_attack
+            ):
+                if user.attack_chance_in_turn <= 0:
+                    raise NoChanceToAttackException("No attack chance in turn")
             card.get_played()
 
         except NotInPlayStateException:
@@ -58,6 +75,13 @@ class PlayerAction:
         except NeedTargetException:
             print("Card need target")
         else:
+            if (
+                card.card_type
+                == CardTypeEnum.physical_attack
+                | CardTypeEnum.magic_attack
+                | CardTypeEnum.mental_attack
+            ):
+                user.attack_chance_in_turn -= 1
             card.take_effect(user)
 
     @staticmethod
@@ -74,7 +98,11 @@ class PlayerAction:
     @staticmethod
     def player_end_play(player: Player):
         """结束回合"""
-        player.stage_state.end_play()
+        if len(player.hand_sequence) <= player.max_hand_sequence_num:
+            player.stage_state.skip_discard()
+            player.stage_state.end_turn()
+        else:
+            player.stage_state.end_play()
 
     @staticmethod
     def player_end_discard(player: Player):
@@ -85,3 +113,14 @@ class PlayerAction:
     def player_end_turn(player: Player):
         """结束回合"""
         player.stage_state.end_turn()
+
+    @staticmethod
+    def player_start_turn_init(player: Player):
+        """回合开始时的初始化"""
+        player.move_chance_in_turn = player.move_chance
+        player.attack_chance_in_turn = player.attack_chance
+        player.stage_state.start_turn()
+
+    def check_health(player: Player):
+        if player.health <= 0:
+            player.living_state.die()

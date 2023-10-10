@@ -134,11 +134,15 @@ class Player:
         self.start_game_draw = 4
 
         # 角色最大手牌数量
-        self.max_hand_sequence = 6
+        self.max_hand_sequence_num = 6
 
-        # 玩家移动次数和攻击次数
+        # 玩家移动次数和攻击次数，在回合开始时，用这个属性来初始化
         self.move_chance = 1
         self.attack_chance = 1
+
+        # 玩家在回合种的移动和攻击次数，用于记录玩家在回合中的移动和攻击次数
+        self.move_chance_in_turn = 0
+        self.attack_chance_in_turn = 0
 
         """以下属性为状态机相关属性"""
         # 玩家阶段状态，先为空，在后面利用函数补充
