@@ -3,7 +3,7 @@ from player import Player
 from card_pile import DrawPile, DiscardPile
 from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 from charaters import Charater
-from ENUMS import SpeciesEnum, GameModeEnum
+from ENUMS import SpeciesEnum, GameModeEnum, CharaterAliveEnum, PlayerStateEnum
 from player_action import PlayerAction
 from pprint import pprint
 
@@ -59,3 +59,18 @@ PlayerAction.draw_card_from_pile(
 )
 print(mac_player.hand_sequence)
 print(draw_pile)
+
+while (
+    mac_player.living_state == CharaterAliveEnum.alive
+    and dummy_player.living_state == CharaterAliveEnum.alive
+):
+    while mac_player.stage_state.state == PlayerStateEnum.play:
+        print(mac_player.stage_state.state)
+        print(mac_player.living_state.state)
+        print(mac_player.hand_sequence)
+        print(mac_player)
+        print(dummy_player)
+        print(draw_pile)
+        print(discard_pile)
+        print("=====================================")
+        print("=====================================")

@@ -75,3 +75,13 @@ class PlayerAction:
     def player_end_play(player: Player):
         """结束回合"""
         player.stage_state.end_play()
+
+    @staticmethod
+    def player_end_discard(player: Player):
+        """结束阶段"""
+        player.stage_state.end_discard()
+
+    @staticmethod
+    def player_end_turn(player: Player):
+        """结束回合"""
+        player.stage_state.end_turn()

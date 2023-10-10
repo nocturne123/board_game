@@ -7,6 +7,7 @@ from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
 from collections import deque
+from player_action import PlayerAction
 
 
 # 游戏类
@@ -75,8 +76,8 @@ class Game:
             self.team_deque.extend([team1, team2])
 
     @property
-    def alive_team_list(self):
-        return [team for team in self.team_deque if team.is_remaining]
+    def alive_team_deque(self):
+        return deque(team for team in self.team_deque if team.is_remaining)
 
     def next_alive_team(self):
         a = self.team_deque.popleft()
@@ -88,15 +89,6 @@ class Game:
         else:
             pass
 
-    def start_stage(self, stage, player):
-        pass
-
-    def end_stage(self, stage, player):
-        pass
-
-    def start_turn(self, player):
-        pass
-
     def game_start_dealing(self):
         for player in self.player_list:
             for i in range(player.start_game_draw):
@@ -105,13 +97,27 @@ class Game:
                 player.hand_sequence.append(card)
                 card.get_into_hand()
 
-    # 返回当前玩家的优先级序列，可以视作玩家观察到的轮次
     def set_round_list(self):
+        """返回当前玩家的优先级序列，可以视作玩家观察到的轮次"""
         return [
             player
             for player in chain.from_iterable(zip_longest(*self.team_deque))
             if player.living_stage != CharaterAliveEnum.dead
         ]
+
+    def set_player_to_current(self):
+        self.current_player = self.team_deque[0][0]
+
+    def set_current_player_start_turn(self):
+        self.current_player.start_turn()  # 开始回合，进入准备阶段
+        self.current_player.end_prepare()  # 结束准备阶段，进入抽牌阶段
+        PlayerAction.draw_card_from_pile(
+            self.current_player,
+            self.draw_pile,
+            self.current_player.draw_stage_card_number,
+        )  # 玩家抽牌
+
+        self.current_player.end_draw()  # 玩家结束抽牌阶段，进入出牌阶段
 
 
 # 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现

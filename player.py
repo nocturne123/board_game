@@ -13,7 +13,7 @@ from transitions import Machine
 
 stage_transitions = [
     {
-        "trigger": "start_round",
+        "trigger": "start_turn",
         "source": PlayerStateEnum.wait,
         "dest": PlayerStateEnum.prepare,
     },
@@ -38,7 +38,7 @@ stage_transitions = [
         "dest": PlayerStateEnum.end,
     },
     {
-        "trigger": "end_round",  # 用于结束回合
+        "trigger": "end_turn",  # 用于结束回合
         "source": PlayerStateEnum.end,
         "dest": PlayerStateEnum.wait,
     },
