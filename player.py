@@ -168,3 +168,12 @@ class Player:
             transitions=transitions,
             initial=CharaterAliveEnum.alive,
         )
+
+    def receive_damage(self, damage):
+        """玩家受到伤害"""
+        if damage.type == DamageTypeEnum.physical:
+            self.health -= damage.num - self.physical_defense
+        elif damage.type == DamageTypeEnum.magic:
+            self.health -= damage.num - self.magic_defense
+        elif damage.type == DamageTypeEnum.mental:
+            self.health -= damage.num - self.mental_defense

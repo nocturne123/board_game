@@ -73,27 +73,31 @@ print(mac_player.living_state.state)
 print(dummy_player.stage_state.state)
 print(dummy_player.living_state.state)
 
-game.set_player_to_current()
 
 # 大循环，根据mac_player的状态来判断是否继续，循环内部进行dummy_player的操作和Team类的轮换、活动玩家的轮换
 while (
-    mac_player.living_state == CharaterAliveEnum.alive
-    and dummy_player.living_state == CharaterAliveEnum.alive
+    mac_player.living_state.state == CharaterAliveEnum.alive
+    and dummy_player.living_state.state == CharaterAliveEnum.alive
 ):
+    game.set_player_to_current()
     print(f"当前玩家为{game.current_player.name}")
     game.set_current_player_start_turn()
     print(f"当前玩家的状态为{game.current_player.stage_state.state}")
-
+    print(f"大麦的回合开始了")
+    print("-" * 50)
     # mac_player的回合，mac先出手，当mac_player的状态为play时，进行出牌操作，出牌操作为内部小循环
     while mac_player.stage_state.state == PlayerStateEnum.play:
-        print(f"大麦的回合开始了")
+        print(f"大麦的出牌阶段开始了")
         print(
             f"你的物理攻击、心理攻击、魔法攻击分别为为{mac_player.physical_attack}|{mac_player.mental_attack}|{mac_player.magic_attack}"
         )
         print(f"你的生命值为{mac_player.health}")
         print(f"你的手牌为{[i for i in enumerate(mac_player.hand_sequence)]}")
         print("请输入手牌对应的序号，出牌。按q结束回合，进入弃牌阶段")
-        while a := input() != "q":
+        while a := input():
+            if a == "q":
+                break
+
             if a.isdigit():
                 card = mac_player.hand_sequence[int(a)]
                 try:
@@ -103,7 +107,7 @@ while (
                     PlayerAction.check_health(dummy_player)
                 except NoChanceToAttackException:
                     print("你没有攻击次数了,考虑到我现在没有写别的卡牌，我建议你直接按q结束回合")
-                continue
+                break
     mac_player.stage_state.end_play()
     print(f"大麦的出牌阶段结束了")
 
@@ -120,6 +124,8 @@ while (
                     mac_player.stage_state.end_turn()
 
     print(f"大麦的回合结束了")
+    print("弃牌堆里面")
+    pprint(game.discard_pile)
     print("-" * 50)
     game.next_alive_team()
     game.set_player_to_current()

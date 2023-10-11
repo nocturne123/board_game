@@ -109,15 +109,16 @@ class Game:
         self.current_player = self.team_deque[0][0]
 
     def set_current_player_start_turn(self):
-        self.current_player.start_turn()  # 开始回合，进入准备阶段
-        self.current_player.end_prepare()  # 结束准备阶段，进入抽牌阶段
+        self.current_player.stage_state.start_turn()  # 开始回合，进入准备阶段
+        PlayerAction.player_start_turn_init(self.current_player)  # 玩家回合开始时的初始化
+        self.current_player.stage_state.end_prepare()  # 结束准备阶段，进入抽牌阶段
         PlayerAction.draw_card_from_pile(
             self.current_player,
             self.draw_pile,
             self.current_player.draw_stage_card_number,
         )  # 玩家抽牌
 
-        self.current_player.end_draw()  # 玩家结束抽牌阶段，进入出牌阶段
+        self.current_player.stage_state.end_draw()  # 玩家结束抽牌阶段，进入出牌阶段
 
 
 # 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现

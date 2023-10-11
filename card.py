@@ -5,6 +5,7 @@ from player import Player
 from damage import Damage
 
 from transitions import Machine
+from card_exceptions import NeedTargetException
 
 """卡牌的状态机实现"""
 
@@ -24,6 +25,11 @@ transtions = [
         "source": CardStateEnum.in_hand,
         "dest": CardStateEnum.on_use,
         "after": "check_target",  # 检查目标，卡牌不负责检测目标是否超出范围、玩家是否有攻击机会，只检测是否有合法目标，检测范围、攻击机会的逻辑在player_action中实现
+    },
+    {
+        "trigger": "cancel_play",
+        "source": CardStateEnum.on_use,
+        "dest": CardStateEnum.in_hand,
     },
     {
         "trigger": "choose_target",
@@ -95,6 +101,11 @@ class Card(metaclass=abc.ABCMeta):
 
     def __repr__(self) -> str:
         return f"{self.card_type}"
+
+    def check_target(self):
+        """检查是否有目标"""
+        if self.target is None:
+            raise NeedTargetException("Card need target")
 
 
 class PhysicalAttackCard(Card):

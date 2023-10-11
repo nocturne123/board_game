@@ -8,10 +8,12 @@ from ENUMS import (
     SpeciesEnum,
     DamageTypeEnum,
     CardTypeEnum,
+    CardStateEnum,
 )
+from card_exceptions import NeedTargetException
 
 from player_exceptions import NotInPlayStateException, NoChanceToAttackException
-from card_exceptions import NeedTargetException
+from card_exceptions import NotInHandStateException
 
 
 class ActionRecord:
@@ -56,30 +58,33 @@ class PlayerAction:
     def use_card(user: Player, card: Card, target: Player | Card | None = None):
         """出牌"""
         try:
+            if card.state != CardStateEnum.in_hand:
+                raise NotInHandStateException("Card is not in hand")
+            card.get_played()
             if target is not None:
                 PlayerAction.card_choose_target(card, target)
-            if user.is_play() != True:
+            if user.stage_state.is_play() != True:
                 raise NotInPlayStateException("Player is not in play stage")
             if (
-                card.card_type
-                == CardTypeEnum.physical_attack
-                | CardTypeEnum.magic_attack
-                | CardTypeEnum.mental_attack
+                card.card_type == CardTypeEnum.physical_attack
+                or card.card_type == CardTypeEnum.magic_attack
+                or card.card_type == CardTypeEnum.mental_attack
             ):
                 if user.attack_chance_in_turn <= 0:
+                    card.cancel_play()
                     raise NoChanceToAttackException("No attack chance in turn")
-            card.get_played()
 
         except NotInPlayStateException:
             print("Please wait until your turn")
         except NeedTargetException:
             print("Card need target")
+
         else:
+            user.hand_sequence.remove(card)
             if (
-                card.card_type
-                == CardTypeEnum.physical_attack
-                | CardTypeEnum.magic_attack
-                | CardTypeEnum.mental_attack
+                card.card_type == CardTypeEnum.physical_attack
+                or card.card_type == CardTypeEnum.magic_attack
+                or card.card_type == CardTypeEnum.mental_attack
             ):
                 user.attack_chance_in_turn -= 1
             card.take_effect(user)
@@ -89,6 +94,7 @@ class PlayerAction:
         """卡牌选择目标，可以是玩家或者卡牌"""
         if card.target is None:
             card.target = target
+        card.choose_target(target)
 
     @staticmethod
     def card_cancel_target(card: Card):
@@ -119,8 +125,8 @@ class PlayerAction:
         """回合开始时的初始化"""
         player.move_chance_in_turn = player.move_chance
         player.attack_chance_in_turn = player.attack_chance
-        player.stage_state.start_turn()
 
+    @staticmethod
     def check_health(player: Player):
         if player.health <= 0:
             player.living_state.die()
