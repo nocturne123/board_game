@@ -101,7 +101,9 @@ while (
             f"你的物理攻击、心理攻击、魔法攻击分别为为{mac_player.physical_attack}|{mac_player.mental_attack}|{mac_player.magic_attack}"
         )
         print(f"你的生命值为{mac_player.health}")
-        print(f"你的手牌为{[i for i in enumerate(mac_player.hand_sequence)]}")
+        print(
+            f"你的手牌为{[i for i in enumerate(mac_player.hand_sequence)]}，手牌总数为{len(mac_player.hand_sequence)}"
+        )
         print("请输入手牌对应的序号，出牌。按q结束回合，进入弃牌阶段")
         while True:
             a = input()
@@ -120,13 +122,17 @@ while (
                     print("你没有攻击次数了,考虑到我现在没有写别的卡牌，我建议你直接按q结束回合")
 
     print(f"大麦的出牌阶段结束了")
+    print()
     print("-" * 50)
+    print()
 
     while mac_player.stage_state.state == PlayerStateEnum.discard:
         print("进入弃牌阶段")
         while len(mac_player.hand_sequence) > mac_player.max_hand_sequence_num:
             print("请输入你要弃掉的手牌的序号，按q结束弃牌阶段")
-            print(f"你的手牌为{[i for i in enumerate(mac_player.hand_sequence)]}")
+            print(
+                f"你的手牌为{[i for i in enumerate(mac_player.hand_sequence)]}，手牌总数为{len(mac_player.hand_sequence)}"
+            )
             a = input()
             if a.isdigit():
                 card = mac_player.hand_sequence[int(a)]
@@ -135,6 +141,9 @@ while (
         game.current_player.stage_state.end_discard()
         game.current_player.stage_state.end_turn()
 
+    print()
+    print("弃牌阶段结束")
+    print()
     print(f"大麦的回合结束了")
     print("弃牌堆里面")
     pprint(game.discard_pile)
