@@ -79,15 +79,9 @@ class Game:
     def alive_team_deque(self):
         return deque(team for team in self.team_deque if team.is_remaining)
 
-    def next_alive_team(self):
+    def next_team(self):
         a = self.team_deque.popleft()
         self.team_deque.append(a)
-        if self.is_remaining:
-            while self[0].living_stage == CharaterAliveEnum.dead:
-                a = self.popleft()
-                self.append(a)
-        else:
-            pass
 
     def game_start_dealing(self):
         for player in self.player_list:

@@ -14,13 +14,13 @@ class Team(deque[Player]):
 
     @property
     def is_remaining(self):
-        return any(player.living_stage != CharaterAliveEnum.dead for player in self)
+        return any(player.living_state != CharaterAliveEnum.dead for player in self)
 
     def next_alive_player(self):
         a = self.popleft()
         self.append(a)
         if self.is_remaining:
-            while self[0].living_stage == CharaterAliveEnum.dead:
+            while self[0].living_state == CharaterAliveEnum.dead:
                 a = self.popleft()
                 self.append(a)
         else:
@@ -32,7 +32,7 @@ class Team(deque[Player]):
         ]
 
     def __repr__(self) -> str:
-        return f"Team({[(player.name,player.living_state) for player in self]})"
+        return f"Team({[player.name for player in self]})"
 
 
 if __name__ == "__main__":

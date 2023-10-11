@@ -139,7 +139,7 @@ while (
     print("弃牌堆里面")
     pprint(game.discard_pile)
     print("-" * 50)
-    game.next_alive_team()
+    game.next_team()
     game.set_player_to_current()
     print(f"当前玩家为{game.current_player.name}")
     game.set_current_player_start_turn()
@@ -159,7 +159,7 @@ while (
         )
     print(f"{game.current_player.name}的回合结束了")
     print("=" * 50)
-    game.next_alive_team()
+    game.next_team()
 
 if mac_player.living_state != CharaterAliveEnum.dead:
     print("大麦赢了")
