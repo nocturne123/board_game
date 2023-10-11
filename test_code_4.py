@@ -12,10 +12,12 @@ from collections import deque
 
 """这个文件是经过状态机重构后的测试文件"""
 
+# 初始化牌堆
 draw_pile = DrawPile()
 draw_pile.test_draw_pile()
 discard_pile = DiscardPile()
 
+# 角色：大麦和dummy
 big_mac = Charater(
     health=15,
     magic_attack=0,
@@ -38,15 +40,19 @@ dummy = Charater(
     species=SpeciesEnum.earth_pony,
 )
 
+# 玩家：大麦和dummy
 mac_player = Player(big_mac)
 dummy_player = Player(dummy)
 print(mac_player)
 
+# 游戏基础组装
 game = Game()
 game.add_player(mac_player, dummy_player)
 game.game_set_gamemode(GameModeEnum.FFA)
 game.game_set_pile(draw_pile, discard_pile)
 
+
+# 分队，注：这里有问题，我写出来的Team，里面有一个None，但是我不知道为什么
 # 这里不适用set_team了，因为set_team里面有shuffle，会打乱顺序，这里直接手动设置
 # game.set_team()
 game.team_deque = deque()
@@ -60,10 +66,13 @@ team2.append(dummy_player)
 game.team_deque.append(team1)
 game.team_deque.append(team2)
 
+# 可以看见None
 print(game.team_deque)
 
+# 初始抽牌，每人抽4张
 game.game_start_dealing()
 
+# 初始玩家的状态机
 for player in game.player_list:
     player.stage_state_init()
     player.living_state_init()
