@@ -24,16 +24,20 @@ class Game:
         self.current_player = None
 
     def add_player(self, *players: Player):
+        """添加玩家"""
         self.player_list = [*players]
         shuffle(self.player_list)
 
     def game_set_gamemode(self, gamemode):
+        """设置游戏模式"""
         self.game_mode = gamemode
 
     def game_set_map(self, map):
+        """设置地图"""
         self.map = map
 
     def game_set_pile(self, drawpile, discardpile):
+        """设置牌堆，包括抽牌堆和弃牌堆"""
         self.draw_pile = drawpile
         self.discard_pile = discardpile
 
