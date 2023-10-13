@@ -7,7 +7,7 @@ from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
 from collections import deque
-from player_action import PlayerAction
+import player_action as PlayerAction
 
 
 # 游戏类
