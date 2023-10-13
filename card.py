@@ -1,5 +1,4 @@
 from ENUMS import CardTypeEnum, CardStateEnum
-from dataclasses import dataclass
 from transitions import Machine
 
 
@@ -21,7 +20,6 @@ transtions = [
         "trigger": "get_played",
         "source": CardStateEnum.in_hand,
         "dest": CardStateEnum.on_use,
-        "after": "check_target",  # 检查目标，卡牌不负责检测目标是否超出范围、玩家是否有攻击机会，只检测是否有合法目标，检测范围、攻击机会的逻辑在player_action中实现
     },
     {
         "trigger": "cancel_play",
@@ -29,16 +27,9 @@ transtions = [
         "dest": CardStateEnum.in_hand,
     },
     {
-        "trigger": "choose_target",
-        "source": CardStateEnum.on_use,
-        "dest": CardStateEnum.on_choose_target,
-        "after": "get_target",
-    },
-    {
         "trigger": "take_effect",
-        "source": CardStateEnum.on_choose_target,
+        "source": CardStateEnum.on_use,
         "dest": CardStateEnum.on_taking_effect,
-        "after": "on_taking_effect",
     },
     {
         "trigger": "end_effect",
@@ -47,7 +38,7 @@ transtions = [
     },
     {
         "trigger": "get_equipped",
-        "source": CardStateEnum.on_choose_target,
+        "source": CardStateEnum.on_use,
         "dest": CardStateEnum.on_equipment,
     },
     {
@@ -84,15 +75,15 @@ class Card:
     ):
         # 是否有距离限制
         self.distance_limited = True
+        # 状态机
         self.machine = Machine(
             model=self,
             states=states,
             transitions=transitions,
             initial=CardStateEnum.in_draw_pile,
         )
+        # 卡牌类型
         self.card_type = card_type
-        # 弃置后是否自动进入弃牌堆
-        self.auto_discard = True
 
     def __repr__(self) -> str:
         return f"{self.card_type}"
@@ -146,12 +137,17 @@ class MentalAttackCard(Card):
         return "MentalAttack"
 
 
-@dataclass
-class DataCard:
-    card_type: CardTypeEnum
-    machine: Machine() = Machine(
-        model=self,
-        states=states,
-        transitions=transitions,
-        initial=CardStateEnum.in_draw_pile,
-    )
+class StealCard(Card):
+    """偷窃牌"""
+
+    def __init__(
+        self,
+        card_type: CardTypeEnum = CardTypeEnum.steal,
+        states=CardStateEnum,
+        transitions=transtions,
+    ):
+        super().__init__(card_type, states, transitions)
+        self.distance_limited = True
+
+    def __repr__(self) -> str:
+        return "Steal"

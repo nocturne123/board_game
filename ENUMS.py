@@ -114,12 +114,11 @@ class CardStateEnum(enum.Enum):
     on_draw = 1  # 被抽取时刻
     in_hand = 2  # 在手牌里
     on_use = 3  # 被打出时刻
-    on_choose_target = 4  # 选择目标时刻
-    on_taking_effect = 5  # 产生效果时刻
-    on_equipment = 6  # 被装备时刻
-    get_stolen = 7  # 被偷窃时刻
-    on_discard = 8  # 被弃置时刻
-    in_discard_pile = 9  # 在弃牌堆里
+    on_taking_effect = 4  # 产生效果时刻
+    on_equipment = 5  # 被装备时刻
+    get_stolen = 6  # 被偷窃时刻
+    on_discard = 7  # 被弃置时刻
+    in_discard_pile = 8  # 在弃牌堆里
 
 
 class DamageTypeEnum(enum.Enum):

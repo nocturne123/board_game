@@ -92,9 +92,8 @@ class Player:
         self.name = cha.name
         self.species = cha.species
 
-        # 玩家的武器、护甲均为空列表形式，因为红龙能装多个装备，设计为列表也方便未来的扩展
-        self.armor = []
-        self.weapon = []
+        # 玩家的装备栏
+        self.equipment_sequence = []
 
         # 玩家手牌
         self.hand_sequence = []
