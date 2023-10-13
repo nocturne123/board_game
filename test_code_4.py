@@ -4,7 +4,7 @@ from card_pile import DrawPile, DiscardPile
 from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 from charaters import Charater
 from ENUMS import SpeciesEnum, GameModeEnum, CharaterAliveEnum, PlayerStateEnum
-from player_action import PlayerAction
+import player_action as PlayerAction
 from pprint import pprint
 from player_exceptions import NoChanceToAttackException
 from team import Team

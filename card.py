@@ -1,13 +1,10 @@
-from ENUMS import CardTypeEnum, CardStateEnum, DamageTypeEnum
-import abc
-
-from player import Player
-from damage import Damage
-
+from ENUMS import CardTypeEnum, CardStateEnum
+from dataclasses import dataclass
 from transitions import Machine
-from card_exceptions import NeedTargetException
+
 
 """卡牌的状态机实现"""
+"""2023.10.13更新，卡牌类现在只有数据，卡牌产生效果的代码进入player_action"""
 
 transtions = [
     {
@@ -76,7 +73,7 @@ transtions = [
 ]
 
 
-class Card(metaclass=abc.ABCMeta):
+class Card:
     """卡牌的基类，所有摸牌堆里的卡牌继承于此类，注意：卡牌不负责检查目标是否合理，检测目标的行为在player_action中实现"""
 
     def __init__(
@@ -96,16 +93,9 @@ class Card(metaclass=abc.ABCMeta):
         self.card_type = card_type
         # 弃置后是否自动进入弃牌堆
         self.auto_discard = True
-        # 目标
-        self.target = None
 
     def __repr__(self) -> str:
         return f"{self.card_type}"
-
-    def check_target(self):
-        """检查是否有目标"""
-        if self.target is None:
-            raise NeedTargetException("Card need target")
 
 
 class PhysicalAttackCard(Card):
@@ -119,20 +109,6 @@ class PhysicalAttackCard(Card):
     ):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
-
-    def on_taking_effect(self, user: Player):
-        """对目标造成物理伤害"""
-        self.target.receive_damage(
-            Damage(user.physical_attack, DamageTypeEnum.physical)
-        )
-
-    def get_target(self, target: Player):
-        """选择目标"""
-        self.target = target
-
-    def check_target(self):
-        """检查是否有目标"""
-        pass
 
     def __repr__(self) -> str:
         return "PhysicalAttack"
@@ -150,18 +126,6 @@ class MagicAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def on_taking_effect(self, user: Player):
-        """对目标造成魔法伤害"""
-        self.target.receive_damage(Damage(user.magic_attack, DamageTypeEnum.magic))
-
-    def get_target(self, target: Player):
-        """选择目标"""
-        self.target = target
-
-    def check_target(self):
-        """检查是否有目标"""
-        pass
-
     def __repr__(self) -> str:
         return "MagicAttack"
 
@@ -178,21 +142,16 @@ class MentalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def on_taking_effect(self, user: Player):
-        """对目标造成魔法伤害"""
-        self.target.receive_damage(Damage(user.mental_attack, DamageTypeEnum.mental))
-
-    def get_target(self, target: Player):
-        """选择目标"""
-        self.target = target
-
     def __repr__(self) -> str:
         return "MentalAttack"
 
 
-if __name__ == "__main__":
-    card1 = Card(None, None, CardTypeEnum.magic_attack)
-
-    print(card1.state)
-    card1.get_draw()
-    print(card1.state)
+@dataclass
+class DataCard:
+    card_type: CardTypeEnum
+    machine: Machine() = Machine(
+        model=self,
+        states=states,
+        transitions=transitions,
+        initial=CardStateEnum.in_draw_pile,
+    )
