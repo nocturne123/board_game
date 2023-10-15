@@ -66,7 +66,7 @@ def choose_card_from_player(user: Player, target: Player, card: Card):
 def use_card(
     user: Player,
     card: Card,
-    target: Player | Card | None = None,
+    target: Player | Card | None | (Player, Card) = None,
     discard_pile: DiscardPile = None,
 ):
     """使用卡牌"""
