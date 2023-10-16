@@ -1,5 +1,3 @@
-import enum
-
 """该文件主要保存一些enum类
 现阶段的ENUM类有：
     CharaterAliveEnum: 用于表示角色的存活状态
@@ -11,9 +9,8 @@ import enum
     PlayerStateEnum: 用于表示玩家的状态类型
     CardStateEnum: 用于表示卡牌的状态机
     DamageTypeEnum: 用于表示伤害的类型
-
-
 """
+import enum
 
 
 class CharaterAliveEnum(enum.Enum):

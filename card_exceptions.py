@@ -14,3 +14,9 @@ class NeedFurtherTargetException(Exception):
     """需要进一步选择目标的异常"""
 
     pass
+
+
+class ImmuneToAttackException(Exception):
+    """免疫攻击的异常"""
+
+    pass
