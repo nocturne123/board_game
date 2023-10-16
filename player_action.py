@@ -2,7 +2,7 @@ from player import Player
 from damage import Damage
 from card import Card
 from card_pile import DrawPile, DiscardPile
-from ENUMS import (
+from ENUMS.common_enums import (
     PlayerStateEnum,
     CharaterAliveEnum,
     SpeciesEnum,

@@ -1,5 +1,5 @@
 import arcade
-from ENUMS import BlockTypeEnum
+from ENUMS.common_enums import BlockTypeEnum
 from pyglet.math import Vec2
 import toml
 

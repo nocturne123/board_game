@@ -1,4 +1,4 @@
-from ENUMS import BlockTypeEnum
+from ENUMS.common_enums import BlockTypeEnum
 from hexutil import Hex
 import arcade
 

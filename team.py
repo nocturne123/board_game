@@ -1,5 +1,5 @@
 from collections import deque
-from ENUMS import CharaterAliveEnum
+from ENUMS.common_enums import CharaterAliveEnum
 from player import Player
 from charaters import Charater, SpeciesEnum
 

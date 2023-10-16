@@ -1,4 +1,4 @@
-from ENUMS import CardTypeEnum, CardStateEnum
+from ENUMS.common_enums import CardTypeEnum, CardStateEnum
 from transitions import Machine
 
 

@@ -1,4 +1,4 @@
-from ENUMS import DamageTypeEnum
+from ENUMS.common_enums import DamageTypeEnum
 from dataclasses import dataclass
 
 

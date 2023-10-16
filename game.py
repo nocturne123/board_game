@@ -2,7 +2,7 @@ import abc
 
 from player import Player
 from collections import deque
-from ENUMS import GameModeEnum, CharaterAliveEnum
+from ENUMS.common_enums import CharaterAliveEnum, GameModeEnum
 from team import Team
 from random import shuffle
 from itertools import chain, zip_longest

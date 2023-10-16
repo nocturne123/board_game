@@ -1,6 +1,6 @@
 from charaters import Charater
 
-from ENUMS import (
+from ENUMS.common_enums import (
     PlayerStateEnum,
     CharaterAliveEnum,
     SpeciesEnum,

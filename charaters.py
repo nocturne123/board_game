@@ -1,4 +1,4 @@
-from ENUMS import SpeciesEnum
+from ENUMS.common_enums import SpeciesEnum
 from dataclasses import dataclass
 
 
