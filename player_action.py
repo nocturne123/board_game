@@ -1,3 +1,6 @@
+"""这个文件是玩家操作的文件，现阶段全部用静态方法实现。
+未来需要用类进行包装。实现hook机制，实现玩家操作的可扩展性，方便技能的实现。
+注：卡牌的状态切换先于卡牌的相关操作，先切换，再操作"""
 from player import Player
 from damage import Damage
 from card import Card
@@ -26,18 +29,25 @@ from card_exceptions import NotInHandStateException
 def draw_card_from_pile(player: Player, drawpile: DrawPile, num: int = 1):
     """抽牌"""
     for _ in range(num):
+        card.get_draw()  # 注：卡牌的状态切换先于卡牌的相关操作，先切换，再操作
         card: Card = drawpile.pop()
-        card.get_draw()
         card.get_into_hand()
         player.hand_sequence.append(card)
 
 
 def player_living_update(player: Player):
+    # TODO:有关收藏品的逻辑没有更新
     if player.health <= 0:
         player.living_state.die()
 
 
-def receive_damage(player: Player, damage: Damage):
+def player_decrease_health(player: Player, num: int):
+    """玩家减少生命值"""
+    player.health -= num
+    player_living_update(player)
+
+
+def player_receive_damage(player: Player, damage: Damage):
     """玩家受到伤害"""
     if damage.type == DamageTypeEnum.physical:
         received_damage = damage.num - player.physical_defense
@@ -45,17 +55,16 @@ def receive_damage(player: Player, damage: Damage):
         received_damage = damage.num - player.magic_defense
     elif damage.type == DamageTypeEnum.mental:
         received_damage = damage.num - player.mental_defense
-    player.health -= received_damage
-    player_living_update(player)
+    player_decrease_health(player, received_damage)
     return received_damage
 
 
 def discard_card(player: Player, card: Card, discardpile: DiscardPile):
     """弃牌"""
-    player.hand_sequence.remove(card)  # 从手牌中移除
     card.get_discarded()  # 状态切换，in_hand 切换到 on_discard
-    discardpile.append(card)  # 加入弃牌堆
+    player.hand_sequence.remove(card)  # 从手牌中移除
     card.get_into_discard_pile()  # 状态切换，on_discard 切换到 in_discard_pile
+    discardpile.append(card)  # 加入弃牌堆
 
 
 def choose_card_from_player(user: Player, target: Player, card: Card):
