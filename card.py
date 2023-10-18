@@ -92,7 +92,7 @@ class Card:
         self.card_type = card_type
 
     @abstractmethod
-    def take_effect(self, user: Player, target: Player):
+    def use(self, user: Player, target: Player):
         """卡牌产生效果"""
         pass
 
