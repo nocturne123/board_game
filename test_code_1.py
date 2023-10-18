@@ -1,13 +1,13 @@
 class A:
-    def __init__(self) -> None:
-        self.a = 20
-        self.b = 30
+    hook_func = []
 
-    def a_trans(self):
-        self.b = self.a
+    def __init__(self):
+        pass
+
+    def func_op(self, a):
+        a += 1
 
 
-a = A()
-a.a_trans()
-a.a += 1
-print(a.a, a.b)
+b = 2
+A.func_op(b)
+print(b)

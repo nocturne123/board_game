@@ -95,6 +95,11 @@ class Player:
         # 玩家的装备栏
         self.equipment_sequence = []
 
+        # 玩家的武器槽、防具槽、元素槽，装备之后变为True
+        self.weapon_slot = False
+        self.defense_slot = False
+        self.element_slot = False
+
         # 玩家手牌
         self.hand_sequence = []
 

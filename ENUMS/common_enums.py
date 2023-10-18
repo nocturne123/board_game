@@ -125,4 +125,3 @@ class DamageTypeEnum(enum.Enum):
     magic = 2
     mental = 3
     real = 4
-    healing = 5

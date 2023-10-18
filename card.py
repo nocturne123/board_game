@@ -1,9 +1,15 @@
 from ENUMS.common_enums import CardTypeEnum, CardStateEnum
 from transitions import Machine
+from card_pile import DrawPile, DiscardPile
+from player import Player
+from player_action import PlayerAction
+from abc import abstractmethod
 
 
 """卡牌的状态机实现"""
 """2023.10.13更新，卡牌类现在只有数据，卡牌产生效果的代码进入player_action"""
+"""2023.10.18更新，卡牌类现在涉及数据和操作，player_action现在只操作player相关数据，
+卡牌自身只提供效果，抽牌、使用、弃牌的操作在card_action中实现"""
 
 transtions = [
     {
@@ -84,6 +90,11 @@ class Card:
         )
         # 卡牌类型
         self.card_type = card_type
+
+    @abstractmethod
+    def take_effect(self, user: Player, target: Player):
+        """卡牌产生效果"""
+        pass
 
     def __repr__(self) -> str:
         return f"{self.card_type}"
