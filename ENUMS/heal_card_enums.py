@@ -7,6 +7,6 @@ class HealingIdentity(Enum):
     cake = 2
     cupcake = 3
     potion = 4
-    boneless = 5
+    toy = 5
     muffin = 6
     sandglass = 7

@@ -6,7 +6,7 @@
 结束回合、跳过回合。"""
 from player_data import PlayerData
 from damage import Damage
-
+import random
 from ENUMS.common_enums import (
     PlayerStateEnum,
     CharaterAliveEnum,
@@ -80,7 +80,14 @@ class Player:
             for func in self.Hook_Bofore_Healing:
                 func(self.data, num)
         self.data.health += num
+        if self.data.health > self.data.max_health:
+            self.data.health = self.data.max_health
         self.living_update(self)
         if self.Hook_After_Healing != []:
             for func in self.Hook_After_Healing:
                 func(self.data, num)
+
+    def roll_dice(self):
+        """玩家掷骰子"""
+        num = random.randint(1, 6)
+        return num
