@@ -1,13 +1,6 @@
-class A:
-    hook_func = []
+import math
 
-    def __init__(self):
-        pass
-
-    def func_op(self, a):
-        a += 1
-
-
-b = 2
-A.func_op(b)
+a = 1.6
+b = math.floor(a)
 print(b)
+print(type(b))

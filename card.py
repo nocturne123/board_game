@@ -1,9 +1,8 @@
-from ENUMS.common_enums import CardTypeEnum, CardStateEnum
+from ENUMS.common_enums import CardTypeEnum, CardStateEnum, DamageTypeEnum
 from transitions import Machine
-from card_pile import DrawPile, DiscardPile
 from player import Player
-from player_action import PlayerAction
 from abc import abstractmethod
+from damage import Damage
 
 
 """卡牌的状态机实现"""
@@ -92,7 +91,7 @@ class Card:
         self.card_type = card_type
 
     @abstractmethod
-    def use(self, user: Player, target: Player):
+    def effect(self, user: Player, target: Player):
         """卡牌产生效果"""
         pass
 
@@ -112,6 +111,12 @@ class PhysicalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
+    def effect(self, user: Player, target: Player):
+        """卡牌产生效果"""
+        target.receive_damage(
+            Damage(user.data.physical_attack, DamageTypeEnum.physical)
+        )
+
     def __repr__(self) -> str:
         return "PhysicalAttack"
 
@@ -127,6 +132,10 @@ class MagicAttackCard(Card):
     ):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
+
+    def effect(self, user: Player, target: Player):
+        """卡牌产生效果"""
+        target.receive_damage(Damage(user.data.magic_attack, DamageTypeEnum.magic))
 
     def __repr__(self) -> str:
         return "MagicAttack"
@@ -144,6 +153,10 @@ class MentalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
+    def effect(self, user: Player, target: Player):
+        """卡牌产生效果"""
+        target.receive_damage(Damage(user.data.mental_attack, DamageTypeEnum.mental))
+
     def __repr__(self) -> str:
         return "MentalAttack"
 
@@ -159,6 +172,12 @@ class StealCard(Card):
     ):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
+
+    def effect(self, user: Player, target: (Player, Card)):
+        """卡牌产生效果"""
+        target[1].get_stolen()
+        target[0].data.hand_sequence.remove(target[1])
+        user.data.hand_sequence.append(target[1])
 
     def __repr__(self) -> str:
         return "Steal"

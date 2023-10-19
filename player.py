@@ -1,174 +1,86 @@
-from charaters import Charater
+"""这个文件是玩家操作的文件，现阶段全部用静态方法实现。
+未来需要用类进行包装。实现hook机制，实现玩家操作的可扩展性，方便技能的实现。
+注：卡牌的状态切换先于卡牌的相关操作，先切换，再操作"""
+"""2023.10.18：将使用卡牌的逻辑剔除出PlayerAction，PlayerAction中的操作只涉及Player类的
+数值操作、状态改变等，例如血量的增加减少、抽牌数的增加减少、受到伤害，以及回合相关操作，比如
+结束回合、跳过回合。"""
+from player_data import PlayerData
+from damage import Damage
 
 from ENUMS.common_enums import (
     PlayerStateEnum,
     CharaterAliveEnum,
     SpeciesEnum,
     DamageTypeEnum,
-    CharaterAliveEnum,
+    CardTypeEnum,
+    CardStateEnum,
 )
-from damage import Damage
 
-from transitions import Machine
-
-stage_transitions = [
-    {
-        "trigger": "start_turn",
-        "source": PlayerStateEnum.wait,
-        "dest": PlayerStateEnum.prepare,
-    },
-    {
-        "trigger": "end_prepare",
-        "source": PlayerStateEnum.prepare,
-        "dest": PlayerStateEnum.draw,
-    },
-    {
-        "trigger": "end_draw",
-        "source": PlayerStateEnum.draw,
-        "dest": PlayerStateEnum.play,
-    },
-    {
-        "trigger": "end_play",
-        "source": PlayerStateEnum.play,
-        "dest": PlayerStateEnum.discard,
-    },
-    {
-        "trigger": "end_discard",
-        "source": PlayerStateEnum.discard,
-        "dest": PlayerStateEnum.end,
-    },
-    {
-        "trigger": "end_turn",  # 用于结束回合
-        "source": PlayerStateEnum.end,
-        "dest": PlayerStateEnum.wait,
-    },
-    {
-        "trigger": "skip_turn",  # 用于跳过回合
-        "source": PlayerStateEnum.prepare,
-        "dest": PlayerStateEnum.end,
-    },
-    {
-        "trigger": "skip_draw",  # 用于跳过抽牌阶段
-        "source": PlayerStateEnum.prepare,
-        "dest": PlayerStateEnum.play,
-    },
-    {
-        "trigger": "skip_play",  # 用于跳过出牌阶段
-        "source": PlayerStateEnum.draw,
-        "dest": PlayerStateEnum.discard,
-    },
-    {
-        "trigger": "skip_discard",  # 用于跳过弃牌阶段
-        "source": PlayerStateEnum.play,
-        "dest": PlayerStateEnum.end,
-    },
-]
-
-living_stage_transitions = [
-    {
-        "trigger": "die",
-        "source": CharaterAliveEnum.alive,
-        "dest": CharaterAliveEnum.dead,
-    },
-    {
-        "trigger": "faint",
-        "source": CharaterAliveEnum.alive,
-        "dest": CharaterAliveEnum.fainted,
-    },
-    {
-        "trigger": "awake",
-        "source": CharaterAliveEnum.fainted,
-        "dest": CharaterAliveEnum.alive,
-    },
-]
+from player_exceptions import (
+    NotInPlayStateException,
+    NoChanceToAttackException,
+    ImmuneToAttackException,
+    ImmuneToStealException,
+)
 
 
 class Player:
-    def __init__(self, cha: Charater):
-        """玩家类实现"""
-        self.health = cha.health
-        self.speed = cha.speed
-        self.skills = []
-        self.name = cha.name
-        self.species = cha.species
+    """玩家操作类"""
 
-        # 玩家的装备栏
-        self.equipment_sequence = []
+    def __init__(self, player_data) -> None:
+        self.data: PlayerData = player_data
+        self.Hook_Bofore_Healing = []
+        self.Hook_After_Healing = []
 
-        # 玩家的武器槽、防具槽、元素槽，装备之后变为True
-        self.weapon_slot = False
-        self.defense_slot = False
-        self.element_slot = False
+    def living_update(self):
+        # TODO:有关收藏品的逻辑没有更新
+        if self.data.health <= 0:
+            self.data.living_state.die()
 
-        # 玩家手牌
-        self.hand_sequence = []
+    def decrease_health(self, num: int):
+        """玩家减少生命值"""
+        self.data.health -= num
+        self.living_update(self)
 
-        # 玩家收集品
-        self.colloctions = []
+    def receive_damage(self, damage: Damage):
+        """玩家受到伤害"""
+        if damage.type == DamageTypeEnum.physical:
+            received_damage = damage.num - self.data.physical_defense
+        elif damage.type == DamageTypeEnum.magic:
+            received_damage = damage.num - self.data.magic_defense
+        elif damage.type == DamageTypeEnum.mental:
+            received_damage = damage.num - self.data.mental_defense
+        self.decrease_health(self, received_damage)
+        return received_damage
 
-        # 玩家可否被选中，主要针对特殊状态，例如晕眩、针线提供的无敌、余晖烁烁的无敌、王冠提供的无敌
-        # 根据技能描述，线轴为不会受到伤害，余晖烁烁、王冠为不能成为攻击牌目标，增加不可被攻击选中的属性
-        # 攻击不可被选中在攻击牌类种实现，玩家类仅提供属性
-        # 玩家可否被偷窃，也写在这里
-        self.is_selectable = True
-        self.immune_from_attack = False
-        self.immune_from_steal = False
+    def end_play(self):
+        """结束回合"""
+        if len(self.data.hand_sequence) <= self.data.max_hand_sequence_num:
+            self.data.stage_state.skip_discard()
+            self.data.stage_state.end_turn()
+        else:
+            self.data.stage_state.end_play()
 
-        # 玩家id，未来看是否会用到
-        self.id = 0
+    def end_discard(self):
+        """结束阶段"""
+        self.data.stage_state.end_discard()
 
-        # 角色的三种基本攻击
-        self.physical_attack = cha.physical_attack
-        self.magic_attack = cha.magic_attack
-        self.mental_attack = cha.mental_attack
+    def end_turn(self):
+        """结束回合"""
+        self.data.stage_state.end_turn()
 
-        # 角色的三种基本防御
-        self.physical_defense = 0
-        self.magic_defense = 0
-        self.mental_defense = 0
+    def start_turn_init(self):
+        """回合开始时的初始化"""
+        self.data.move_chance_in_turn = self.data.move_chance
+        self.data.attack_chance_in_turn = self.data.attack_chance
 
-        # 角色的基础生命值和最大生命值
-        self.base_health = cha.health
-        self.max_health = cha.health
-
-        # 角色在回合开始时的抽牌数量
-        self.draw_stage_card_number = 2
-
-        # 角色初始手牌数量
-        self.start_game_draw = 4
-
-        # 角色最大手牌数量
-        self.max_hand_sequence_num = 6
-
-        # 玩家移动次数和攻击次数，在回合开始时，用这个属性来初始化
-        self.move_chance = 1
-        self.attack_chance = 1
-
-        # 玩家在回合种的移动和攻击次数，用于记录玩家在回合中的移动和攻击次数
-        self.move_chance_in_turn = 0
-        self.attack_chance_in_turn = 0
-
-        """以下属性为状态机相关属性"""
-        # 玩家阶段状态，先为空，在后面利用函数补充
-        self.stage_state = None
-
-        # 玩家生存状态，先为空，同上
-        self.living_state = None
-
-    def stage_state_init(self, transitions=stage_transitions):
-        """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
-        准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
-        # 基础状态机，初始化为等待状态
-        self.stage_state = Machine(
-            states=PlayerStateEnum,
-            transitions=transitions,
-            initial=PlayerStateEnum.wait,
-        )
-
-    def living_state_init(self, transitions=living_stage_transitions):
-        """玩家生存状态，用于表示玩家当前处于哪个状态，状态包括存活、昏迷、死亡"""
-        self.living_state = Machine(
-            states=CharaterAliveEnum,
-            transitions=transitions,
-            initial=CharaterAliveEnum.alive,
-        )
+    def heal(self, num: int):
+        """玩家回复生命值"""
+        if self.Hook_Bofore_Healing != []:
+            for func in self.Hook_Bofore_Healing:
+                func(self.data, num)
+        self.data.health += num
+        self.living_update(self)
+        if self.Hook_After_Healing != []:
+            for func in self.Hook_After_Healing:
+                func(self.data, num)
