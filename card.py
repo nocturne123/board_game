@@ -4,7 +4,6 @@ from player import Player
 from abc import abstractmethod
 from damage import Damage
 
-
 """卡牌的状态机实现"""
 """2023.10.13更新，卡牌类现在只有数据，卡牌产生效果的代码进入player_action"""
 """2023.10.18更新，卡牌类现在涉及数据和操作，player_action现在只操作player相关数据，
@@ -173,7 +172,7 @@ class StealCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user: Player, target: (Player, Card)):
+    def effect(self, user: Player, target: tuple[Player, Card]):
         """卡牌产生效果"""
         target[1].get_stolen()
         target[0].data.hand_sequence.remove(target[1])

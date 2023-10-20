@@ -7,7 +7,8 @@ from team import Team
 from random import shuffle
 from itertools import chain, zip_longest
 from collections import deque
-import player_action as PlayerAction
+from player_data import PlayerData
+from card_action import CardAction
 
 
 # 游戏类
@@ -89,11 +90,7 @@ class Game:
 
     def game_start_dealing(self):
         for player in self.player_list:
-            for i in range(player.start_game_draw):
-                card = self.draw_pile.pop()
-                card.get_draw()
-                player.hand_sequence.append(card)
-                card.get_into_hand()
+            pass
 
     def set_round_list(self):
         """返回当前玩家的优先级序列，可以视作玩家观察到的轮次"""
@@ -108,9 +105,9 @@ class Game:
 
     def set_current_player_start_turn(self):
         self.current_player.stage_state.start_turn()  # 开始回合，进入准备阶段
-        PlayerAction.player_start_turn_init(self.current_player)  # 玩家回合开始时的初始化
+        self.current_player.player_start_turn_init(self.current_player)  # 玩家回合开始时的初始化
         self.current_player.stage_state.end_prepare()  # 结束准备阶段，进入抽牌阶段
-        PlayerAction.draw_card_from_pile(
+        self.current_player.draw_card_from_pile(
             self.current_player,
             self.draw_pile,
             self.current_player.draw_stage_card_number,
