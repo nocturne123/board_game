@@ -4,7 +4,7 @@ from player_action import PlayerAction
 
 
 class Player:
-    def __init__(self, player_data) -> None:
-        self.data: PlayerData = player_data
+    def __init__(self, character) -> None:
+        self.data: PlayerData = PlayerData(character)
         self.player_action = PlayerAction(self.data)
         self.card_action = CardAction(self.player_action)

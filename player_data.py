@@ -18,12 +18,12 @@ stage_transitions = [
         "dest": PlayerStateEnum.prepare,
     },
     {
-        "trigger": "end_prepare",
+        "trigger": "start_draw",
         "source": PlayerStateEnum.prepare,
         "dest": PlayerStateEnum.draw,
     },
     {
-        "trigger": "end_draw",
+        "trigger": "start_play",
         "source": PlayerStateEnum.draw,
         "dest": PlayerStateEnum.play,
     },

@@ -2,7 +2,19 @@
 from player_action import PlayerAction
 from player_data import PlayerData
 from card_pile import DiscardPile, DrawPile
-from ENUMS.common_enums import CardTypeEnum
+from ENUMS.common_enums import CardTypeEnum, CardStateEnum, PlayerStateEnum
+from player_exceptions import (
+    NotInPlayStateException,
+    NoChanceToAttackException,
+    ImmuneToAttackException,
+    ImmuneToStealException,
+)
+
+from card_exceptions import (
+    CardNotInHandStateException,
+    CardNotInHandException,
+    MismatchedCardException,
+)
 
 
 class CardAction:
@@ -25,6 +37,43 @@ class CardAction:
         card.get_into_discard_pile()
         discard_pile.append(card)
 
+    def use_card_checker(self, card, target):
+        """检查卡牌是否合法"""
+        # 检查玩家状态，只有在play状态下才能打出卡牌
+        if self.data.stage_state.state != PlayerStateEnum.play:
+            raise NotInPlayStateException
+        # 检查卡牌是否在状态，你不能打出一张不在手牌状态的卡牌
+        if card.state != CardStateEnum.in_hand:
+            raise CardNotInHandStateException
+
+        # 你不能打出一张不在手牌中的手牌
+        if card not in self.data.hand_sequence:
+            raise CardNotInHandException
+
+        # 攻击牌下的检查
+        if (
+            card.card_type == CardTypeEnum.physical_attack
+            or card.card_type == CardTypeEnum.magic_attack
+            or card.card_type == CardTypeEnum.mental_attack
+        ):
+            # 没有攻击次数时不能打出攻击牌
+            if self.data.attack_chance_in_turn <= 0:
+                raise NoChanceToAttackException
+            # 目标免疫攻击时不能打出攻击牌
+            if target.data.immune_from_attack:
+                raise ImmuneToAttackException
+
+        # 偷窃牌下的检查，目标免疫偷牌时无效
+        # 注：target(Player,Card)，Player是被偷牌的目标，Card是被偷的牌
+        if card.card_type == CardTypeEnum.steal:
+            if target[0].data.immune_from_steal:
+                raise ImmuneToStealException
+            if (
+                target[1] not in target[0].data.equipment_sequence
+                and target[1] not in target[0].data.hand_sequence
+            ):
+                raise MismatchedCardException
+
     def use_card(
         self,
         card,
@@ -33,6 +82,7 @@ class CardAction:
     ):
         """玩家使用卡牌，这个环节要包含卡牌的状态转换、卡牌的位置转换。
         卡牌自己产生的效果在卡牌的effect函数中实现，这里只调用effect函数，不关心效果的具体实现"""
+        self.use_card_checker(card, target)
         card.get_played()
         self.data.hand_sequence.remove(card)  # 这个时刻，卡牌已经不在手牌中了
 
@@ -53,7 +103,7 @@ class CardAction:
         ):
             card.get_equipped()  # 装备卡牌的状态转换，由on_use转换到on_equipment
             self.data.equipment_sequence.append(card)
-            card.effect(self.player_action, target)
+            card.effect(self, target)
             match card.card_type:
                 case CardTypeEnum.armor:
                     self.data.armor_slot = True
@@ -64,7 +114,15 @@ class CardAction:
 
         else:  # 一般卡牌的状态转换逻辑
             card.take_effect()  # 卡牌的状态转换，由on_use转换到on_taking_effect
-            card.effect(self.player_action, target)
+            card.effect(self, target)
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)
+
+    def unmount_item(self, card, discard_pile: DiscardPile):
+        """玩家卸下物品"""
+        card.get_unmounted()  # 物品的状态转换，由on_equipment转换到on_discard
+        card.unequip(self)  # 调用卡牌的unequip函数，进行一些注销的操作
+        self.data.equipment_sequence.remove(card)
+        card.get_into_discard_pile()
+        discard_pile.append(card)

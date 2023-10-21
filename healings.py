@@ -25,8 +25,8 @@ class Apple(HealCard):
         self.identity = HealingIdentity.apple
         self.description = "Heal 2 HP"
 
-    def effect(self, user: PlayerAction, target):
-        user.heal(2)
+    def effect(self, user, target):
+        user.player_action.heal(2)
 
     def __repr__(self):
         return f"Apple: {self.description}"
@@ -38,8 +38,8 @@ class Cupcake(HealCard):
         self.identity = HealingIdentity.cupcake
         self.description = "Heal 4 HP"
 
-    def effect(self, user: PlayerAction, target):
-        user.heal(4)
+    def effect(self, user, target):
+        user.player_action.heal(4)
 
     def __repr__(self):
         return f"Cupcake: {self.description}"
@@ -51,9 +51,9 @@ class Cake(HealCard):
         self.identity = HealingIdentity.cake
         self.description = "Heal half of your lost HP(round down)"
 
-    def effect(self, user: PlayerAction, target):
+    def effect(self, user, target):
         lost_hp = user.data.max_health - user.data.health
-        user.heal(math.floor(lost_hp / 2))
+        user.player_action.heal(math.floor(lost_hp / 2))
 
     def __repr__(self):
         return f"Cake: {self.description}"
@@ -65,9 +65,9 @@ class Muffin(HealCard):
         self.identity = HealingIdentity.muffin
         self.description = "Roll a dice, heal dice number"
 
-    def effect(self, user: PlayerAction, target):
-        num = user.roll_dice()
-        user.heal(num)
+    def effect(self, user, target):
+        num = user.player_action.roll_dice()
+        user.player_action.heal(num)
 
     def __repr__(self):
         return f"Muffin: {self.description}"
@@ -79,9 +79,9 @@ class Sandglass(HealCard):
         self.identity = HealingIdentity.sandglass
         self.description = "Recover to your last turn's HP"
 
-    def effect(self, user: PlayerAction, target):
+    def effect(self, user, target):
         if user.data.health < user.data.health_last_turn:
-            user.heal(user.data.health_last_turn - user.data.health)
+            user.player_action.heal(user.data.health_last_turn - user.data.health)
 
     def __repr__(self):
         return f"Sandglass: {self.description}"

@@ -16,19 +16,15 @@ from ENUMS.common_enums import (
     CardStateEnum,
 )
 
-from player_exceptions import (
-    NotInPlayStateException,
-    NoChanceToAttackException,
-    ImmuneToAttackException,
-    ImmuneToStealException,
-)
-
 
 class PlayerAction:
     """玩家操作类"""
 
     def __init__(self, player_data) -> None:
         self.data: PlayerData = player_data
+        # 玩家数据的状态机初始化在这一步完成，这样当玩家数据初始化时，状态机也会初始化
+        self.data.stage_state_init()
+        self.data.living_state_init()
         self.Hook_Bofore_Healing = []
         self.Hook_After_Healing = []
 
@@ -40,7 +36,7 @@ class PlayerAction:
     def decrease_health(self, num: int):
         """玩家减少生命值"""
         self.data.health -= num
-        self.living_update(self)
+        self.living_update()
 
     def receive_damage(self, damage: Damage):
         """玩家受到伤害"""
@@ -50,8 +46,20 @@ class PlayerAction:
             received_damage = damage.num - self.data.magic_defense
         elif damage.type == DamageTypeEnum.mental:
             received_damage = damage.num - self.data.mental_defense
-        self.decrease_health(self, received_damage)
+        self.decrease_health(received_damage)
         return received_damage
+
+    def start_turn(self):
+        """开始回合"""
+        self.data.stage_state.start_turn()  # 玩家状态切换，从wait切换到prepare
+
+    def start_draw(self):
+        """结束准备阶段,抽牌阶段开始"""
+        self.data.stage_state.start_draw()  # 玩家状态切换，从prepare切换到draw
+
+    def start_play(self):
+        """结束抽牌阶段，出牌阶段开始"""
+        self.data.stage_state.start_play()
 
     def end_play(self):
         """结束回合"""
@@ -86,7 +94,7 @@ class PlayerAction:
         self.data.health += num
         if self.data.health > self.data.max_health:
             self.data.health = self.data.max_health
-        self.living_update(self)
+        self.living_update()
         if self.Hook_After_Healing != []:
             for func in self.Hook_After_Healing:
                 func(self.data, num)
