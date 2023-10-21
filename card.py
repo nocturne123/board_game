@@ -1,6 +1,5 @@
 from ENUMS.common_enums import CardTypeEnum, CardStateEnum, DamageTypeEnum
 from transitions import Machine
-from player import Player
 from abc import abstractmethod
 from damage import Damage
 
@@ -90,7 +89,7 @@ class Card:
         self.card_type = card_type
 
     @abstractmethod
-    def effect(self, user: Player, target: Player):
+    def effect(self, user, target):
         """卡牌产生效果"""
         pass
 
@@ -110,9 +109,9 @@ class PhysicalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user: Player, target: Player):
+    def effect(self, user, target):
         """卡牌产生效果"""
-        target.receive_damage(
+        target.player_action.receive_damage(
             Damage(user.data.physical_attack, DamageTypeEnum.physical)
         )
 
@@ -132,9 +131,11 @@ class MagicAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user: Player, target: Player):
+    def effect(self, user, target):
         """卡牌产生效果"""
-        target.receive_damage(Damage(user.data.magic_attack, DamageTypeEnum.magic))
+        target.player_action.receive_damage(
+            Damage(user.data.magic_attack, DamageTypeEnum.magic)
+        )
 
     def __repr__(self) -> str:
         return "MagicAttack"
@@ -152,9 +153,11 @@ class MentalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user: Player, target: Player):
+    def effect(self, user, target):
         """卡牌产生效果"""
-        target.receive_damage(Damage(user.data.mental_attack, DamageTypeEnum.mental))
+        target.player_action.receive_damage(
+            Damage(user.data.mental_attack, DamageTypeEnum.mental)
+        )
 
     def __repr__(self) -> str:
         return "MentalAttack"
@@ -172,11 +175,17 @@ class StealCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user: Player, target: tuple[Player, Card]):
+    def effect(self, user, target: tuple):
         """卡牌产生效果"""
-        target[1].get_stolen()
-        target[0].data.hand_sequence.remove(target[1])
-        user.data.hand_sequence.append(target[1])
+        match target[1].state:
+            case CardStateEnum.on_equipment:
+                target[1].get_unmounted()
+                target[0].data.equipment_sequence.remove(target[1])
+                user.data.equipment_sequence.append(target[1])
+            case CardStateEnum.in_hand:
+                target[1].get_stolen()
+                target[0].data.hand_sequence.remove(target[1])
+                user.data.hand_sequence.append(target[1])
 
     def __repr__(self) -> str:
         return "Steal"

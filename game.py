@@ -85,8 +85,9 @@ class Game:
         return deque(team for team in self.team_deque if team.is_remaining)
 
     def next_team(self):
-        a = self.team_deque.popleft()
-        self.team_deque.append(a)
+        while self.team_deque[0].is_remaining == False:
+            a = self.team_deque.popleft()
+            self.team_deque.append(a)
 
     def game_start_dealing(self):
         for player in self.player_list:
@@ -101,13 +102,13 @@ class Game:
         ]
 
     def set_player_to_current(self):
-        self.current_player = self.team_deque[0][0]
+        self.current_player: Player = self.team_deque[0][0]
 
     def set_current_player_start_turn(self):
-        self.current_player.stage_state.start_turn()  # 开始回合，进入准备阶段
-        self.current_player.player_start_turn_init(self.current_player)  # 玩家回合开始时的初始化
-        self.current_player.stage_state.end_prepare()  # 结束准备阶段，进入抽牌阶段
-        self.current_player.draw_card_from_pile(
+        self.current_player.data.stage_state.start_turn()  # 开始回合，进入准备阶段
+        self.current_player.player_start_turn_init()  # 玩家回合开始时的初始化
+        self.current_player.data.stage_state.end_prepare()  # 结束准备阶段，进入抽牌阶段
+        self.current_player.data.draw_card_from_pile(
             self.current_player,
             self.draw_pile,
             self.current_player.draw_stage_card_number,

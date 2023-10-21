@@ -15,7 +15,9 @@ class Team(deque[Player]):
 
     @property
     def is_remaining(self):
-        return any(player.data.living_state != CharaterAliveEnum.dead for player in self)
+        return any(
+            player.data.living_state != CharaterAliveEnum.dead for player in self
+        )
 
     def next_alive_player(self):
         if self.is_remaining:
@@ -27,7 +29,9 @@ class Team(deque[Player]):
 
     def alive_list(self):
         return [
-            player for player in self if player.data.living_state != CharaterAliveEnum.dead
+            player
+            for player in self
+            if player.data.living_state != CharaterAliveEnum.dead
         ]
 
     def __repr__(self) -> str:

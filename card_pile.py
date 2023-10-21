@@ -1,6 +1,5 @@
 """牌堆的实现，继承自list，包含洗牌功能，对牌堆的操作在玩家类中实现"""
 from random import shuffle
-from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard
 
 
 # TODO:实现抽牌，弃牌，洗牌等功能
@@ -16,6 +15,8 @@ class DrawPile(CardPile):
     def __init__(self):
         super().__init__()
 
+
+'''
     def test_draw_pile(self):
         """临时测试的牌堆"""
         a = [PhysicalAttackCard() for i in range(16)]
@@ -25,6 +26,7 @@ class DrawPile(CardPile):
         self.extend(b)
         self.extend(c)
         shuffle(self)
+'''
 
 
 class DiscardPile(CardPile):

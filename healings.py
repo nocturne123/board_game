@@ -4,7 +4,7 @@ from card import Card, transtions
 from ENUMS.common_enums import CardTypeEnum, CardStateEnum
 from ENUMS.heal_card_enums import HealingIdentity
 from abc import abstractmethod
-from player import Player
+from player_action import PlayerAction
 import math
 
 
@@ -25,7 +25,7 @@ class Apple(HealCard):
         self.identity = HealingIdentity.apple
         self.description = "Heal 2 HP"
 
-    def effect(self, user: Player, target):
+    def effect(self, user: PlayerAction, target):
         user.heal(2)
 
     def __repr__(self):
@@ -38,7 +38,7 @@ class Cupcake(HealCard):
         self.identity = HealingIdentity.cupcake
         self.description = "Heal 4 HP"
 
-    def effect(self, user: Player, target):
+    def effect(self, user: PlayerAction, target):
         user.heal(4)
 
     def __repr__(self):
@@ -51,7 +51,7 @@ class Cake(HealCard):
         self.identity = HealingIdentity.cake
         self.description = "Heal half of your lost HP(round down)"
 
-    def effect(self, user: Player, target):
+    def effect(self, user: PlayerAction, target):
         lost_hp = user.data.max_health - user.data.health
         user.heal(math.floor(lost_hp / 2))
 
@@ -65,7 +65,7 @@ class Muffin(HealCard):
         self.identity = HealingIdentity.muffin
         self.description = "Roll a dice, heal dice number"
 
-    def effect(self, user: Player, target):
+    def effect(self, user: PlayerAction, target):
         num = user.roll_dice()
         user.heal(num)
 
@@ -79,7 +79,7 @@ class Sandglass(HealCard):
         self.identity = HealingIdentity.sandglass
         self.description = "Recover to your last turn's HP"
 
-    def effect(self, user: Player, target):
+    def effect(self, user: PlayerAction, target):
         if user.data.health < user.data.health_last_turn:
             user.heal(user.data.health_last_turn - user.data.health)
 

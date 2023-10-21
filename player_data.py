@@ -158,6 +158,12 @@ class PlayerData:
         # 玩家上一轮的生命值，初始时为最大生命值，在回合结束时记录，给沙漏使用
         self.health_last_turn = self.max_health
 
+        # 玩家的回合计数
+        self.turn_count = 0
+
+        # 玩家的轮次计数
+        self.round_count = 0
+
     def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""

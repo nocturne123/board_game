@@ -1,39 +1,40 @@
 """这个文件是卡牌的上级操作文件，包括抽牌、卡牌的使用、弃牌等卡牌自己看不到的操作"""
-from card import Card
-from player import Player
-from card_pile import CardPile, DiscardPile, DrawPile
+from player_action import PlayerAction
+from player_data import PlayerData
+from card_pile import DiscardPile, DrawPile
 from ENUMS.common_enums import CardTypeEnum
 
 
 class CardAction:
-    def __init__(self, player) -> None:
-        self.player: Player = player
+    def __init__(self, player_action):
+        self.player_action: PlayerAction = player_action
+        self.data: PlayerData = player_action.data
 
-    def draw_card(self, card_pile: CardPile, num=1):
+    def draw_card(self, card_pile: DrawPile, num=1):
         """玩家抽牌"""
         for i in range(num):
             card = card_pile.pop()
             card.get_draw()
             card.get_into_hand()
-            self.player.data.hand_sequence.append(card)
+            self.data.hand_sequence.append(card)
 
-    def discard_card(self, card: Card, discard_pile: DiscardPile):
+    def discard_card(self, card, discard_pile: DiscardPile):
         """玩家弃牌"""
         card.get_discarded()
-        self.player.data.hand_sequence.remove(card)
+        self.data.hand_sequence.remove(card)
         card.get_into_discard_pile()
         discard_pile.append(card)
 
     def use_card(
         self,
-        card: Card,
-        target: Player | Card |tuple| None,
+        card,
+        target,  # 摆烂了，target可以为player，也可以是一个tuple[Player,Card]，如果想要类型提示的话一定会import player，但是这样就循环import了
         discard_pile: DiscardPile,
     ):
         """玩家使用卡牌，这个环节要包含卡牌的状态转换、卡牌的位置转换。
         卡牌自己产生的效果在卡牌的effect函数中实现，这里只调用effect函数，不关心效果的具体实现"""
         card.get_played()
-        self.player.data.hand_sequence.remove(card)  # 这个时刻，卡牌已经不在手牌中了
+        self.data.hand_sequence.remove(card)  # 这个时刻，卡牌已经不在手牌中了
 
         # 当卡牌类型为攻击时，玩家的攻击次数减少1
         if (
@@ -41,7 +42,7 @@ class CardAction:
             or card.card_type == CardTypeEnum.magic_attack
             or card.card_type == CardTypeEnum.mental_attack
         ):
-            self.player.data.attack_chance_in_turn -= 1
+            self.data.attack_chance_in_turn -= 1
 
         # 当卡牌类型为装备时，状态转换逻辑要分开
         if (
@@ -51,47 +52,19 @@ class CardAction:
             or card.card_type == CardTypeEnum.anti_element
         ):
             card.get_equipped()  # 装备卡牌的状态转换，由on_use转换到on_equipment
-            self.player.data.equipment_sequence.append(card)
-            card.effect(self.player, target)
+            self.data.equipment_sequence.append(card)
+            card.effect(self.player_action, target)
             match card.card_type:
                 case CardTypeEnum.armor:
-                    self.player.data.armor_slot = True
+                    self.data.armor_slot = True
                 case CardTypeEnum.weapon:
-                    self.player.data.weapon_slot = True
+                    self.data.weapon_slot = True
                 case CardTypeEnum.element, CardTypeEnum.anti_element:
-                    self.player.data.element_slot = True
+                    self.data.element_slot = True
 
         else:  # 一般卡牌的状态转换逻辑
             card.take_effect()  # 卡牌的状态转换，由on_use转换到on_taking_effect
-            card.effect(self.player, target)
+            card.effect(self.player_action, target)
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)
-
-    def unmount_card(self,card:Card,discard_pile:DiscardPile): #把装备从装备区拆下的操作
-        if card in self.player.data.equipment_sequence:
-            card.get_unmounted() #卡牌状态转换，从on_equipment转换为on_discard
-            self.player.data.equipment_sequence.remove(card)
-            match card.card_type:
-                case CardTypeEnum.weapon:
-                    if self.player.data.weapon_slot:
-                        self.player.data.weapon_slot = False
-                    else:
-                        raise ValueError("mismatched quiptment slot!")
-
-                case CardTypeEnum.armor:
-                    if self.player.data.armor_slot:
-                        self.player.data.armor_slot =False
-                    else:
-                        raise ValueError("mismatched quiptment slot!")
-
-                case CardTypeEnum.element:
-                    if self.player.data.element_slot:
-
-                        self.player.data.element_slot = False
-                    else:
-                        ValueError("mismatched quiptment slot!")
-
-            card.get_into_discard_pile() #卡牌状态转换，从on_discard转换为in_discard_pile
-            discard_pile.append(card)
-
