@@ -100,6 +100,11 @@ class PlayerAction:
                 func(self.data, num)
 
     def roll_dice(self):
-        """玩家掷骰子"""
+        """玩家掷色子"""
+        num = random.randint(1, 6)
+        return num
+
+    def roll_earthpony_dice(self):
+        """陆马技能的色子和普通色子分开"""
         num = random.randint(1, 6)
         return num

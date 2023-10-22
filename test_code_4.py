@@ -2,7 +2,7 @@ from game import Game
 from player import Player
 from card_pile import DrawPile, DiscardPile
 from card import PhysicalAttackCard, MagicAttackCard, MentalAttackCard, StealCard
-from healings import Muffin
+from healings import Muffin, Cake
 from charaters import Charater
 from ENUMS.common_enums import (
     SpeciesEnum,
@@ -10,7 +10,6 @@ from ENUMS.common_enums import (
     CharaterAliveEnum,
     PlayerStateEnum,
 )
-import player_action as PlayerAction
 from pprint import pprint
 from player_exceptions import NoChanceToAttackException
 from team import Team
@@ -79,7 +78,7 @@ print(discard_pile[0].state)
 # 模拟大麦偷牌
 # 先往抽牌堆里加入一张偷牌，再加入一张马芬恢复牌，大麦抽到偷牌，dummy抽到马芬，大麦再偷马芬
 steal_card = StealCard()
-muffin = Muffin()
+muffin = Cake()
 draw_pile.append(steal_card)
 draw_pile.append(muffin)
 dummy_player.card_action.draw_card(draw_pile, 1)
@@ -94,7 +93,7 @@ print(mac_player.data.hand_sequence[-1])
 print(mac_player.data.hand_sequence[-1].state)
 
 # 模拟大麦打出一张马芬
-mac_player.player_action.decrease_health(10)
+mac_player.player_action.decrease_health(9)
 print(mac_player.data.health)
 mac_player.card_action.use_card(
     mac_player.data.hand_sequence[-1],

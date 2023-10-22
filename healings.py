@@ -53,7 +53,7 @@ class Cake(HealCard):
 
     def effect(self, user, target):
         lost_hp = user.data.max_health - user.data.health
-        user.player_action.heal(math.floor(lost_hp / 2))
+        user.player_action.heal(math.ceil(lost_hp / 2))
 
     def __repr__(self):
         return f"Cake: {self.description}"

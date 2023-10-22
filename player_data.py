@@ -88,9 +88,13 @@ class PlayerData:
         """玩家类实现"""
         self.health = cha.health
         self.speed = cha.speed
-        self.skills = []
         self.name = cha.name
         self.species = cha.species
+
+        # 技能栏，分为种族技能、角色技能、装备技能
+        self.species_skills = []
+        self.character_skills = []
+        self.equipment_skills = []
 
         # 玩家的装备栏
         self.equipment_sequence = []
@@ -121,6 +125,9 @@ class PlayerData:
         self.physical_attack = cha.physical_attack
         self.magic_attack = cha.magic_attack
         self.mental_attack = cha.mental_attack
+
+        # 角色的攻击距离
+        self.attack_distance = 0
 
         # 角色的三种基本防御
         self.physical_defense = 0

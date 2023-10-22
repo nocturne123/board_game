@@ -122,7 +122,7 @@ class CardAction:
     def unmount_item(self, card, discard_pile: DiscardPile):
         """玩家卸下物品"""
         card.get_unmounted()  # 物品的状态转换，由on_equipment转换到on_discard
-        card.unequip(self)  # 调用卡牌的unequip函数，进行一些注销的操作
+        card.unequiped(self)  # 调用卡牌的unequip函数，进行一些注销的操作
         self.data.equipment_sequence.remove(card)
         card.get_into_discard_pile()
         discard_pile.append(card)
