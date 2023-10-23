@@ -22,6 +22,9 @@ class CardAction:
         self.player_action: PlayerAction = player_action
         self.data: PlayerData = player_action.data
 
+        self.Hook_Before_Use = []
+        self.Hook_After_Use = []
+
     def draw_card(self, card_pile: DrawPile, num=1):
         """玩家抽牌"""
         for i in range(num):

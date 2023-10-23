@@ -24,6 +24,7 @@ class EarthponySkill(SpeciesSkill):
 
     def __init__(self):
         super().__init__()
+        self.auto_use = True
 
     def register(self, user: Player):
         pass

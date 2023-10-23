@@ -15,6 +15,7 @@ from player_exceptions import NoChanceToAttackException
 from team import Team
 from collections import deque
 from random import shuffle
+from armors import Clothes, Hat
 
 """这个文件是经过状态机重构后的测试文件"""
 
@@ -74,11 +75,13 @@ mac_player.card_action.use_card(
 print(dummy_player.data.health)
 print(discard_pile[0])
 print(discard_pile[0].state)
+print("=" * 30)
+
 
 # 模拟大麦偷牌
 # 先往抽牌堆里加入一张偷牌，再加入一张马芬恢复牌，大麦抽到偷牌，dummy抽到马芬，大麦再偷马芬
 steal_card = StealCard()
-muffin = Cake()
+muffin = Muffin()
 draw_pile.append(steal_card)
 draw_pile.append(muffin)
 dummy_player.card_action.draw_card(draw_pile, 1)
@@ -91,6 +94,7 @@ mac_player.card_action.use_card(
 )
 print(mac_player.data.hand_sequence[-1])
 print(mac_player.data.hand_sequence[-1].state)
+print("=" * 30)
 
 # 模拟大麦打出一张马芬
 mac_player.player_action.decrease_health(9)
@@ -101,3 +105,24 @@ mac_player.card_action.use_card(
     discard_pile,
 )
 print(mac_player.data.health)
+print("=" * 30)
+
+
+# 模拟大麦抽到衣服并装上
+clothes = Clothes()
+draw_pile.append(clothes)
+mac_player.card_action.draw_card(draw_pile, 1)
+mac_player.card_action.use_card(clothes, mac_player, discard_pile)
+print(mac_player.data.physical_defense)
+print(mac_player.data.equipment_sequence)
+print(mac_player.data.equipment_sequence[0].state)
+print(mac_player.data.stage_state.state)
+print("=" * 30)
+
+# 模拟大麦弃掉衣服
+mac_player.card_action.unmount_item(mac_player.data.equipment_sequence[0], discard_pile)
+print(mac_player.data.physical_defense)
+print(mac_player.data.equipment_sequence)
+print(discard_pile)
+print(discard_pile[-1].state)
+print("=" * 30)

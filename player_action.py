@@ -46,6 +46,8 @@ class PlayerAction:
             received_damage = damage.num - self.data.magic_defense
         elif damage.type == DamageTypeEnum.mental:
             received_damage = damage.num - self.data.mental_defense
+        elif damage.type == DamageTypeEnum.real:
+            received_damage = damage.num
         self.decrease_health(received_damage)
         return received_damage
 
