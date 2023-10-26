@@ -1,6 +1,7 @@
 """种族技能的实现，飞马的技能暂时不写，因为地面效果还没写"""
 from skill import SpeciesSkill
 from player import Player
+from damage import Damage
 
 
 class UnicornSkill(SpeciesSkill):
@@ -33,4 +34,8 @@ class EarthponySkill(SpeciesSkill):
         pass
 
     def use(self, user: Player, target):
+        pass
+
+    @staticmethod
+    def damage_add_1():
         pass
