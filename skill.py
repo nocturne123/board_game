@@ -10,7 +10,8 @@ from abc import abstractclassmethod
 
 class Skill:
     def __init__(self):
-        pass
+        # 是否被沉默，如果玩家被沉默则挂起，等沉默结束后再注册
+        self.hold = False
 
     @abstractclassmethod
     def use(self, user: Player, target):

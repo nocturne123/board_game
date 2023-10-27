@@ -26,16 +26,34 @@ class EarthponySkill(SpeciesSkill):
     def __init__(self):
         super().__init__()
         self.auto_use = True
+        self.forced_switch = True
 
+    @property
+    def is_on(self):
+        """判断技能是否开启，当自动生效且没有事件影响时，技能开启"""
+        return self.auto_use and self.forced_switch
+
+    # 技能挂到挂钩之前应判断是否挂过，防止重复挂钩
+    def send_func_to_card(self, user_data, card, target, discard_pile):
+        if self.damage_add_1 not in card.hook_change_effect:
+            card.hook_change_effect.append(self.damage_add_1)
+        else:
+            pass
+
+    # 技能注册前应判断是否有这个技能，防止重复注册
     def register(self, user: Player):
-        pass
+        if self not in user.data.species_skills:
+            user.data.species_skills.append(self)
+        else:
+            pass
 
     def unregister(self, user: Player):
-        pass
+        if self in user.data.species_skills:
+            user.data.species_skills.remove(self)
 
     def use(self, user: Player, target):
         pass
 
     @staticmethod
-    def damage_add_1():
-        pass
+    def damage_add_1(damage: Damage):
+        damage.num += 1

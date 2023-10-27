@@ -85,7 +85,12 @@ class CardAction:
     ):
         """玩家使用卡牌，这个环节要包含卡牌的状态转换、卡牌的位置转换。
         卡牌自己产生的效果在卡牌的effect函数中实现，这里只调用effect函数，不关心效果的具体实现"""
-        self.use_card_checker(card, target)
+        self.use_card_checker(card, target)  # 检查卡牌是否合法
+
+        # 使用卡牌前的钩子函数
+        if self.Hook_Before_Use:
+            for func in self.Hook_Before_Use:
+                func(self.data, card, target, discard_pile)
         card.get_played()
         self.data.hand_sequence.remove(card)  # 这个时刻，卡牌已经不在手牌中了
 
@@ -106,7 +111,7 @@ class CardAction:
         ):
             card.get_equipped()  # 装备卡牌的状态转换，由on_use转换到on_equipment
             self.data.equipment_sequence.append(card)
-            card.effect(self, target)
+            card.use(self, target)
             match card.card_type:
                 case CardTypeEnum.armor:
                     self.data.armor_slot = True
@@ -117,7 +122,7 @@ class CardAction:
 
         else:  # 一般卡牌的状态转换逻辑
             card.take_effect()  # 卡牌的状态转换，由on_use转换到on_taking_effect
-            card.effect(self, target)
+            card.use(self, target)
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)
@@ -127,5 +132,12 @@ class CardAction:
         card.get_unmounted()  # 物品的状态转换，由on_equipment转换到on_discard
         card.unequiped(self)  # 调用卡牌的unequip函数，进行一些注销的操作
         self.data.equipment_sequence.remove(card)
+        match card.card_type:
+            case CardTypeEnum.armor:
+                self.data.armor_slot = False
+            case CardTypeEnum.weapon:
+                self.data.weapon_slot = False
+            case CardTypeEnum.element, CardTypeEnum.anti_element:
+                self.data.element_slot = False
         card.get_into_discard_pile()
         discard_pile.append(card)

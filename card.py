@@ -88,6 +88,42 @@ class Card:
         # 卡牌类型
         self.card_type = card_type
 
+        # 卡牌的hook函数，分别是卡牌生效前的hook，卡牌生效后的hook，替换卡牌效果的hook,增加效果的hook
+        self.hook_before_effect = []
+        self.hook_after_effect = []
+        self.hook_replace_effect = []
+        self.hook_change_effect = []
+
+    def use(self, user, target):
+        """卡牌使用，当卡牌生效前的hook不为空时，将self,user,target传入hook函数，
+        当卡牌替换的函数不为空时，将self,user,target传入hook函数，否则调用effect函数，
+        当卡牌生效后的hook不为空时，将self,user,target传入hook函数"""
+
+        if self.hook_before_effect:
+            for func in self.hook_before_effect:
+                func(self, user, target)
+
+            # 当全部函数运行完毕后，清空hook_before_effect，将卡牌重置到原始状态
+            self.hook_before_effect.clear()
+
+        # 有替换函数的情况，这种情况下不调用effect函数
+        if self.hook_replace_effect:
+            for func in self.hook_replace_effect:
+                func(self, user, target)
+            self.hook_replace_effect.clear()
+
+        # 没有替换函数，正常运行effect函数，如果有hook_change_effect，将hook传进去
+        else:
+            if self.hook_change_effect:
+                self.effect(self, user, target, self.hook_change_effect)
+            else:
+                self.effect(self, user, target)
+
+        if self.hook_after_effect:
+            for func in self.hook_after_effect:
+                func(self, user, target)
+            self.hook_after_effect.clear()
+
     @abstractmethod
     def effect(self, user, target):
         """卡牌产生效果"""
@@ -109,11 +145,21 @@ class PhysicalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user, target):
-        """卡牌产生效果"""
-        target.player_action.receive_damage(
-            Damage(user.data.physical_attack, DamageTypeEnum.physical)
-        )
+    # 这里的hook是一个列表，列表里包装函数
+    def effect(self, user, target, hook=None):
+        """卡牌产生效果，如果有额外的hook函数，在构造damage之后调用，修改damage，再对目标传递damage"""
+        if hook:
+            damage = Damage(user.data.physical_attack, DamageTypeEnum.physical)
+            for func in hook:
+                func(damage)
+            dealed_damage = target.player_action.receive_damage(damage)
+            return dealed_damage
+
+        else:
+            dealed_damage = target.player_action.receive_damage(
+                Damage(user.data.physical_attack, DamageTypeEnum.physical)
+            )
+            return dealed_damage
 
     def __repr__(self) -> str:
         return "PhysicalAttack"
