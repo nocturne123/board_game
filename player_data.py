@@ -171,6 +171,16 @@ class PlayerData:
         # 玩家的轮次计数
         self.round_count = 0
 
+        # 玩家是否被沉默，分为装备栏沉默，种族技能沉默，技能沉默
+        self.muted_equipment = False
+        self.muted_species_skill = False
+        self.muted_skill = False
+
+        # 玩家被沉默之后，取消注册的技能被挂起，挂在对应的列表里面
+        self.hold_equipment = False
+        self.hold_species_skill = False
+        self.hold_skill = False
+
     def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""
