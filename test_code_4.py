@@ -16,6 +16,7 @@ from team import Team
 from collections import deque
 from random import shuffle
 from armors import Clothes, Hat
+from species_skills import EarthponySkill
 
 """这个文件是经过状态机重构后的测试文件"""
 
@@ -126,3 +127,6 @@ print(mac_player.data.equipment_sequence)
 print(discard_pile)
 print(discard_pile[-1].state)
 print("=" * 30)
+
+# 给大麦增加陆马技能，这里手动构造陆马技能，后续会有一个技能构造器
+earth_skill_mac = EarthponySkill(mac_player)

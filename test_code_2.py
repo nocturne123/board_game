@@ -1,5 +1,18 @@
-from healings import HealCard
+class A:
+    def __init__(self) -> None:
+        self.a = 1
+        self.say()
 
-if __name__ == "__main__":
-    card1 = HealCard()
-    print(card1)
+    def say(self):
+        print(self.a)
+
+
+class B(A):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def say(self):
+        print("aaaaa")
+
+
+b = B()

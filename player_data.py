@@ -177,9 +177,9 @@ class PlayerData:
         self.muted_skill = False
 
         # 玩家被沉默之后，取消注册的技能被挂起，挂在对应的列表里面
-        self.hold_equipment = False
-        self.hold_species_skill = False
-        self.hold_skill = False
+        self.hold_equipment = []
+        self.hold_species_skill = []
+        self.hold_skill = []
 
     def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、

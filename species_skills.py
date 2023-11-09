@@ -7,24 +7,23 @@ from damage import Damage
 class UnicornSkill(SpeciesSkill):
     """独角兽技能 ,攻击距离+1"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, player):
+        super().__init__(player=player)
 
-    def register(self, user: Player):
-        user.data.attack_distance += 1
+    def register(self):
+        self.registed = True
+        self.player.data.attack_distance += 1
 
-    def unregister(self, user: Player):
-        user.data.attack_distance -= 1
-
-    def use(self, user: Player, target):
-        pass
+    def unregister(self):
+        self.registed = False
+        self.player.data.attack_distance -= 1
 
 
 class EarthponySkill(SpeciesSkill):
     """地种技能 ,攻击时投一个色子，大于3则造成额外1点伤害"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, player):
+        super().__init__(player=player)
         self.auto_use = True
         self.forced_switch = True
 
@@ -41,15 +40,17 @@ class EarthponySkill(SpeciesSkill):
             pass
 
     # 技能注册前应判断是否有这个技能，防止重复注册
-    def register(self, user: Player):
-        if self not in user.data.species_skills:
-            user.data.species_skills.append(self)
+    def register(self):
+        self.registed = True
+        if self not in self.player.data.species_skills:
+            self.player.data.species_skills.append(self)
         else:
             pass
 
-    def unregister(self, user: Player):
-        if self in user.data.species_skills:
-            user.data.species_skills.remove(self)
+    def unregister(self):
+        self.registed = False
+        if self in self.player.data.species_skills:
+            self.player.data.species_skills.remove(self)
 
     def use(self, user: Player, target):
         pass
@@ -57,3 +58,18 @@ class EarthponySkill(SpeciesSkill):
     @staticmethod
     def damage_add_1(damage: Damage):
         damage.num += 1
+
+
+class OtherSkill(SpeciesSkill):
+    """其他种族技能，初始摸牌数+3，昏厥后摸两张牌"""
+
+    def __init__(self, player):
+        super().__init__(player=player)
+
+    def register(self):
+        self.registed = True
+        self.player.data.start_game_draw += 3
+
+    def unregister(self):
+        self.registed = False
+        self.player.data.start_game_draw -= 3

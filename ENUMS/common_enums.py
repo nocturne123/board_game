@@ -45,6 +45,7 @@ class SpeciesEnum(enum.Enum):
     unicorn = 2
     pegasi = 3
     alicon = 4
+    others = 5
 
 
 class SpecialNumberEnum(enum.Enum):

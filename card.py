@@ -3,6 +3,7 @@ from transitions import Machine
 from abc import abstractmethod
 from damage import Damage
 
+
 """卡牌的状态机实现"""
 """2023.10.13更新，卡牌类现在只有数据，卡牌产生效果的代码进入player_action"""
 """2023.10.18更新，卡牌类现在涉及数据和操作，player_action现在只操作player相关数据，
@@ -103,7 +104,7 @@ class Card:
             for func in self.hook_before_effect:
                 func(self, user, target)
 
-            # 当全部函数运行完毕后，清空hook_before_effect，将卡牌重置到原始状态
+            # 当全部函数运行完毕后，清空hook_before_effect
             self.hook_before_effect.clear()
 
         # 有替换函数的情况，这种情况下不调用effect函数
@@ -115,9 +116,9 @@ class Card:
         # 没有替换函数，正常运行effect函数，如果有hook_change_effect，将hook传进去
         else:
             if self.hook_change_effect:
-                self.effect(self, user, target, self.hook_change_effect)
+                self.effect(user, target, self.hook_change_effect)
             else:
-                self.effect(self, user, target)
+                self.effect(user, target)
 
         if self.hook_after_effect:
             for func in self.hook_after_effect:
@@ -226,8 +227,8 @@ class StealCard(Card):
         match target[1].state:
             case CardStateEnum.on_equipment:
                 target[1].get_unmounted()
-                target[0].data.equipment_sequence.remove(target[1])
-                user.data.equipment_sequence.append(target[1])
+                target[0].card_action.unmount_item(target[1])
+
             case CardStateEnum.in_hand:
                 target[1].get_stolen()
                 target[0].data.hand_sequence.remove(target[1])

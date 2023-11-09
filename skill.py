@@ -3,79 +3,55 @@
 角色失去技能时，用disconnect断开连接，再注销，使技能失效。
 技能被沉默时，调用unregister，使技能失效。
 失效效果结束后，再调用register，使技能生效。"""
-from player import Player
-from card import Card
-from abc import abstractclassmethod
+
+if __name__ == "__main__":
+    from player import Player
+
+from abc import abstractmethod
 
 
 class Skill:
-    def __init__(self):
+    def __init__(self, player: Player = None):
         # 是否被沉默，如果玩家被沉默则挂起，等沉默结束后再注册
         self.hold = False
+        self.player = player
+        self.registed = False
+        self.register()
 
-    @abstractclassmethod
+    # 主动技能需要额外提供use功能，
+    # 被动技能的效果直接写在register和unregister里面，注册后生效
     def use(self, user: Player, target):
         pass
 
+    @abstractmethod
     def register(self, user: Player):
         pass
 
+    @abstractmethod
     def unregister(self, user: Player):
         pass
-
-    def connect_player(self, user: Player):
-        self.register(user)
-
-    def disconnect_player(self, user: Player):
-        self.unregister(user)
 
 
 class CharacterSkill(Skill):
     """角色技能"""
 
-    def __init__(self):
-        super().__init__()
-
-    def register(self, user: Player):
-        user.data.character_skills.append(self)
-
-    def unregister(self, user: Player):
-        user.data.character_skills.remove(self)
-
-    @abstractclassmethod
-    def use(self, user: Player, target):
-        pass
+    def __init__(self, player: Player):
+        super().__init__(player=player)
+        # 在这一步添加到角色的技能列表里面
+        self.player.data.character_skills.append(self)
 
 
 class EquipmentSkill(Skill):
     """装备技能"""
 
-    def __init__(self):
-        super().__init__()
-
-    def register(self, user: Player):
-        user.data.equipment_skills.append(self)
-
-    def unregister(self, user: Player):
-        user.data.equipment_skills.remove(self)
-
-    @abstractclassmethod
-    def use(self, user: Player, target):
-        pass
+    def __init__(self, player):
+        super().__init__(player=player)
+        self.player.data.equipment_skills.append(self)
 
 
 class SpeciesSkill(Skill):
     """种族技能"""
 
-    def __init__(self):
-        super().__init__()
-
-    def register(self, user: Player):
-        user.data.species_skills.append(self)
-
-    def unregister(self, user: Player):
-        user.data.species_skills.remove(self)
-
-    @abstractclassmethod
-    def use(self, user: Player, target):
-        pass
+    def __init__(self, player: Player):
+        super().__init__(player=player)
+        self.player.data.species_skills.append(self)
