@@ -186,9 +186,9 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         if self.up_pressed and not self.down_pressed:
-            self.view_bottom += 1
-        elif self.down_pressed and not self.up_pressed:
             self.view_bottom -= 1
+        elif self.down_pressed and not self.up_pressed:
+            self.view_bottom += 1
         if self.left_pressed and not self.right_pressed:
             self.view_left += 1
         elif self.right_pressed and not self.left_pressed:
