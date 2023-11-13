@@ -20,10 +20,7 @@ from card_exceptions import (
 class CardAction:
     def __init__(self, player_action):
         self.player_action: PlayerAction = player_action
-        self.data: PlayerData = player_action.data
-
-        self.Hook_Before_Use = []
-        self.Hook_After_Use = []
+        self.data: PlayerData = self.player_action.data
 
     def draw_card(self, card_pile: DrawPile, num=1):
         """玩家抽牌"""
@@ -84,13 +81,14 @@ class CardAction:
         discard_pile: DiscardPile,
     ):
         """玩家使用卡牌，这个环节要包含卡牌的状态转换、卡牌的位置转换。
-        卡牌自己产生的效果在卡牌的effect函数中实现，这里只调用effect函数，不关心效果的具体实现"""
+        卡牌自己产生的效果在卡牌的effect函数中实现，这里只调用effect函数，不关心效果的具体实现。
+        当对自己使用卡牌，比如恢复牌、自我增益的效果牌时，target为None"""
         self.use_card_checker(card, target)  # 检查卡牌是否合法
 
         # 使用卡牌前的钩子函数
-        if self.Hook_Before_Use:
-            for func in self.Hook_Before_Use:
-                func(self.data, card, target, discard_pile)
+        if self.data.Hook_Before_Use:
+            for func in self.data.Hook_Before_Use:
+                func(self, card, target, discard_pile)
         card.get_played()
         self.data.hand_sequence.remove(card)  # 这个时刻，卡牌已经不在手牌中了
 
@@ -101,6 +99,34 @@ class CardAction:
             or card.card_type == CardTypeEnum.mental_attack
         ):
             self.data.attack_chance_in_turn -= 1
+
+        # 在这个阶段，视为已经指定了目标，并且把牌打出去了
+        # 检查目标是否有被卡牌指定后的hook
+        if target:
+            if type(target) != tuple:  # 这是目标为Player的情况
+                if target.data.Hook_After_chosen:
+                    for func in target.data.Hook_After_chosen:
+                        func(self, card, target, discard_pile)
+            else:  # 这是目标为tuple的情况
+                if target[0].data.Hook_After_chosen:
+                    for func in target[0].data.Hook_After_chosen:
+                        func(self, card, target, discard_pile)
+
+        # 检查玩家是否有在卡牌生效前的hook
+        if self.data.Hook_Before_Effect:
+            for func in self.data.Hook_Before_Effect:
+                func(self, card, target, discard_pile)
+
+        # 检查目标是否有在卡牌生效前的hook
+        if target:
+            if type(target) != tuple:  # 这是目标为Player的情况
+                if target.data.Hook_Before_Effect_As_Target:
+                    for func in target.data.Hook_Before_Effect_As_Target:
+                        func(self, card, target, discard_pile)
+            else:  # 这是目标为tuple的情况
+                if target[0].data.Hook_Before_Effect_As_Target:
+                    for func in target[0].data.Hook_Before_Effect_As_Target:
+                        func(self, card, target, discard_pile)
 
         # 当卡牌类型为装备时，状态转换逻辑要分开
         if (
@@ -126,6 +152,22 @@ class CardAction:
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)
+
+        # 这个阶段，卡牌已经生效完毕，检查目标是否有被卡牌生效后的hook
+        if target:
+            if type(target) != tuple:  # 这是目标为Player的情况
+                if target.data.Hook_After_Effect_As_Target:
+                    for func in target.data.Hook_After_Effect_As_Target:
+                        func(self, card, target, discard_pile)
+            else:  # 这是目标为tuple的情况
+                if target[0].data.Hook_After_Effect_As_Target:
+                    for func in target[0].data.Hook_After_Effect_As_Target:
+                        func(self, card, target, discard_pile)
+
+        # 使用卡牌后的钩子函数
+        if self.data.Hook_After_Use:
+            for func in self.data.Hook_After_Use:
+                func(self, card, target, discard_pile)
 
     def unmount_item(self, card, discard_pile: DiscardPile):
         """玩家卸下物品"""

@@ -130,3 +130,14 @@ print("=" * 30)
 
 # 给大麦增加陆马技能，这里手动构造陆马技能，后续会有一个技能构造器
 earth_skill_mac = EarthponySkill(mac_player)
+print(mac_player.data.species_skills)
+print(mac_player.data.Hook_Before_Effect)
+print(mac_player.data.hand_sequence)
+mac_player.data.attack_chance_in_turn += 3
+
+print(dummy_player.data.health)
+mac_player.card_action.use_card(
+    mac_player.data.hand_sequence[0], dummy_player, discard_pile
+)
+print(dummy_player.data.health)
+print("=" * 30)

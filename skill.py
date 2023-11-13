@@ -11,7 +11,7 @@ from abc import abstractmethod
 
 
 class Skill:
-    def __init__(self, player: Player = None):
+    def __init__(self, player=None):
         # 是否被沉默，如果玩家被沉默则挂起，等沉默结束后再注册
         self.hold = False
         self.player = player
@@ -20,22 +20,22 @@ class Skill:
 
     # 主动技能需要额外提供use功能，
     # 被动技能的效果直接写在register和unregister里面，注册后生效
-    def use(self, user: Player, target):
+    def use(self, user, target):
         pass
 
     @abstractmethod
-    def register(self, user: Player):
+    def register(self):
         pass
 
     @abstractmethod
-    def unregister(self, user: Player):
+    def unregister(self):
         pass
 
 
 class CharacterSkill(Skill):
     """角色技能"""
 
-    def __init__(self, player: Player):
+    def __init__(self, player):
         super().__init__(player=player)
         # 在这一步添加到角色的技能列表里面
         self.player.data.character_skills.append(self)
@@ -52,6 +52,6 @@ class EquipmentSkill(Skill):
 class SpeciesSkill(Skill):
     """种族技能"""
 
-    def __init__(self, player: Player):
+    def __init__(self, player):
         super().__init__(player=player)
         self.player.data.species_skills.append(self)

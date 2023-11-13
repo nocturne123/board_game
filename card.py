@@ -146,7 +146,8 @@ class PhysicalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    # 这里的hook是一个列表，列表里包装函数
+    # 这里的hook是一个列表，列表里包装函数，如果hook不为空，则运行里面的函数，
+    # hook由card的use方法传参传进来
     def effect(self, user, target, hook=None):
         """卡牌产生效果，如果有额外的hook函数，在构造damage之后调用，修改damage，再对目标传递damage"""
         if hook:
@@ -178,11 +179,20 @@ class MagicAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user, target):
-        """卡牌产生效果"""
-        target.player_action.receive_damage(
-            Damage(user.data.magic_attack, DamageTypeEnum.magic)
-        )
+    def effect(self, user, target, hook=None):
+        """卡牌产生效果，如果有额外的hook函数，在构造damage之后调用，修改damage，再对目标传递damage"""
+        if hook:
+            damage = Damage(user.data.magic_attack, DamageTypeEnum.magic)
+            for func in hook:
+                func(damage)
+            dealed_damage = target.player_action.receive_damage(damage)
+            return dealed_damage
+
+        else:
+            dealed_damage = target.player_action.receive_damage(
+                Damage(user.data.magic_attack, DamageTypeEnum.magic)
+            )
+            return dealed_damage
 
     def __repr__(self) -> str:
         return "MagicAttack"
@@ -200,11 +210,20 @@ class MentalAttackCard(Card):
         super().__init__(card_type, states, transitions)
         self.distance_limited = True
 
-    def effect(self, user, target):
-        """卡牌产生效果"""
-        target.player_action.receive_damage(
-            Damage(user.data.mental_attack, DamageTypeEnum.mental)
-        )
+    def effect(self, user, target, hook=None):
+        """卡牌产生效果，如果有额外的hook函数，在构造damage之后调用，修改damage，再对目标传递damage"""
+        if hook:
+            damage = Damage(user.data.mental_attack, DamageTypeEnum.mental)
+            for func in hook:
+                func(damage)
+            dealed_damage = target.player_action.receive_damage(damage)
+            return dealed_damage
+
+        else:
+            dealed_damage = target.player_action.receive_damage(
+                Damage(user.data.mental_attack, DamageTypeEnum.mental)
+            )
+            return dealed_damage
 
     def __repr__(self) -> str:
         return "MentalAttack"
@@ -226,6 +245,7 @@ class StealCard(Card):
         """卡牌产生效果"""
         match target[1].state:
             case CardStateEnum.on_equipment:
+                # TODO：拆装备的逻辑需要重构
                 target[1].get_unmounted()
                 target[0].card_action.unmount_item(target[1])
 

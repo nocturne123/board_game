@@ -1,6 +1,6 @@
 """种族技能的实现，飞马的技能暂时不写，因为地面效果还没写"""
 from skill import SpeciesSkill
-from player import Player
+from ENUMS.common_enums import SpeciesEnum, CardTypeEnum
 from damage import Damage
 
 
@@ -26,6 +26,7 @@ class EarthponySkill(SpeciesSkill):
         super().__init__(player=player)
         self.auto_use = True
         self.forced_switch = True
+        self.sucessful_dice_num = 3
 
     @property
     def is_on(self):
@@ -33,27 +34,43 @@ class EarthponySkill(SpeciesSkill):
         return self.auto_use and self.forced_switch
 
     # 技能挂到挂钩之前应判断是否挂过，防止重复挂钩
-    def send_func_to_card(self, user_data, card, target, discard_pile):
+    def send_func_to_card(self, card):
         if self.damage_add_1 not in card.hook_change_effect:
             card.hook_change_effect.append(self.damage_add_1)
         else:
             pass
 
+    # 将投骰子的判断添加到player.data的Hook_Before_Effect中
+    def send_func_to_player(self):
+        if self.dice_judge not in self.player.data.Hook_Before_Effect:
+            self.player.data.Hook_Before_Effect.append(self.dice_judge)
+
+    # 对应的，取消注册时，将投色子的判断函数从player.data的Hook_Before_Effect中移除
+    def remove_func_from_player(self):
+        if self.dice_judge in self.player.data.Hook_Before_Effect:
+            self.player.data.Hook_Before_Effect.remove(self.dice_judge)
+
+    # 进行一次陆马投色子判断，成功则将伤害加1挂接到卡牌上
+    def dice_judge(self, card_action, card, target, discard_pile):
+        if (
+            card.card_type == CardTypeEnum.physical_attack
+            or card.card_type == CardTypeEnum.magic_attack
+            or card.card_type == CardTypeEnum.mental_attack
+        ):
+            if (
+                self.player.player_action.roll_earthpony_dice()
+                > self.sucessful_dice_num
+            ):
+                self.send_func_to_card(card)
+
     # 技能注册前应判断是否有这个技能，防止重复注册
     def register(self):
         self.registed = True
-        if self not in self.player.data.species_skills:
-            self.player.data.species_skills.append(self)
-        else:
-            pass
+        self.send_func_to_player()
 
     def unregister(self):
         self.registed = False
-        if self in self.player.data.species_skills:
-            self.player.data.species_skills.remove(self)
-
-    def use(self, user: Player, target):
-        pass
+        self.remove_func_from_player()
 
     @staticmethod
     def damage_add_1(damage: Damage):
@@ -62,6 +79,8 @@ class EarthponySkill(SpeciesSkill):
 
 class OtherSkill(SpeciesSkill):
     """其他种族技能，初始摸牌数+3，昏厥后摸两张牌"""
+
+    # TODO:现在没有实现昏厥相关，所以昏厥后摸两张牌未实现
 
     def __init__(self, player):
         super().__init__(player=player)

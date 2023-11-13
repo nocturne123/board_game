@@ -27,3 +27,6 @@ class SkillEnum(enum.Enum):
     Trixie_2 = 12  # 崔克西的2技能
 
     Sunburst_1 = 13  # 日光的1技能
+
+    """"飞马的技能"""
+    derpy_1 = 14  # 小呆的1技能

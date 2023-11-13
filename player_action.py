@@ -25,8 +25,6 @@ class PlayerAction:
         # 玩家数据的状态机初始化在这一步完成，这样当玩家数据初始化时，状态机也会初始化
         self.data.stage_state_init()
         self.data.living_state_init()
-        self.Hook_Bofore_Healing = []
-        self.Hook_After_Healing = []
 
     def living_update(self):
         # TODO:有关收藏品的逻辑没有更新
@@ -90,15 +88,15 @@ class PlayerAction:
 
     def heal(self, num: int):
         """玩家回复生命值"""
-        if self.Hook_Bofore_Healing != []:
-            for func in self.Hook_Bofore_Healing:
+        if self.data.Hook_Before_Healing != []:
+            for func in self.data.Hook_Bofore_Healing:
                 func(self.data, num)
         self.data.health += num
         if self.data.health > self.data.max_health:
             self.data.health = self.data.max_health
         self.living_update()
-        if self.Hook_After_Healing != []:
-            for func in self.Hook_After_Healing:
+        if self.data.Hook_After_Healing != []:
+            for func in self.data.Hook_After_Healing:
                 func(self.data, num)
 
     def roll_dice(self):
