@@ -3,12 +3,13 @@ from ENUMS.common_enums import DamageTypeEnum
 from damage import Damage
 
 
-class derpy_1(CharacterSkill):
+class Derpy_1(CharacterSkill):
     """小呆的1技能，在受到攻击牌指定时，攻击者受到1点真实伤害，
     自身打出攻击牌后受到1点真实伤害"""
 
     def __init__(self, player):
         super().__init__(player=player)
+        self.name = "Not named yet"
 
     def register(self):
         """将反伤和自伤分别挂接到Hook_After_Chosn和Hook_Before_Effect上"""

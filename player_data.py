@@ -210,6 +210,10 @@ class PlayerData:
         # 玩家在被卡牌指定后，生效后的hook
         self.Hook_After_Effect_As_Target = []
 
+        # 玩家在受到伤害前后的hook
+        self.Hook_After_Receive_Damage = []
+        self.Hook_Before_Receive_Damage = []
+
     def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""

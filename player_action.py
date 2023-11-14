@@ -38,6 +38,9 @@ class PlayerAction:
 
     def receive_damage(self, damage: Damage):
         """玩家受到伤害"""
+        if self.data.Hook_Before_Receiving_Damage:
+            for func in self.data.Hook_Before_Receiving_Damage:
+                func(self, damage)
         if damage.type == DamageTypeEnum.physical:
             received_damage = damage.num - self.data.physical_defense
         elif damage.type == DamageTypeEnum.magic:
@@ -47,6 +50,9 @@ class PlayerAction:
         elif damage.type == DamageTypeEnum.real:
             received_damage = damage.num
         self.decrease_health(received_damage)
+        if self.data.Hook_After_Receiving_Damage:
+            for func in self.data.Hook_After_Receiving_Damage:
+                func(self, damage)
         return received_damage
 
     def start_turn(self):
@@ -90,14 +96,14 @@ class PlayerAction:
         """玩家回复生命值"""
         if self.data.Hook_Before_Healing != []:
             for func in self.data.Hook_Bofore_Healing:
-                func(self.data, num)
+                func(self, num)
         self.data.health += num
         if self.data.health > self.data.max_health:
             self.data.health = self.data.max_health
         self.living_update()
         if self.data.Hook_After_Healing != []:
             for func in self.data.Hook_After_Healing:
-                func(self.data, num)
+                func(self, num)
 
     def roll_dice(self):
         """玩家掷色子"""
