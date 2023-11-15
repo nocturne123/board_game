@@ -192,7 +192,7 @@ class PlayerData:
         # 玩家在被指定后的hook
         # 这个hook在card的use阶段调用
         # 小呆的技能挂在这里
-        self.Hook_After_chosen = []
+        self.Hook_After_Chosen = []
 
         # 卡牌生效前的hook，
         # 在使用卡牌后、卡牌生效前也就是effect前调用，

@@ -104,12 +104,12 @@ class CardAction:
         # 检查目标是否有被卡牌指定后的hook
         if target:
             if type(target) != tuple:  # 这是目标为Player的情况
-                if target.data.Hook_After_chosen:
-                    for func in target.data.Hook_After_chosen:
+                if target.data.Hook_After_Chosen:
+                    for func in target.data.Hook_After_Chosen:
                         func(self, card, target, discard_pile)
             else:  # 这是目标为tuple的情况
-                if target[0].data.Hook_After_chosen:
-                    for func in target[0].data.Hook_After_chosen:
+                if target[0].data.Hook_After_Chosen:
+                    for func in target[0].data.Hook_After_Chosen:
                         func(self, card, target, discard_pile)
 
         # 检查玩家是否有在卡牌生效前的hook

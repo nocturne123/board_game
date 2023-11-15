@@ -18,6 +18,10 @@ from random import shuffle
 from armors import Clothes, Hat
 from species_skills import EarthponySkill
 
+# 技能的测试
+from unicorn_skills import Sunburst_1
+from pegasus_skills import Derpy_1
+
 """这个文件是经过状态机重构后的测试文件"""
 
 # 初始化牌堆
@@ -141,3 +145,30 @@ mac_player.card_action.use_card(
 )
 print(dummy_player.data.health)
 print("=" * 30)
+
+# 给大麦挂接上日光耀耀的1技能
+# 给dummy挂上小呆的技能
+sunburst_skill = Sunburst_1(mac_player)
+derpy_skill = Derpy_1(dummy_player)
+mac_player.data.character_skills[0].use(
+    card=mac_player.data.hand_sequence[0],
+    target=dummy_player,
+    discard_pile=discard_pile,
+)
+print(dummy_player.data.sunburst_mark)
+
+# 再给dummy挂上日光耀耀的技能
+sunburst_skill_1 = Sunburst_1(dummy_player)
+dummy_player.card_action.draw_card(draw_pile, 5)
+dummy_player.data.character_skills[1].use(
+    card=dummy_player.data.hand_sequence[0],
+    target=mac_player,
+    discard_pile=discard_pile,
+)
+
+# 没有报错，说明技能计数相互之间不影响，接下来测试使用了两次技能的情况
+mac_player.data.character_skills[0].use(
+    card=mac_player.data.hand_sequence[0],
+    target=dummy_player,
+    discard_pile=discard_pile,
+)

@@ -29,4 +29,4 @@ class SkillEnum(enum.Enum):
     Sunburst_1 = 13  # 日光的1技能
 
     """"飞马的技能"""
-    derpy_1 = 14  # 小呆的1技能
+    Derpy_1 = 14  # 小呆的1技能

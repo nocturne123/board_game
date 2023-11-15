@@ -38,8 +38,8 @@ class PlayerAction:
 
     def receive_damage(self, damage: Damage):
         """玩家受到伤害"""
-        if self.data.Hook_Before_Receiving_Damage:
-            for func in self.data.Hook_Before_Receiving_Damage:
+        if self.data.Hook_Before_Receive_Damage:
+            for func in self.data.Hook_Before_Receive_Damage:
                 func(self, damage)
         if damage.type == DamageTypeEnum.physical:
             received_damage = damage.num - self.data.physical_defense
@@ -50,8 +50,8 @@ class PlayerAction:
         elif damage.type == DamageTypeEnum.real:
             received_damage = damage.num
         self.decrease_health(received_damage)
-        if self.data.Hook_After_Receiving_Damage:
-            for func in self.data.Hook_After_Receiving_Damage:
+        if self.data.Hook_After_Receive_Damage:
+            for func in self.data.Hook_After_Receive_Damage:
                 func(self, damage)
         return received_damage
 
