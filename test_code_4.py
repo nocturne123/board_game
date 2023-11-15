@@ -159,7 +159,7 @@ print(dummy_player.data.sunburst_mark)
 
 # 再给dummy挂上日光耀耀的技能
 sunburst_skill_1 = Sunburst_1(dummy_player)
-dummy_player.card_action.draw_card(draw_pile, 5)
+dummy_player.card_action.draw_card(draw_pile, 1)
 dummy_player.data.character_skills[1].use(
     card=dummy_player.data.hand_sequence[0],
     target=mac_player,

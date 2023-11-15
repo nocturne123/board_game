@@ -28,6 +28,7 @@ class TestPlayer:
         # 如果不同，则使用技能，在技能结算完后将回合数更新到记录里
         turn_record = 0
 
+        @wraps(func)
         def wrapper(self, *args, **kwargs):
             nonlocal turn_record
             if turn_record != self.turn_count:
@@ -43,7 +44,18 @@ class TestPlayer:
         print("使用了一个技能")
 
 
-player1 = TestPlayer()
+class subplayer(TestPlayer):
+    @TestPlayer.use_once_in_turn
+    def some_skill(self):
+        print("子类使用了一个技能")
+
+
+player1 = subplayer()
 player1.turn_start()
 player1.some_skill()
-player1.some_skill()
+
+player2 = subplayer()
+player2.turn_start()
+player2.some_skill()
+
+# player1.some_skill()
