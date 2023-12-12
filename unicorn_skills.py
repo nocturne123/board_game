@@ -24,13 +24,10 @@ class Sunburst_1(CharacterSkill):
             if self.sunburst_hurt_after_healing in target.data.Hook_After_Healing:
                 target.data.Hook_After_Healing.remove(self.sunburst_hurt_after_healing)
 
-    def use_once_in_turn(func):
-        return super().use_once_in_turn(func=func)
-
-    @Skill.use_once_in_turn
     def use(self, card, target, discard_pile):
         """弃置一张牌，给目标挂接一个标记和一个回血时根据标记扣血的特效
         特效挂接到Hook_After_Healing上"""
+        self.use_once_in_turn()
         if self.registed == True:
             self.player.card_action.discard_card(card, discard_pile)
             # 打上标记，目标有标记则标记加1，同时将目标记录到affected_list中，技能失效时注销

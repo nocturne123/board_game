@@ -90,3 +90,10 @@ class Glasses(BaseArmor):
 
     def unregister(self, user):
         user.data.mental_defense -= 2
+
+
+class Bowknot(BaseArmor):
+    def __init__(self, states=CardStateEnum, transitions=transtions):
+        super().__init__(states=states, transitions=transitions)
+        self.identity = ArmorIdentity.bowknot
+        self.description = "Choose a target, target can't use effect card"

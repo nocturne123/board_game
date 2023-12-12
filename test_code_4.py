@@ -65,7 +65,6 @@ print(mac_player.data.health)
 
 # 模拟大麦回合开始，只不过一次抽了5张牌
 mac_player.player_action.start_turn()
-mac_player.player_action.start_turn_init()
 mac_player.player_action.start_draw()
 mac_player.card_action.draw_card(draw_pile, 5)
 mac_player.player_action.start_play()
@@ -159,6 +158,9 @@ print(dummy_player.data.sunburst_mark)
 
 # 再给dummy挂上日光耀耀的技能
 sunburst_skill_1 = Sunburst_1(dummy_player)
+
+# dummy开始回合
+dummy_player.player_action.start_turn()
 dummy_player.card_action.draw_card(draw_pile, 1)
 dummy_player.data.character_skills[1].use(
     card=dummy_player.data.hand_sequence[0],
@@ -166,9 +168,13 @@ dummy_player.data.character_skills[1].use(
     discard_pile=discard_pile,
 )
 
+"""
 # 没有报错，说明技能计数相互之间不影响，接下来测试使用了两次技能的情况
 mac_player.data.character_skills[0].use(
     card=mac_player.data.hand_sequence[0],
     target=dummy_player,
     discard_pile=discard_pile,
 )
+
+# 测试成功，该报的错都报了
+"""

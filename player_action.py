@@ -55,9 +55,19 @@ class PlayerAction:
                 func(self, damage)
         return received_damage
 
+    def start_turn_init(self):
+        """回合开始时的初始化"""
+        # 当到自己回合时无论如何回合计数都会加1，轮次计数因为玩家不能从game类里获取信息，所以轮次计数在game类里实现
+        self.data.turn_count += 1
+
+        # 回合开始时，玩家的移动次数和攻击次数都会重置
+        self.data.move_chance_in_turn = self.data.move_chance
+        self.data.attack_chance_in_turn = self.data.attack_chance
+
     def start_turn(self):
         """开始回合"""
         self.data.stage_state.start_turn()  # 玩家状态切换，从wait切换到prepare
+        self.start_turn_init()  # 状态切换后进行自动初始化
 
     def start_draw(self):
         """结束准备阶段,抽牌阶段开始"""
@@ -82,15 +92,6 @@ class PlayerAction:
     def end_turn(self):
         """结束回合"""
         self.data.stage_state.end_turn()
-
-    def start_turn_init(self):
-        """回合开始时的初始化"""
-        # 当到自己回合时无论如何回合计数都会加1，轮次计数因为玩家不能从game类里获取信息，所以轮次计数在game类里实现
-        self.data.turn_count += 1
-
-        # 回合开始时，玩家的移动次数和攻击次数都会重置
-        self.data.move_chance_in_turn = self.data.move_chance
-        self.data.attack_chance_in_turn = self.data.attack_chance
 
     def heal(self, num: int):
         """玩家回复生命值"""

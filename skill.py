@@ -45,25 +45,17 @@ class Skill:
         if self.turn_record != self.player.data.turn_count:
             self.turn_record = self.player.data.turn_count
         else:
-            raise Exception("技能一轮只能使用一次")
+            raise Exception("技能一回合只能使用一次")
 
-    def use_once_in_round(func):
+    def use_once_in_round(self):
         """限定技能一轮只能使用一次"""
         # 轮次记录，使用技能前如果记录的轮次和玩家轮次相同，
         # 那么玩家在此轮已经使用过了技能，不能再使用
         # 如果不同，则使用技能，在技能结算完后将轮次数更新到记录里
-        round_record = 0
-
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            nonlocal round_record
-            if round_record != self.player.data.round_count:
-                round_record = self.player.data.round_count
-                return func(self, *args, **kwargs)
-            else:
-                raise Exception("技能一轮只能使用一次")
-
-        return wrapper
+        if self.round_record != self.player.data.round_count:
+            self.round_record = self.player.data.round_count
+        else:
+            raise Exception("技能一轮只能使用一次")
 
 
 class CharacterSkill(Skill):

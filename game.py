@@ -12,8 +12,10 @@ from card_action import CardAction
 
 
 # 游戏类
-# 游戏的回合分为已经进行的回合，正在进行的回合，将要生成的回合
 # 回合和轮次不同
+# 游戏类主持开一局游戏的逻辑，组织玩家，组织抽牌堆、弃牌堆，组织地图，判断胜负。
+# 其中，最重要的就是胜负关系的判断，判断完胜负后游戏结束。
+# 游戏类负责指挥一个玩家的回合结束后，下一个玩家的回合开始
 class Game:
     def __init__(self):
         self.player_list = None
@@ -115,6 +117,14 @@ class Game:
         )  # 玩家抽牌
 
         self.current_player.stage_state.end_draw()  # 玩家结束抽牌阶段，进入出牌阶段
+
+    # TODO：优化逻辑
+    def winning_team(self):
+        """根据team_deque中的队伍，判断胜负，只剩一只队伍时，剩下的那只队伍获得胜利"""
+        if len(self.alive_team_deque) == 1:
+            return self.alive_team_deque[0]
+        else:
+            return False
 
 
 # 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现
