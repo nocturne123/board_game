@@ -148,7 +148,11 @@ class CardAction:
 
         else:  # 一般卡牌的状态转换逻辑
             card.take_effect()  # 卡牌的状态转换，由on_use转换到on_taking_effect
-            card.use(self, target)
+            # 如果造成了伤害，那么造成伤害的值会一路从目标的received_damage传到
+            # card的effect，传到card的use，最后传到这里
+            dealed_damage_int = card.use(self, target)
+            if dealed_damage_int:
+                self.player_action.dealed_damage(dealed_damage_int)
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)

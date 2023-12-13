@@ -115,3 +115,12 @@ class PlayerAction:
         """陆马技能的色子和普通色子分开"""
         num = random.randint(1, 6)
         return num
+
+    def dealed_damage(self, damage_int):
+        """玩家造成伤害后的操作，比如装备乐器之后造成2点伤害后回血1点，挂在这里的hook上
+        卡牌在造成伤害后会从player的received_damage收到一个数值，
+        卡牌或者其他技能造成伤害后调用dealed_damage函数，将伤害数值传入，然后在这里进行处理"""
+
+        if self.data.Hook_After_Dealing_Damage != []:
+            for func in self.data.Hook_After_Dealing_Damage:
+                func(self, damage_int)

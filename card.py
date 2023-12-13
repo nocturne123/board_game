@@ -115,10 +115,13 @@ class Card:
 
         # 没有替换函数，正常运行effect函数，如果有hook_change_effect，将hook传进去
         else:
+            # 如果造成伤害了，将伤害值传出去
             if self.hook_change_effect:
-                self.effect(user, target, self.hook_change_effect)
+                dealed_damage_int = self.effect(user, target, self.hook_change_effect)
             else:
-                self.effect(user, target)
+                dealed_damage_int = self.effect(user, target)
+
+            return dealed_damage_int
 
         if self.hook_after_effect:
             for func in self.hook_after_effect:

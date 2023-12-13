@@ -214,6 +214,9 @@ class PlayerData:
         self.Hook_After_Receive_Damage = []
         self.Hook_Before_Receive_Damage = []
 
+        # 玩家在造成伤害后的hook
+        self.Hook_After_Dealing_Damage = []
+
     def stage_state_init(self, transitions=stage_transitions):
         """玩家阶段状态，用于表示玩家当前处于哪个阶段,阶段包括等待阶段、
         准备阶段、抽牌阶段、出牌阶段、弃牌阶段、结束阶段"""

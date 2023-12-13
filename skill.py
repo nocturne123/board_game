@@ -18,8 +18,14 @@ class Skill:
         self.player = player
         self.registed = False
         self.register()
+        # 回合记录
         self.turn_record = 0
+        # 一个回合中的使用次数记录
+        self.used_count_in_turn = 0
+        # 轮次记录
         self.round_record = 0
+        # 一轮中的使用次数记录
+        self.used_count_in_round = 0
 
     # 主动技能需要额外提供use功能，
     # 被动技能的效果直接写在register和unregister里面，注册后生效
@@ -56,6 +62,21 @@ class Skill:
             self.round_record = self.player.data.round_count
         else:
             raise Exception("技能一轮只能使用一次")
+
+    def use_twice_in_turn(self):
+        """限定技能一回合只能使用两次"""
+
+        # 每回合的第一次使用，将回合记录更新为玩家回合数，使用次数更新为1
+        if self.turn_record != self.player.data.turn_count:
+            self.turn_record = self.player.data.turn_count
+            self.used_count_in_turn = 1
+
+        # 每回合不是第一次使用，使用次数加1
+        elif self.turn_record == self.player.data.turn_count:
+            if self.used_count_in_turn < 2:
+                self.used_count_in_turn += 1
+            else:
+                raise Exception("技能一回合只能使用两次")
 
 
 class CharacterSkill(Skill):
