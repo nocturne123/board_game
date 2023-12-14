@@ -1,18 +1,15 @@
 """最基础的技能模块，所有技能都需要register功能和unregister功能，主动技能需要额外提供use功能"""
-"""角色获得技能时，技能用connect连接上角色，再注册，使技能生效。
-角色失去技能时，用disconnect断开连接，再注销，使技能失效。
+"""角色获得技能时，技能添加到角色技能槽里，再注册，使技能生效。
+角色失去技能时，先从技能槽退出来，再注销，使技能失效。
 技能被沉默时，调用unregister，使技能失效。
 失效效果结束后，再调用register，使技能生效。"""
 
-if __name__ == "__main__":
-    from player import Player
 
 from abc import abstractmethod
-from functools import wraps
 
 
 class Skill:
-    def __init__(self, player=None):
+    def __init__(self, player):
         # 是否被沉默，如果玩家被沉默则挂起，等沉默结束后再注册
         self.hold = False
         self.player = player
@@ -83,8 +80,8 @@ class CharacterSkill(Skill):
     """角色技能"""
 
     def __init__(self, player):
-        super().__init__(player=player)
         # 在这一步添加到角色的技能列表里面
+        super().__init__(player=player)
         self.player.data.character_skills.append(self)
 
 

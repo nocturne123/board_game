@@ -1,8 +1,9 @@
-"""装备，"""
+"""装备"""
 from card import Card, transtions
 from ENUMS.common_enums import CardTypeEnum, CardStateEnum
 from ENUMS.armor_card_enums import ArmorIdentity
 from abc import abstractmethod
+from skill import EquipmentSkill
 
 
 class BaseArmor(Card):
@@ -10,24 +11,26 @@ class BaseArmor(Card):
         super().__init__(
             card_type=CardTypeEnum.armor, states=states, transitions=transitions
         )
+        # skill列表里面装装备内部定义的类，在equip的时候实例化
+        self.skill = []
+        # skill实例化之后装进skill_instance里面，
+        # 方便装备卸下时从player_data里面删除
+        self.skill_instance = []
 
-    @abstractmethod
-    def register(self, user):
-        """注册时的效果，也就是生效，卡牌在装备时调用这个函数，进行'生效'。"""
-        pass
-
-    @abstractmethod
-    def unregister(self, user):
-        """注销时的效果，当装备失效时，装备不会从装备栏中消失，而是调用这个函数，进行'失效'。"""
-        pass
-
+    # 装备的技能在装备时实例化，而不是游戏开始卡牌实例化的时候就实例化
     def equiped(self, user):
         """装备时的效果"""
-        self.register(user)
+        for skill in self.skill:
+            self.skill_instance.append(skill(user))
 
+    # 同理，装备被卸下时应该主动回收技能的实例
     def unequiped(self, user):
         """卸下时的效果"""
-        self.unregister(user)
+        for skill_instance in self.skill_instance:
+            skill_instance.unregister()
+            if skill_instance in user.data.equipment_skills:
+                user.data.equipment_skills.remove(skill_instance)
+            self.skill_instance.remove(skill_instance)
 
     @abstractmethod
     def effect(self, user, target):
@@ -43,14 +46,21 @@ class Clothes(BaseArmor):
         super().__init__(states=states, transitions=transitions)
         self.identity = ArmorIdentity.clothes
         self.description = "Physical Defense +1, Magic Defense +1"
+        self.skill.append(Clothes.ClothesSkill)
 
-    def register(self, user):
-        user.data.physical_defense += 1
-        user.data.magic_defense += 1
+    class ClothesSkill(EquipmentSkill):
+        def __init__(self, player):
+            super().__init__(player=player)
+            self.name = "Clothes"
+            self.description = "Physical Defense +1, Magic Defense +1"
 
-    def unregister(self, user):
-        user.data.physical_defense -= 1
-        user.data.magic_defense -= 1
+        def register(self):
+            self.player.data.physical_defense += 1
+            self.player.data.magic_defense += 1
+
+        def unregister(self):
+            self.player.data.physical_defense -= 1
+            self.player.data.magic_defense -= 1
 
 
 class Hat(BaseArmor):
@@ -58,12 +68,19 @@ class Hat(BaseArmor):
         super().__init__(states=states, transitions=transitions)
         self.identity = ArmorIdentity.hat
         self.description = "Physical Defense +2"
+        self.skill.append(Hat.HatSkill)
 
-    def register(self, user):
-        user.data.physical_defense += 2
+    class HatSkill(EquipmentSkill):
+        def __init__(self, player):
+            super().__init__(player=player)
+            self.name = "Hat"
+            self.description = "Physical Defense +2"
 
-    def unregister(self, user):
-        user.data.physical_defense -= 2
+        def register(self):
+            self.player.data.physical_defense += 2
+
+        def unregister(self):
+            self.player.data.physical_defense -= 2
 
 
 class Amulet(BaseArmor):
@@ -71,12 +88,19 @@ class Amulet(BaseArmor):
         super().__init__(states=states, transitions=transitions)
         self.identity = ArmorIdentity.amulet
         self.description = "Magic Defense +2"
+        self.skill.append(Amulet.AmuletSkill)
 
-    def register(self, user):
-        user.data.magic_defense += 2
+    class AmuletSkill(EquipmentSkill):
+        def __init__(self, player):
+            super().__init__(player=player)
+            self.name = "Amulet"
+            self.description = "Magic Defense +2"
 
-    def unregister(self, user):
-        user.data.magic_defense -= 2
+        def register(self):
+            self.player.data.magic_defense += 2
+
+        def unregister(self):
+            self.player.data.magic_defense -= 2
 
 
 class Glasses(BaseArmor):
@@ -84,12 +108,19 @@ class Glasses(BaseArmor):
         super().__init__(states=states, transitions=transitions)
         self.identity = ArmorIdentity.glasses
         self.description = "Mental Defense +2"
+        self.skill.append(Glasses.GlassesSkill)
 
-    def register(self, user):
-        user.data.mental_defense += 2
+    class GlassesSkill(EquipmentSkill):
+        def __init__(self, player):
+            super().__init__(player=player)
+            self.name = "Glasses"
+            self.description = "Mental Defense +2"
 
-    def unregister(self, user):
-        user.data.mental_defense -= 2
+        def register(self):
+            self.player.data.mental_defense += 2
+
+        def unregister(self):
+            self.player.data.mental_defense -= 2
 
 
 class Bowknot(BaseArmor):
