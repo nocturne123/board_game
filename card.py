@@ -249,10 +249,12 @@ class StealCard(Card):
         match target[1].state:
             case CardStateEnum.on_equipment:
                 # TODO：拆装备的逻辑需要重构
-                target[1].get_unmounted()
+
                 target[0].card_action.unmount_item(target[1])
 
             case CardStateEnum.in_hand:
+                # TODO：偷牌的逻辑需要重构，现有的偷牌只是把手牌从a玩家的手里移到了b玩家的手里
+                # 应该是有一个被偷掉的方法，而不是简单的remove，这样方便加相关的hook
                 target[1].get_stolen()
                 target[0].data.hand_sequence.remove(target[1])
                 user.data.hand_sequence.append(target[1])
