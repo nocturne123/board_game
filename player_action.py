@@ -67,7 +67,6 @@ class PlayerAction:
     def start_turn(self):
         """开始回合"""
         self.data.stage_state.start_turn()  # 玩家状态切换，从wait切换到prepare
-        self.start_turn_init()  # 状态切换后进行自动初始化
 
     def start_draw(self):
         """结束准备阶段,抽牌阶段开始"""

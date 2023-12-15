@@ -156,6 +156,7 @@ class CardAction:
             card.end_effect()  # 卡牌的状态转换，由on_taking_effect转换到on_discard
             card.get_into_discard_pile()  # 卡牌的状态转换，由on_discard转换到in_discard_pile
             discard_pile.append(card)
+            return dealed_damage_int
 
         # 这个阶段，卡牌已经生效完毕，检查目标是否有被卡牌生效后的hook
         if target:

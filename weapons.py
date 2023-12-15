@@ -117,7 +117,15 @@ class Bouquet(BaseWeapon):
             self.name = "BouquetSkill"
             self.description = "You can discard a card and draw a card,twice per turn"
 
-        def discard_a_card_and_draw_a_card(self, card, drawpile, discard_pile):
+        def use(self, card, drawpile, discard_pile):
             self.use_twice_in_turn()
             self.player.card_action.discard_card(card, discard_pile)
             self.player.card_action.draw_card(drawpile, 1)
+
+        def register(self):
+            if self.use not in self.player.data.equipment_skills:
+                self.player.data.equipment_skills.append(self.use)
+
+        def unregister(self):
+            if self.use in self.player.data.equipment_skills:
+                self.player.data.equipment_skills.remove(self.use)

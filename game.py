@@ -93,7 +93,7 @@ class Game:
 
     def game_start_dealing(self):
         for player in self.player_list:
-            pass
+            player.card_action.draw_card(player.data.start_game_draw)
 
     def set_round_list(self):
         """返回当前玩家的优先级序列，可以视作玩家观察到的轮次"""
