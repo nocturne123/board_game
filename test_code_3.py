@@ -1,14 +1,6 @@
-a = 1
-b = 2
-c = 3
+import tkinter as tk
 
-d = []
-d.append(a)
-d.append(b)
-d.append(c)
-
-del a
-
-del b
-
-del c
+root = tk.Tk()
+print(root.winfo_screenwidth())
+print(root.winfo_screenheight())
+root.destroy()
