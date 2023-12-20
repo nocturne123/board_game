@@ -79,8 +79,8 @@ class PlayerAction:
     def end_play(self):
         """结束回合"""
         if len(self.data.hand_sequence) <= self.data.max_hand_sequence_num:
-            self.data.stage_state.skip_discard()
-            self.data.stage_state.end_turn()
+            self.data.stage_state.end_play()
+            self.data.stage_state.end_discard()
         else:
             self.data.stage_state.end_play()
 

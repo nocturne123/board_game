@@ -87,13 +87,17 @@ class Game:
         return deque(team for team in self.team_deque if team.is_remaining)
 
     def next_team(self):
-        while self.team_deque[0].is_remaining == False:
+        # 这个地方变相写了一个do-while循环，先把第二位的Team排上来，检测这个Team还活着没有
+        # 没有的话，就再把下一个第二位的Team排上来
+        while True:
             a = self.team_deque.popleft()
             self.team_deque.append(a)
+            if self.team_deque[0].is_remaining:
+                break
 
     def game_start_dealing(self):
         for player in self.player_list:
-            player.card_action.draw_card(player.data.start_game_draw)
+            player.card_action.draw_card(self.draw_pile, player.data.start_game_draw)
 
     def set_round_list(self):
         """返回当前玩家的优先级序列，可以视作玩家观察到的轮次"""
@@ -107,24 +111,20 @@ class Game:
         self.current_player: Player = self.team_deque[0][0]
 
     def set_current_player_start_turn(self):
-        self.current_player.data.stage_state.start_turn()  # 开始回合，进入准备阶段
-        self.current_player.player_start_turn_init()  # 玩家回合开始时的初始化
-        self.current_player.data.stage_state.end_prepare()  # 结束准备阶段，进入抽牌阶段
-        self.current_player.data.draw_card_from_pile(
-            self.current_player,
+        self.current_player.player_action.start_turn()  # 开始回合，进入准备阶段
+        self.current_player.player_action.start_turn_init()  # 玩家回合开始时的初始化
+        self.current_player.player_action.start_draw()  # 结束准备阶段，进入抽牌阶段
+        self.current_player.card_action.draw_card(
             self.draw_pile,
-            self.current_player.draw_stage_card_number,
+            self.current_player.data.draw_stage_card_number,
         )  # 玩家抽牌
 
-        self.current_player.stage_state.end_draw()  # 玩家结束抽牌阶段，进入出牌阶段
+        self.current_player.player_action.start_play()  # 玩家结束抽牌阶段，进入出牌阶段
 
     # TODO：优化逻辑
     def winning_team(self):
         """根据team_deque中的队伍，判断胜负，只剩一只队伍时，剩下的那只队伍获得胜利"""
-        if len(self.alive_team_deque) == 1:
-            return self.alive_team_deque[0]
-        else:
-            return False
+        return len(self.alive_team_deque) > 1
 
 
 # 轮次类，里面包含多个回合，游戏逻辑更新后，以角色看到的优先级序列作为轮次的实现

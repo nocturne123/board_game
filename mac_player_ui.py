@@ -19,12 +19,14 @@ def print_basic_imformation(mac_player: Player, dummy: Player):
     print(f"dummy的手牌数量为{len(dummy.data.hand_sequence)}")
     print(f"dummy的装备栏为{dummy.data.equipment_sequence}")
     print("-" * 30)
-    print(f"你的手牌为{mac_player.data.hand_sequence}")
+    print(f"你的手牌为")
+    for index, card in enumerate(mac_player.data.hand_sequence):
+        print(f"{index}:{card}")
 
 
 # 因为偷牌涉及到两层的“选择-回退”逻辑，要写两遍match-case，为了避免缩进地狱，
 # 把偷牌的逻辑包装成一个函数，后面调用
-def steal_helper(mac_player: Player, dummy: Player, discard_pile):
+def steal_helper(card, mac_player: Player, dummy: Player, discard_pile):
     if len(dummy.data.hand_sequence) == 0 and len(dummy.data.equipment_sequence) == 0:
         print("dummy既没有手牌也没有装备")
 
@@ -32,7 +34,7 @@ def steal_helper(mac_player: Player, dummy: Player, discard_pile):
         print(f"dummy没有手牌，但是有装备，dummy的装备栏为")
         for index, item in enumerate(dummy.data.equipment_sequence):
             print(f"{index}:{item}")
-        while key_pressed_4 := input("输入对应的数字拆下装备，输入q退回上级，输入i查看详细信息") != "q":
+        while (key_pressed_4 := input("输入对应的数字拆下装备，输入q退回上级，输入i查看详细信息")) != "q":
             if key_pressed_4.isdigit() and int(key_pressed_4) < len(
                 dummy.data.equipment_sequence
             ):
@@ -57,11 +59,11 @@ def steal_helper(mac_player: Player, dummy: Player, discard_pile):
 
     elif len(dummy.data.equipment_sequence) == 0:
         while (
-            key_pressed_4 := input("dummy没有装备，但是有手牌，按1随机偷取一张牌，按i查看详细信息，按q退回上一级") != "q"
-        ):
+            key_pressed_4 := input("dummy没有装备，但是有手牌，按1随机偷取一张牌，按i查看详细信息，按q退回上一级")
+        ) != "q":
             match key_pressed_4:
                 case "1":
-                    card = mac_player.card_action.use_card(
+                    mac_player.card_action.use_card(
                         card,
                         (
                             dummy,
@@ -82,7 +84,7 @@ def steal_helper(mac_player: Player, dummy: Player, discard_pile):
                     print(f"你的输入是{key_pressed_4}，我不知道这个是啥，再来一次吧")
     # 接下来是既有手牌也有装备的情况
     else:
-        while key_pressed_3 := input("按q退出偷牌，按0随机偷取一张手牌，按1选择一件装备，按i查看当前信息") != "q":
+        while (key_pressed_3 := input("按q退出偷牌，按0随机偷取一张手牌，按1选择一件装备，按i查看当前信息")) != "q":
             print(
                 f"dummy的手牌数量为{len(dummy.data.hand_sequence)}，dummy的装备栏为{dummy.data.equipment_sequence}"
             )
@@ -107,8 +109,8 @@ def steal_helper(mac_player: Player, dummy: Player, discard_pile):
                     for index, item in enumerate(dummy.data.equipment_sequence):
                         print(f"{index}:{item}")
                     while (
-                        key_pressed_4 := input("输入对应的数字拆下装备，输入q退回上级，输入i查看详细信息") != "q"
-                    ):
+                        key_pressed_4 := input("输入对应的数字拆下装备，输入q退回上级，输入i查看详细信息")
+                    ) != "q":
                         if key_pressed_4.isdigit() and int(key_pressed_4) < len(
                             dummy.data.equipment_sequence
                         ):
@@ -150,21 +152,24 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
 
     # 出牌层级的输入循环
     while (
-        key_pressed_1 := input(
-            "你可以选择以下操作：\
-\n输入1使用手牌，输入2使用角色技能，输入3使用装备技能，输入e进入弃牌阶段，输入i查看当前详细信息"
+        (
+            key_pressed_1 := input(
+                "你可以选择以下操作：\
+\n输入1使用手牌，输入2使用角色技能，输入3使用装备技能，输入e进入弃牌阶段，输入i查看当前详细信息:"
+            )
         )
         != "e"
     ):
         match key_pressed_1:
             # 选牌层级的输入循环
             case "1":
-                while key_pressed_2 := input("输入对应的数字打出卡牌，输入q重新选择操作，输入i查看详细信息") != "q":
-                    print(f"你的手牌为")
-                    for index, card in enumerate(mac_player.data.hand_sequence):
-                        print(f"{index}:{card}")
-                    print("请输入你要使用的手牌的序号")
-
+                print(f"你的手牌为")
+                for index, card in enumerate(mac_player.data.hand_sequence):
+                    print(f"{index}:{card}")
+                print("请输入你要使用的手牌的序号")
+                while (
+                    key_pressed_2 := input("输入对应的数字打出卡牌，输入q重新选择操作，输入i查看详细信息")
+                ) != "q":
                     # 我本来想接着写match、case的，但涉及到一个数字是否在手牌里的判断，还是写if-else了
                     if key_pressed_2.isdigit() and int(key_pressed_2) < len(
                         mac_player.data.hand_sequence
@@ -172,7 +177,7 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
                         card = mac_player.data.hand_sequence[int(key_pressed_2)]
                         # 简单捕捉个异常，如果出牌失败就重新选牌
                         try:
-                            match card.type:
+                            match card.card_type:
                                 # 攻击牌类因为默认是攻击dummy，选了牌就可以打出去
                                 case CardTypeEnum.physical_attack:
                                     dealed_damage = mac_player.card_action.use_card(
@@ -190,7 +195,7 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
                                     )
                                     print(f"你使用了{card},造成了{dealed_damage}点伤害")
                                 case CardTypeEnum.steal:
-                                    steal_helper(mac_player, dummy, discard_pile)
+                                    steal_helper(card, mac_player, dummy, discard_pile)
                                 case CardTypeEnum.armor:
                                     mac_player.card_action.use_card(
                                         card, mac_player, discard_pile
@@ -216,6 +221,10 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
                         except Exception as e:
                             print(e)
                             # continue
+                        print(f"你的手牌为")
+                        for index, card in enumerate(mac_player.data.hand_sequence):
+                            print(f"{index}:{card}")
+                        print("请输入你要使用的手牌的序号")
                     elif key_pressed_2 == "i":
                         print_basic_imformation(mac_player, dummy)
                     else:
@@ -224,7 +233,9 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
             case "2":
                 # 角色技能层级的输入循环
                 # 因为现在只有一个日光耀耀的技能，所以这里直接选择一张牌给技能用就好了
-                while key_pressed_3 := input("现在只有日光耀耀的技能，选择一张牌弃掉，并给dummy上一层印记") != "q":
+                while (
+                    key_pressed_3 := input("现在只有日光耀耀的技能，选择一张牌弃掉，并给dummy上一层印记")
+                ) != "q":
                     if key_pressed_3.isdigit() and int(key_pressed_3) < len(
                         mac_player.data.hand_sequence
                     ):
@@ -232,6 +243,12 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
                         mac_player.data.character_skills[0].use(
                             card, dummy, discard_pile
                         )
+                        break
+                    elif key_pressed_3 == "i":
+                        print_basic_imformation(mac_player, dummy)
+                    else:
+                        print(f"你的输入是{key_pressed_3}，我不知道这个是啥，再来一次吧")
+                        # continue
 
             case "3":
                 # 装备技能层级的输入循环
@@ -250,3 +267,28 @@ def play_ui(mac_player: Player, discard_pile, dummy: Player):
 
     # 输入e后出牌循环结束。进入弃牌阶段或者直接结束
     mac_player.player_action.end_play()
+
+
+def discard_ui(mac_player: Player, discard_pile):
+    # 弃牌阶段的输入循环
+    while len(mac_player.data.hand_sequence) > mac_player.data.max_hand_sequence_num:
+        print(f"你的手牌为")
+        for index, card in enumerate(mac_player.data.hand_sequence):
+            print(f"{index}:{card}")
+
+        key_pressed_1 = input(
+            f"你的手牌上限为{mac_player.data.max_hand_sequence_num}，\
+                你的手牌数量为{len(mac_player.data.hand_sequence)}，\
+                请输入对应数字弃牌"
+        )
+
+        if key_pressed_1.isdigit() and int(key_pressed_1) < len(
+            mac_player.data.hand_sequence
+        ):
+            card = mac_player.data.hand_sequence[int(key_pressed_1)]
+            mac_player.card_action.discard_card(card, discard_pile)
+            continue
+        else:
+            print(f"你的输入是{key_pressed_1}，请输入对应的数字")
+            continue
+    mac_player.player_action.end_discard()

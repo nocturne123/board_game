@@ -16,21 +16,21 @@ class BaseWeapon(Card):
         # skill实例化之后装进skill_instance里面，
         # 方便装备卸下时从player_data里面删除
         self.skill_instance = []
-        self.attack_distence = 0
+        self.attack_distance = 0
 
     # 装备的技能在装备时实例化，而不是游戏开始卡牌实例化的时候就实例化
     def equiped(self, user):
         """装备时的效果"""
         """与防具不同的点在于，装备有一个攻击距离的属性，在装备时直接加到player_data上
         这样不论装备被沉默与否，攻击距离始终是在的"""
-        user.data.attack_distence += self.attack_distence
+        user.data.attack_distance += self.attack_distance
         for skill in self.skill:
             self.skill_instance.append(skill(user))
 
     # 同理，装备被卸下时应该主动回收技能的实例
     def unequiped(self, user):
         """卸下时的效果"""
-        user.data.attack_distence -= self.attack_distence
+        user.data.attack_distance -= self.attack_distance
         for skill_instance in self.skill_instance:
             skill_instance.unregister()
             if skill_instance in user.data.equipment_skills:
@@ -49,7 +49,7 @@ class BaseWeapon(Card):
 class Instrument(BaseWeapon):
     def __init__(self, states=CardStateEnum, transitions=transtions):
         super().__init__(states=states, transitions=transitions)
-        self.attack_distence = 2
+        self.attack_distance = 2
         self.identity = WeaponIdentity.instrument
         self.description = "Heal 1 when dealing damage more than 1"
         self.skill.append(Instrument.InstrumentSkill)
@@ -86,7 +86,7 @@ class Instrument(BaseWeapon):
 class Machine(BaseWeapon):
     def __init__(self, states=CardStateEnum, transitions=transtions):
         super().__init__(states=states, transitions=transitions)
-        self.attack_distence = 1
+        self.attack_distance = 1
         self.identity = WeaponIdentity.machine
         self.description = "Draw 1 more card at drawing stage"
         self.skill.append(Machine.MachineSkill)
@@ -107,7 +107,7 @@ class Machine(BaseWeapon):
 class Bouquet(BaseWeapon):
     def __init__(self, states=CardStateEnum, transitions=transtions):
         super().__init__(states=states, transitions=transitions)
-        self.attack_distence = 1
+        self.attack_distance = 1
         self.identity = WeaponIdentity.bouquet
         self.description = "You can discard a card and draw a card,twice per turn"
 

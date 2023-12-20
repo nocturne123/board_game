@@ -21,6 +21,8 @@ class CardAction:
     def __init__(self, player_action):
         self.player_action: PlayerAction = player_action
         self.data: PlayerData = self.player_action.data
+        # 自动卸下装备的设置，当此项为真时，装上装备会自动卸下原有装备
+        self.auto_unmount = True
 
     def draw_card(self, card_pile: DrawPile, num=1):
         """玩家抽牌"""
@@ -136,6 +138,27 @@ class CardAction:
             or card.card_type == CardTypeEnum.anti_element
         ):
             card.get_equipped()  # 装备卡牌的状态转换，由on_use转换到on_equipment
+
+            # 如果装备栏里已有装备，那么自动卸下原来的装备
+            if self.auto_unmount:
+                if card.card_type == CardTypeEnum.armor:
+                    if self.data.armor_slot:
+                        armor = [
+                            i
+                            for i in self.data.equipment_sequence
+                            if i.card_type == CardTypeEnum.armor
+                        ][0]
+                        self.unmount_item(armor, discard_pile)
+                elif card.card_type == CardTypeEnum.weapon:
+                    if self.data.weapon_slot:
+                        self.unmount_item(self.data.weapon_slot, discard_pile)
+                elif (
+                    card.card_type == CardTypeEnum.element
+                    or card.card_type == CardTypeEnum.anti_element
+                ):
+                    if self.data.element_slot:
+                        self.unmount_item(self.data.element_slot, discard_pile)
+
             self.data.equipment_sequence.append(card)
             card.use(self, target)
             match card.card_type:
