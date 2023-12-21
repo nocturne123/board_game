@@ -143,21 +143,35 @@ class CardAction:
             if self.auto_unmount:
                 if card.card_type == CardTypeEnum.armor:
                     if self.data.armor_slot:
-                        armor = [
+                        # 利用列表推导式找到装备栏里的装备
+                        equiped_armor = [
                             i
                             for i in self.data.equipment_sequence
                             if i.card_type == CardTypeEnum.armor
                         ][0]
-                        self.unmount_item(armor, discard_pile)
+                        self.unmount_item(equiped_armor, discard_pile)
                 elif card.card_type == CardTypeEnum.weapon:
                     if self.data.weapon_slot:
-                        self.unmount_item(self.data.weapon_slot, discard_pile)
+                        equiped_weapon = [
+                            i
+                            for i in self.data.equipment_sequence
+                            if i.card_type == CardTypeEnum.weapon
+                        ][0]
+                        self.unmount_item(equiped_weapon, discard_pile)
                 elif (
                     card.card_type == CardTypeEnum.element
                     or card.card_type == CardTypeEnum.anti_element
                 ):
                     if self.data.element_slot:
-                        self.unmount_item(self.data.element_slot, discard_pile)
+                        equiped_element = [
+                            i
+                            for i in self.data.equipment_sequence
+                            if (
+                                i.card_type == CardTypeEnum.element
+                                or i.card_type == CardTypeEnum.anti_element
+                            )
+                        ]
+                        self.unmount_item(equiped_element, discard_pile)
 
             self.data.equipment_sequence.append(card)
             card.use(self, target)

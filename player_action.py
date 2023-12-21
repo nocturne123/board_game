@@ -49,6 +49,9 @@ class PlayerAction:
             received_damage = damage.num - self.data.mental_defense
         elif damage.type == DamageTypeEnum.real:
             received_damage = damage.num
+        # 防止伤害为负数
+        if received_damage < 0:
+            received_damage = 0
         self.decrease_health(received_damage)
         if self.data.Hook_After_Receive_Damage:
             for func in self.data.Hook_After_Receive_Damage:
