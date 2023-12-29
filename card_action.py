@@ -8,6 +8,7 @@ from player_exceptions import (
     NoChanceToAttackException,
     ImmuneToAttackException,
     ImmuneToStealException,
+    UnmountAntielementException,
 )
 
 from card_exceptions import (
@@ -33,7 +34,7 @@ class CardAction:
             self.data.hand_sequence.append(card)
 
     def discard_card(self, card, discard_pile: DiscardPile):
-        """玩家弃牌"""
+        """玩家弃牌，这里是从手牌中弃牌"""
         card.get_discarded()
         self.data.hand_sequence.remove(card)
         card.get_into_discard_pile()
@@ -211,8 +212,12 @@ class CardAction:
             for func in self.data.Hook_After_Use:
                 func(self, card, target, discard_pile)
 
-    def unmount_item(self, card, discard_pile: DiscardPile):
-        """玩家卸下物品"""
+    def unmount_item(self, card, discard_pile: DiscardPile, passive=True):
+        """玩家卸下物品，根据传入的参数有不同的表现,当passive为真时，视为被动卸下，
+        也就是装新装备时，老装备的自动卸下和卡牌在装备栏被偷牌弃置时的被动卸下，
+        当passive为假时，视为主动卸下，也就是玩家主动的弃置，
+        两者的关键区别在于，---不能主动弃置逆元素---，
+        为了实现这个目标产生的其他效果都是附加效果"""
         card.get_unmounted()  # 物品的状态转换，由on_equipment转换到on_discard
         card.unequiped(self)  # 调用卡牌的unequip函数，进行一些注销的操作
         self.data.equipment_sequence.remove(card)

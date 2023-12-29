@@ -30,3 +30,9 @@ class MismatchedCardException(Exception):
     """卡牌不匹配的异常，主要用于偷牌时，卡牌不在目标有效手牌或装备中"""
 
     pass
+
+
+class UnmountAntielementException(Exception):
+    """主动弃置逆元素的异常"""
+
+    pass
