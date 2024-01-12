@@ -8,13 +8,13 @@ from player_exceptions import (
     NoChanceToAttackException,
     ImmuneToAttackException,
     ImmuneToStealException,
-    UnmountAntielementException,
 )
 
 from card_exceptions import (
     CardNotInHandStateException,
     CardNotInHandException,
     MismatchedCardException,
+    UnmountAntielementException,
 )
 
 
@@ -218,6 +218,10 @@ class CardAction:
         当passive为假时，视为主动卸下，也就是玩家主动的弃置，
         两者的关键区别在于，---不能主动弃置逆元素---，
         为了实现这个目标产生的其他效果都是附加效果"""
+
+        # 不能主动卸下逆元素
+        if card.card_type == CardTypeEnum.anti_element and not passive:
+            raise UnmountAntielementException
         card.get_unmounted()  # 物品的状态转换，由on_equipment转换到on_discard
         card.unequiped(self)  # 调用卡牌的unequip函数，进行一些注销的操作
         self.data.equipment_sequence.remove(card)
