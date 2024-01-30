@@ -52,8 +52,9 @@ town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, 2, 6)
 town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -4, 4)
 town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -2, 6)
 town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -1, 7)
-"""
 
+
+#此处为hexutils包坐标下的城镇方块，换成hexlogic后弃用
 # 手动录入的所有城镇方块
 town_block1 = snow_castle_block(BlockTypeEnum.crystal_empire, 10, 0)
 town_block2 = our_town_block(BlockTypeEnum.our_town, 8, -4)
@@ -71,6 +72,23 @@ town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, -2, -2)
 town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -8, 0)
 town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -6, -2)
 town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -5, -3)
+"""
+town_block1 = town_block_no_fence(BlockTypeEnum.cloudsdale, -2, 2, 4)
+town_block2 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, -2, 0, 2)
+town_block3 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, -2, 2, 0)
+town_block4 = snow_castle_block(BlockTypeEnum.crystal_empire, 0, -5, 5)
+town_block5 = town_block_with_fence(BlockTypeEnum.castle_of_friendship, 0, -2, 2)
+town_block6 = town_block_no_fence(BlockTypeEnum.town_hall, 0, 0, 0)
+town_block7 = town_block_no_fence(BlockTypeEnum.carousel_boutique, 0, 2, -2)
+town_block8 = town_block_no_fence(BlockTypeEnum.zecora_house, 0, 4, -4)
+town_block9 = town_block_high_fence(BlockTypeEnum.canterlot, 2, -4, 2)
+town_block10 = town_block_no_fence(BlockTypeEnum.rainbow_dash_house, 2, -2, 0)
+town_block11 = town_block_no_fence(BlockTypeEnum.fluttershy_house, 2, 0, -2)
+town_block12 = snow_castle_block(BlockTypeEnum.old_castle, -2, 2, -4)
+town_block13 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, 3, 1, -4)
+town_block14 = our_town_block(BlockTypeEnum.our_town, 4, -6, 2)
+town_block15 = town_block_no_fence(BlockTypeEnum.manehattan, 6, -5, -1)
+town_block16 = town_block_with_fence(BlockTypeEnum.baltimare, 6, -3, -3)
 
 town_block_list = [
     town_block1,
