@@ -22,9 +22,6 @@ from species_skills import EarthponySkill
 from unicorn_skills import Sunburst_1
 from pegasus_skills import Derpy_1
 
-# 装备测试
-from weapons import Instrument
-
 """这个文件是经过状态机重构后的测试文件"""
 
 # 初始化牌堆
@@ -46,7 +43,7 @@ big_mac = Charater(
     mental_attack=2,
     speed=1,
     name="big_mac",
-    collect_items=(2, 2, 3),
+    collect_items=(1, 2, 3),
     species=SpeciesEnum.earth_pony,
 )
 
@@ -162,11 +159,6 @@ print(dummy_player.data.sunburst_mark)
 
 # 再给dummy挂上日光耀耀的技能
 sunburst_skill_1 = Sunburst_1(dummy_player)
-
-"""
-# dummy开始回合
-dummy_player.player_action.start_turn()
-dummy_player.player_action.start_turn_init()
 dummy_player.card_action.draw_card(draw_pile, 1)
 dummy_player.data.character_skills[1].use(
     card=dummy_player.data.hand_sequence[0],
@@ -174,27 +166,14 @@ dummy_player.data.character_skills[1].use(
     discard_pile=discard_pile,
 )
 
-
 # 没有报错，说明技能计数相互之间不影响，接下来测试使用了两次技能的情况
 mac_player.data.character_skills[0].use(
     card=mac_player.data.hand_sequence[0],
     target=dummy_player,
     discard_pile=discard_pile,
 )
-
-# 测试成功，该报的错都报了
-"""
-
-# 测试大麦装备乐器，造成两点伤害后，乐器给大麦回血的情况
-instrument = Instrument()
-draw_pile.append(instrument)
-mac_player.card_action.draw_card(draw_pile, 1)
-print(f"大麦的最大生命值为{mac_player.data.max_health}")
-print(f"大麦的当前生命值为{mac_player.data.health}")
-print(f"大麦的手牌为{mac_player.data.hand_sequence}")
-mac_player.card_action.use_card(instrument, mac_player, discard_pile)
-mac_player.card_action.use_card(
-    mac_player.data.hand_sequence[0], dummy_player, discard_pile
+mac_player.data.character_skills[0].use(
+    card=mac_player.data.hand_sequence[0],
+    target=dummy_player,
+    discard_pile=discard_pile,
 )
-print(f"大麦的攻击次数为{mac_player.data.attack_chance_in_turn}")
-print(f"大麦的当前生命值为{mac_player.data.health}")

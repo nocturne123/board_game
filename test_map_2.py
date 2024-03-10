@@ -27,7 +27,7 @@ SCREEN_TITLE = "Test Map"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
-MAP_BLOCK_PATH = "resources/map_config/base_map.toml"
+MAP_BLOCK_PATH = "resources/map_config/base_map_hexlogic.toml"
 
 TILE_SCALING = 1
 
@@ -73,7 +73,7 @@ town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -8, 0)
 town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -6, -2)
 town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -5, -3)
 """
-town_block1 = town_block_no_fence(BlockTypeEnum.cloudsdale, -2, 2, 4)
+town_block1 = town_block_no_fence(BlockTypeEnum.cloudsdale, -2, -2, 4)
 town_block2 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, -2, 0, 2)
 town_block3 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, -2, 2, 0)
 town_block4 = snow_castle_block(BlockTypeEnum.crystal_empire, 0, -5, 5)
@@ -84,7 +84,7 @@ town_block8 = town_block_no_fence(BlockTypeEnum.zecora_house, 0, 4, -4)
 town_block9 = town_block_high_fence(BlockTypeEnum.canterlot, 2, -4, 2)
 town_block10 = town_block_no_fence(BlockTypeEnum.rainbow_dash_house, 2, -2, 0)
 town_block11 = town_block_no_fence(BlockTypeEnum.fluttershy_house, 2, 0, -2)
-town_block12 = snow_castle_block(BlockTypeEnum.old_castle, -2, 2, -4)
+town_block12 = snow_castle_block(BlockTypeEnum.old_castle, 2, 2, -4)
 town_block13 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, 3, 1, -4)
 town_block14 = our_town_block(BlockTypeEnum.our_town, 4, -6, 2)
 town_block15 = town_block_no_fence(BlockTypeEnum.manehattan, 6, -5, -1)
@@ -118,13 +118,13 @@ dense_forest_hex_list = map_dic["dense_forest_hex_list"]
 snow_hex_list = map_dic["snow_hex_list"]
 water_hex_list = map_dic["water_hex_list"]
 
-grass_block_list = [grass_block(x[0], x[1]) for x in grass_hex_list]
-mountain_block_list = [mountain_block(x[0], x[1]) for x in mountain_hex_list]
+grass_block_list = [grass_block(x[0], x[1], x[2]) for x in grass_hex_list]
+mountain_block_list = [mountain_block(x[0], x[1], x[2]) for x in mountain_hex_list]
 dense_forest_block_list = [
-    dense_forest_block(x[0], x[1]) for x in dense_forest_hex_list
+    dense_forest_block(x[0], x[1], x[2]) for x in dense_forest_hex_list
 ]
-snow_block_list = [snow_block(x[0], x[1]) for x in snow_hex_list]
-water_block_list = [shallow_water_block(x[0], x[1]) for x in water_hex_list]
+snow_block_list = [snow_block(x[0], x[1], x[2]) for x in snow_hex_list]
+water_block_list = [shallow_water_block(x[0], x[1], x[2]) for x in water_hex_list]
 
 
 class MyGame(arcade.Window):
