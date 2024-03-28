@@ -31,48 +31,7 @@ MAP_BLOCK_PATH = "resources/map_config/base_map_hexlogic.toml"
 
 TILE_SCALING = 1
 
-"""
-# x轴向上，y轴向右的左手坐标系下的城镇坐标
-# 草方块、水方块见resource文件夹下的y_axis_reverse_map.toml文件
-# 此处为手动录入的城镇坐标
 
-town_block1 = snow_castle_block(BlockTypeEnum.crystal_empire, 14, 4)
-town_block2 = our_town_block(BlockTypeEnum.our_town, 12, 8)
-town_block3 = town_block_no_fence(BlockTypeEnum.cloudsdale, 10, 2)
-town_block4 = town_block_high_fence(BlockTypeEnum.canterlot, 10, 6)
-town_block5 = town_block_with_fence(BlockTypeEnum.castle_of_friendship, 8, 4)
-town_block6 = town_block_no_fence(BlockTypeEnum.manehattan, 8, 10)
-town_block7 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, 6, 2)
-town_block8 = town_block_no_fence(BlockTypeEnum.rainbow_dash_house, 6, 6)
-town_block9 = town_block_no_fence(BlockTypeEnum.town_hall, 4, 4)
-town_block10 = town_block_with_fence(BlockTypeEnum.baltimare, 4, 10)
-town_block11 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, 2, 2)
-town_block12 = town_block_no_fence(BlockTypeEnum.carousel_boutique, 0, 4)
-town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, 2, 6)
-town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -4, 4)
-town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -2, 6)
-town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -1, 7)
-
-
-#此处为hexutils包坐标下的城镇方块，换成hexlogic后弃用
-# 手动录入的所有城镇方块
-town_block1 = snow_castle_block(BlockTypeEnum.crystal_empire, 10, 0)
-town_block2 = our_town_block(BlockTypeEnum.our_town, 8, -4)
-town_block3 = town_block_no_fence(BlockTypeEnum.cloudsdale, 6, 2)
-town_block4 = town_block_high_fence(BlockTypeEnum.canterlot, 6, -2)
-town_block5 = town_block_with_fence(BlockTypeEnum.castle_of_friendship, 4, 0)
-town_block6 = town_block_no_fence(BlockTypeEnum.manehattan, 4, -6)
-town_block7 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, 2, 2)
-town_block8 = town_block_no_fence(BlockTypeEnum.rainbow_dash_house, 2, -2)
-town_block9 = town_block_no_fence(BlockTypeEnum.town_hall, 0, 0)
-town_block10 = town_block_with_fence(BlockTypeEnum.baltimare, 0, -6)
-town_block11 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, -2, 2)
-town_block12 = town_block_no_fence(BlockTypeEnum.carousel_boutique, -4, 0)
-town_block13 = town_block_no_fence(BlockTypeEnum.fluttershy_house, -2, -2)
-town_block14 = town_block_no_fence(BlockTypeEnum.zecora_house, -8, 0)
-town_block15 = snow_castle_block(BlockTypeEnum.old_castle, -6, -2)
-town_block16 = tree_of_harmony_block(BlockTypeEnum.tree_of_harmony, -5, -3)
-"""
 town_block1 = town_block_no_fence(BlockTypeEnum.cloudsdale, -2, -2, 4)
 town_block2 = town_block_no_fence(BlockTypeEnum.sweet_apple_acres, -2, 0, 2)
 town_block3 = town_block_no_fence(BlockTypeEnum.sugar_cube_corner, -2, 2, 0)
@@ -136,7 +95,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.player_sprite = None
         self.block_list = None
-        self.camera_map = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.camera_map = arcade.SimpleCamera()
 
         self.left_pressed = False
         self.right_pressed = False
@@ -200,7 +159,7 @@ class MyGame(arcade.Window):
             self.player_sprite.center_x - self.width / 2,
             self.player_sprite.center_y - self.height / 2,
         )
-        self.camera_sprites.move_to(position, 1.0)
+        self.camera_map.move_to(position, 1.0)
 
     def on_update(self, delta_time: float):
         if self.up_pressed and not self.down_pressed:

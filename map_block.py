@@ -8,16 +8,6 @@ import arcade
 
 TILE_SCALING = 1
 
-"""
-def hex_to_pixel(hex: HexCoords) -> tuple:
-    Converts a hex coordinate to a pixel coordinate
-    #将六边形坐标转换为像素坐标
-    
-    hex_x = hex[0]
-    hex_y = hex[1]
-    return (hex_y * -24, hex_x * 13)
-"""
-
 
 class map_block(arcade.Sprite):
     def __init__(
