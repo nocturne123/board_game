@@ -2,6 +2,7 @@ import arcade
 from enum import Enum
 from arcade import load_textures
 from itertools import cycle
+from hexlogic import HexCoords, hex_to_pixel
 
 """
 这个文件用于测试角色动画，实现灰琪在地图上上下左右移动的效果
@@ -86,7 +87,6 @@ class MaudPie(arcade.Sprite):
         elif self.character_face_direction == Direction.DOWN:
             self.texture = self.facing_down_textures[self.cur_texture]
 
-        animation_sequance = [1, 0, 1, 2]
         self.cur_texture = next(self.animation_sequance)
         if self.idle:
             self.cur_texture = 1
@@ -110,8 +110,8 @@ class MyGame(arcade.Window):
 
     def setup(self):
         self.player_sprite = MaudPie()
-        self.player_sprite.center_x = 300
-        self.player_sprite.center_y = 300
+        self.player_sprite.center_x = 0
+        self.player_sprite.center_y = 0
 
     def on_draw(self):
         """Draw everything"""

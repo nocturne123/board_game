@@ -28,6 +28,7 @@ class map_block(arcade.Sprite):
         self,
         map_texture=None,
         block_type: BlockTypeEnum = BlockTypeEnum.grass,
+        hit_box_algorithm="None",
         hex_q=0,
         hex_r=0,
         hex_s=0,
@@ -35,12 +36,10 @@ class map_block(arcade.Sprite):
         super().__init__(
             path_or_texture=map_texture,
             scale=TILE_SCALING,
-            center_x=300
-            + hex_to_pixel(
+            center_x=hex_to_pixel(
                 HexCoords(hex_q, hex_r, hex_s), tile_width=26, tile_height=-24
             )[0],
-            center_y=300
-            + hex_to_pixel(
+            center_y=hex_to_pixel(
                 HexCoords(hex_q, hex_r, hex_s), tile_width=26, tile_height=-24
             )[1],
         )

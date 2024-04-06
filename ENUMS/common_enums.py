@@ -10,6 +10,7 @@
     CardStateEnum: 用于表示卡牌的状态机
     DamageTypeEnum: 用于表示伤害的类型
 """
+
 import enum
 
 
@@ -23,19 +24,23 @@ class CharaterAliveEnum(enum.Enum):
 
 class CardTypeEnum(enum.Enum):
     # 基础抽牌牌堆
-    magic_attack = 1
-    physical_attack = 2
-    mental_attack = 3
-    steal = 4
+    attack = 1
+    steal = 2
 
-    armor = 5
-    weapon = 6
-    effect = 7
-    healing = 8
+    armor = 3
+    weapon = 4
+    effect = 5
+    healing = 6
 
-    event_trigger = 9
-    element = 10
-    anti_element = 11
+    event_trigger = 7
+    element = 8
+    anti_element = 9
+
+
+class AttackCardTypeEnum(enum.Enum):
+    physical = 1
+    magic = 2
+    mental = 3
 
 
 class SpeciesEnum(enum.Enum):
@@ -117,6 +122,18 @@ class CardStateEnum(enum.Enum):
     get_stolen = 6  # 被偷窃时刻
     on_discard = 7  # 被弃置时刻
     in_discard_pile = 8  # 在弃牌堆里
+
+
+class CardTargetEnum(enum.Enum):
+    """卡牌的目标，包括自己，队友，敌人，所有人"""
+
+    self = 0
+    teammate = 1
+
+    singel_enemy = 2
+    all_enemy = 3
+
+    all = 4
 
 
 class DamageTypeEnum(enum.Enum):

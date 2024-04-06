@@ -1,7 +1,11 @@
 import arcade
+from arcade import load_textures
+from enum import Enum
 from ENUMS.common_enums import BlockTypeEnum
 from pyglet.math import Vec2
 import toml
+from itertools import cycle
+from hexlogic import HexCoords, hex_to_pixel
 
 """
 这个文件是最主要的地图测试文件，现阶段所有的地图都在这里测试
@@ -27,6 +31,7 @@ SCREEN_TITLE = "Test Map"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
+CHARACTER_SCALING = 0.5
 MAP_BLOCK_PATH = "resources/map_config/base_map_hexlogic.toml"
 
 TILE_SCALING = 1
@@ -85,6 +90,80 @@ dense_forest_block_list = [
 snow_block_list = [snow_block(x[0], x[1], x[2]) for x in snow_hex_list]
 water_block_list = [shallow_water_block(x[0], x[1], x[2]) for x in water_hex_list]
 
+Maud_Pie_file = (
+    "resources/raw_character/mlp_pie_family_for_rpg_maker_by_zeka10000_dbo84ae.png"
+)
+
+
+class Direction(Enum):
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
+
+
+class MaudPie(arcade.Sprite):
+    def __init__(self):
+        super().__init__(hit_box_algorithm="None")
+
+        self.character_face_direction = Direction.RIGHT
+        self.cur_texture = 0
+        self.scale = CHARACTER_SCALING
+        self.idle = True
+
+        self.timer = 0
+        self.frame_time = 0.1
+
+        self.facing_right_textures = []
+        textures = load_textures(
+            Maud_Pie_file, [(x, 48 * 2, 48, 48) for x in range(48 * 3, 48 * 6 + 1, 48)]
+        )
+        self.facing_right_textures.extend(textures)
+
+        self.facing_down_textures = []
+        textures = load_textures(
+            Maud_Pie_file, [(x, 48 * 0, 48, 48) for x in range(48 * 3, 48 * 6 + 1, 48)]
+        )
+        self.facing_down_textures.extend(textures)
+
+        self.facing_left_textures = []
+        textures = load_textures(
+            Maud_Pie_file, [(x, 48 * 1, 48, 48) for x in range(48 * 3, 48 * 6 + 1, 48)]
+        )
+        self.facing_left_textures.extend(textures)
+
+        self.facing_up_textures = []
+        textures = load_textures(
+            Maud_Pie_file, [(x, 48 * 3, 48, 48) for x in range(48 * 3, 48 * 6 + 1, 48)]
+        )
+        self.facing_up_textures.extend(textures)
+
+        self.texture = self.facing_right_textures[self.cur_texture]
+
+        self.hex_position = HexCoords(0, 0, 0)
+        self.position = hex_to_pixel(self.hex_position, tile_width=26, tile_height=-24)
+
+        self.animation_sequance = cycle([1, 0, 1, 2])
+
+    def update_animation(self, delta_time: float = 1 / 60):
+
+        self.timer += delta_time
+        if self.timer < self.frame_time:
+            return
+        self.timer = 0
+        if self.character_face_direction == Direction.RIGHT:
+            self.texture = self.facing_right_textures[self.cur_texture]
+        elif self.character_face_direction == Direction.LEFT:
+            self.texture = self.facing_left_textures[self.cur_texture]
+        elif self.character_face_direction == Direction.UP:
+            self.texture = self.facing_up_textures[self.cur_texture]
+        elif self.character_face_direction == Direction.DOWN:
+            self.texture = self.facing_down_textures[self.cur_texture]
+
+        self.cur_texture = next(self.animation_sequance)
+        if self.idle:
+            self.cur_texture = 1
+
 
 class MyGame(arcade.Window):
     """Our custom Window Class"""
@@ -93,9 +172,15 @@ class MyGame(arcade.Window):
         """Initializer"""
         # Call the parent class initializer
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        self.player_sprite = None
+        self.player_list = None
         self.block_list = None
         self.camera_map = arcade.SimpleCamera()
+        # self.camera_map.move_to((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2), 1)
+        # self.camera_map.update()
+
+        # 角色操作相关设置
+        self.held_player = None
+        self.held_player_original_hex_position = None
 
         self.left_pressed = False
         self.right_pressed = False
@@ -111,6 +196,10 @@ class MyGame(arcade.Window):
         self.block_list.extend(water_block_list)
         self.block_list.extend(town_block_list)
 
+        self.player_list = arcade.SpriteList()
+
+        self.player_list.append(MaudPie())
+
         self.block_list.sort(key=lambda x: x.center_y, reverse=True)
         self.view_left = 0
         self.view_bottom = 0
@@ -120,6 +209,7 @@ class MyGame(arcade.Window):
         self.clear()
         self.camera_map.use()
         self.block_list.draw(pixelated=True)
+        self.player_list.draw(pixelated=True)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -172,7 +262,8 @@ class MyGame(arcade.Window):
             self.view_left -= 1
 
         position = self.view_left, self.view_bottom
-        self.camera_map.move_to(position, 1)
+        # self.camera_map.move_to(position, 1)
+        self.camera_map.move_to((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2), 1)
 
     def on_resize(self, width, height):
         """
@@ -181,6 +272,44 @@ class MyGame(arcade.Window):
         """
         self.camera_map.resize(int(width), int(height))
         self.camera_map.resize(int(width), int(height))
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        map_cords = self.camera_map.get_map_coordinates((x, y))
+        players = arcade.get_sprites_at_point((map_cords), self.player_list)
+
+        if players:
+            self.held_player = players[0]
+            self.held_player_original_hex_position = self.held_player.hex_position
+        print(map_cords)
+        print(self.held_player)
+        print(players)
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        if self.held_player:
+            self.held_player.center_x += dx
+            self.held_player.center_y += dy
+
+    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+        if self.held_player:
+            map_cords = self.camera_map.get_map_coordinates((x, y))
+            blocks = arcade.get_sprites_at_point((map_cords), self.block_list)
+            if blocks:
+                block = blocks[0]
+                self.held_player.hex_position = block.hex_position
+                self.held_player.position = hex_to_pixel(
+                    block.hex_position, tile_width=26, tile_height=-24
+                )
+
+            else:
+                self.held_player.hex_position = self.held_player_original_hex_position
+                self.held_player.position = hex_to_pixel(
+                    self.held_player_original_hex_position,
+                    tile_width=26,
+                    tile_height=-24,
+                )
+
+        self.held_player = None
+        self.held_player_original_hex_position = None
 
 
 window = MyGame()

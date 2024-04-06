@@ -1,9 +1,5 @@
-"""这个文件是玩家操作的文件，现阶段全部用静态方法实现。
-未来需要用类进行包装。实现hook机制，实现玩家操作的可扩展性，方便技能的实现。
-注：卡牌的状态切换先于卡牌的相关操作，先切换，再操作"""
-"""2023.10.18：将使用卡牌的逻辑剔除出PlayerAction，PlayerAction中的操作只涉及Player类的
-数值操作、状态改变等，例如血量的增加减少、抽牌数的增加减少、受到伤害，以及回合相关操作，比如
-结束回合、跳过回合。"""
+"""2024.4.4更新，以图论为数据基础重构,基础的node在base_actions里实现"""
+
 from player_data import PlayerData
 from damage import Damage
 import random
@@ -58,7 +54,7 @@ class PlayerAction:
                 func(self, damage)
         return received_damage
 
-    def start_turn_init(self):
+    def start_turn(self):
         """回合开始时的初始化"""
         # 当到自己回合时无论如何回合计数都会加1，轮次计数因为玩家不能从game类里获取信息，所以轮次计数在game类里实现
         self.data.turn_count += 1
@@ -66,18 +62,6 @@ class PlayerAction:
         # 回合开始时，玩家的移动次数和攻击次数都会重置
         self.data.move_chance_in_turn = self.data.move_chance
         self.data.attack_chance_in_turn = self.data.attack_chance
-
-    def start_turn(self):
-        """开始回合"""
-        self.data.stage_state.start_turn()  # 玩家状态切换，从wait切换到prepare
-
-    def start_draw(self):
-        """结束准备阶段,抽牌阶段开始"""
-        self.data.stage_state.start_draw()  # 玩家状态切换，从prepare切换到draw
-
-    def start_play(self):
-        """结束抽牌阶段，出牌阶段开始"""
-        self.data.stage_state.start_play()
 
     def end_play(self):
         """结束回合"""
