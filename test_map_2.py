@@ -175,8 +175,10 @@ class MyGame(arcade.Window):
         self.player_list = None
         self.block_list = None
         self.camera_map = arcade.SimpleCamera()
-        # self.camera_map.move_to((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2), 1)
-        # self.camera_map.update()
+        self.camera_map.position.x = -SCREEN_WIDTH / 2
+        self.camera_map.position.y = -SCREEN_HEIGHT / 2
+        # move((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2))
+        print(self.camera_map.position)
 
         # 角色操作相关设置
         self.held_player = None
@@ -252,18 +254,20 @@ class MyGame(arcade.Window):
         self.camera_map.move_to(position, 1.0)
 
     def on_update(self, delta_time: float):
-        if self.up_pressed and not self.down_pressed:
-            self.view_bottom -= 1
-        elif self.down_pressed and not self.up_pressed:
-            self.view_bottom += 1
-        if self.left_pressed and not self.right_pressed:
-            self.view_left += 1
-        elif self.right_pressed and not self.left_pressed:
-            self.view_left -= 1
 
-        position = self.view_left, self.view_bottom
-        # self.camera_map.move_to(position, 1)
-        self.camera_map.move_to((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2), 1)
+        if self.up_pressed and not self.down_pressed:
+            self.view_bottom = -1
+        elif self.down_pressed and not self.up_pressed:
+            self.view_bottom = +1
+        if self.left_pressed and not self.right_pressed:
+            self.view_left = -1
+        elif self.right_pressed and not self.left_pressed:
+            self.view_left = +1
+
+        position = Vec2(self.view_left, self.view_bottom)
+        position += self.camera_map.position
+        self.camera_map.move_to(position, 1)
+        # self.camera_map.move_to((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2), 1)
 
     def on_resize(self, width, height):
         """
