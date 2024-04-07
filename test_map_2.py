@@ -256,13 +256,18 @@ class MyGame(arcade.Window):
     def on_update(self, delta_time: float):
 
         if self.up_pressed and not self.down_pressed:
-            self.view_bottom = -1
+            self.view_bottom = -5
         elif self.down_pressed and not self.up_pressed:
-            self.view_bottom = +1
+            self.view_bottom = +5
+        else:
+            self.view_bottom = 0
+
         if self.left_pressed and not self.right_pressed:
-            self.view_left = -1
+            self.view_left = +5
         elif self.right_pressed and not self.left_pressed:
-            self.view_left = +1
+            self.view_left = -5
+        else:
+            self.view_left = 0
 
         position = Vec2(self.view_left, self.view_bottom)
         position += self.camera_map.position
