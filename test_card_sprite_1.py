@@ -1,10 +1,21 @@
 import arcade
 from arcade import load_texture
 from pyglet.math import Vec2
+from enum import Enum
 
 SCREEN_TITLE = "Test Card Sprite"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
+
+
+class CardState(Enum):
+    in_deck = 0
+    on_draw = 1
+    in_hand = 2
+    on_choose = 3
+    back_to_hand = 4
+    on_board = 5
+    on_discard = 5
 
 
 class CardSprite(arcade.Sprite):
@@ -25,7 +36,7 @@ class CardSprite(arcade.Sprite):
         if self.getting_bigger:
             if self.scale <= 0.35:
                 self.scale += 0.01
-                self.center_y += 1
+                self.forward(5)
 
         else:
             if self.scale >= 0.15:
@@ -34,6 +45,14 @@ class CardSprite(arcade.Sprite):
                     self.center_y -= 5
                 else:
                     self.center_y = 0
+
+    def lerp_y(self, y, speed):
+        return self.y + (speed * (y - self.y))
+
+    def move_to_y(self, y: float, speed):
+        self.center_y = self.lerp_y(y, speed)
+        if self.center_y == y:
+            return True
 
 
 class MyGame(arcade.Window):
