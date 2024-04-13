@@ -1,6 +1,5 @@
-class Card:
-    def __init__(self):
-        self.a = 1
+from pathlib import Path
 
-    def get_a(self):
-        return self.a
+
+font_path = Path("resources/fonts/ark-pixel-10px-proportional-zh_cn.ttf")
+print(font_path)

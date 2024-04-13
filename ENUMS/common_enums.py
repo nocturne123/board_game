@@ -52,6 +52,9 @@ class SpeciesEnum(enum.Enum):
     alicon = 4
     others = 5
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class SpecialNumberEnum(enum.Enum):
     """特殊数字，无限大和强制0"""

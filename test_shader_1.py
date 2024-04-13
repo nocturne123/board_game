@@ -3,12 +3,18 @@
 先搁置，先把卡牌和选择写出来，后续技术成熟再回来写shader、特效"""
 
 import arcade
+import pyglet
 from enum import Enum
 from arcade import load_textures
 from itertools import cycle
 from hexlogic import HexCoords, hex_to_pixel
 from pyglet.math import Vec2
 from arcade.experimental import Shadertoy
+from pathlib import Path
+
+from charaters import Charater
+from ENUMS.common_enums import SpeciesEnum
+from player_data import PlayerData
 
 """
 这个文件用于测试角色动画，实现灰琪在地图上上下左右移动的效果
@@ -21,6 +27,21 @@ class Direction(Enum):
     LEFT = 2
     RIGHT = 3
 
+
+pixel_font = arcade.load_font("resources/fonts/ark-pixel-10px-proportional-zh_cn.ttf")
+
+maud_pie_character = Charater(
+    health=14,
+    magic_attack=1,
+    physical_attack=2,
+    mental_attack=1,
+    speed=1,
+    name="maud_pie",
+    collect_items=(1, 2, 3),
+    species=SpeciesEnum.earth_pony,
+)
+
+maud_pie_player = PlayerData(maud_pie_character)
 
 Maud_Pie_file = (
     "resources/raw_character/mlp_pie_family_for_rpg_maker_by_zeka10000_dbo84ae.png"
@@ -49,6 +70,18 @@ class MaudPie(arcade.Sprite):
 
         self.timer = 0
         self.frame_time = 0.1
+
+        self.player = maud_pie_player
+        self.imformation = arcade.Text(
+            text="",
+            font_name=pixel_font,
+            start_x=self.center_x + 50,
+            start_y=self.center_y,
+            color=arcade.color.BLUE,
+            multiline=True,
+            width=200,
+        )
+        self.show_text = False
 
         self.facing_right_textures = []
         textures = load_textures(
@@ -100,6 +133,17 @@ class MaudPie(arcade.Sprite):
         def __repr__(self):
             return f"Maud Pie at {self.position}"
 
+    def show_imformation(self):
+        self.imformation.text = f"name:{self.player.name}\
+            \nspecies:{self.player.species}\
+            \nhealth:{self.player.health}\
+            \nmagic_attack:{self.player.magic_attack}\
+            \nphysical_attack:{self.player.physical_attack}\
+            \nmental_attack:{self.player.mental_attack}\
+            \nspeed:{self.player.speed}"
+        self.imformation.x = self.center_x + 50
+        self.imformation.y = self.center_y
+
 
 class MyGame(arcade.Window):
     """Our custom Window Class"""
@@ -122,44 +166,47 @@ class MyGame(arcade.Window):
 
         self.held_player = None
 
-        self.shadertoy = None
-        self.channel0 = None
-        self.channel1 = None
-        self.load_shader()
+        # self.shadertoy = None
+        # self.channel0 = None
+        # self.channel1 = None
+        # self.load_shader()
 
     def setup(self):
         self.player_list = arcade.SpriteList()
         self.player_list.append(MaudPie())
         self.player_sprite = self.player_list[0]
 
-    def load_shader(self):
-        window_size = self.get_size()
+    # def load_shader(self):
+    #     window_size = self.get_size()
 
-        self.shadertoy = Shadertoy.create_from_file(
-            window_size, "shadertoy_test/step_1.glsl"
-        )
+    #     self.shadertoy = Shadertoy.create_from_file(
+    #         window_size, "shadertoy_test/step_1.glsl"
+    #     )
 
-        self.channel0 = self.shadertoy.ctx.framebuffer(
-            color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
-        )
-        self.channel1 = self.shadertoy.ctx.framebuffer(
-            color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
-        )
+    #     self.channel0 = self.shadertoy.ctx.framebuffer(
+    #         color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
+    #     )
+    #     self.channel1 = self.shadertoy.ctx.framebuffer(
+    #         color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
+    #     )
 
-        self.shadertoy.channel_0 = self.channel0.color_attachments[0]
-        self.shadertoy.channel_1 = self.channel1.color_attachments[0]
+    #     self.shadertoy.channel_0 = self.channel0.color_attachments[0]
+    #     self.shadertoy.channel_1 = self.channel1.color_attachments[0]
 
     def on_draw(self):
         """Draw everything"""
-        self.channel0.use()
-        self.channel0.clear()
+        # self.channel0.use()
+        # self.channel0.clear()
 
         self.use()
 
         self.clear()
         self.camera_map.use()
         self.player_list.draw(pixelated=True)
-        self.shadertoy.render()
+        if self.player_sprite.show_text:
+            self.player_sprite.imformation.draw()
+
+        # self.shadertoy.render()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -201,6 +248,7 @@ class MyGame(arcade.Window):
         elif self.right_pressed and not self.left_pressed:
             self.player_sprite.center_x += 1
         self.player_sprite.update_animation()
+        self.player_sprite.show_imformation()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         print(self.camera_map.position)
@@ -213,9 +261,16 @@ class MyGame(arcade.Window):
             self.player_position_record = self.held_player.position
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        map_cords = self.camera_map.get_map_coordinates((x, y))
+        players = arcade.get_sprites_at_point((map_cords), self.player_list)
+        if players:
+            self.player_sprite.show_text = True
+        else:
+            self.player_sprite.show_text = False
         if self.held_player:
             self.held_player.center_x += dx
             self.held_player.center_y += dy
+            self.player_sprite.imformation.draw()
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
         if self.held_player:
