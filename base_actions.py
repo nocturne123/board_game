@@ -7,31 +7,21 @@ from ENUMS.common_enums import CharaterAliveEnum
 
 
 class Action:
-    def __init__(self, key):
-        self.id = key
-        self.connectedTo = []
-
-    def __repr__(self) -> str:
-        return f"{self.id}"
-
     @abstractmethod
     def take_action(self):
         pass
 
 
 class DecreaseHealth(Action):
-    def __init__(self, key):
-        super().__init__(key)
-
     def take_action(self, player_data: PlayerData, num: int):
         player_data.health -= num
         return num
 
+    def __repr__(self) -> str:
+        return f"DecreaseHealth"
+
 
 class ReceiveDamage(Action):
-    def __init__(self, key):
-        super().__init__(key)
-
     def take_action(self, player_data: PlayerData, damage: Damage):
         if damage.type == DamageTypeEnum.physical:
             received_damage = damage.num - player_data.physical_defense
@@ -47,11 +37,11 @@ class ReceiveDamage(Action):
 
         return received_damage
 
+    def __repr__(self) -> str:
+        return f"ReceiveDamage"
+
 
 class LivingUpdate(Action):
-    def __init__(self, key):
-        super().__init__(key)
-
     def take_action(self, player_data: PlayerData):
         # 角色眩晕相关的操作后续实现
         # if player_data.colloctions:
@@ -60,11 +50,23 @@ class LivingUpdate(Action):
             player_data.living_state = CharaterAliveEnum.dead
         return player_data.living_state
 
+    def __repr__(self) -> str:
+        return f"LivingUpdate"
+
 
 class StartTurn(Action):
-    def __init__(self, key):
-        super().__init__(key)
-
     def take_action(self, player_data: PlayerData):
         player_data.turn_count += 1
         return player_data.turn_count
+
+    def __repr__(self) -> str:
+        return f"StartTurn"
+
+
+class UseCard(Action):
+    def take_action(self, card, target):
+        card.take_effect(self, target)
+        return card
+
+    def __repr__(self) -> str:
+        return f"UseCard"
