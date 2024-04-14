@@ -28,7 +28,9 @@ class Direction(Enum):
     RIGHT = 3
 
 
-pixel_font = arcade.load_font("resources/fonts/ark-pixel-10px-proportional-zh_cn.ttf")
+pixel_font = arcade.load_font(
+    "resources/fonts/fusion-pixel-10px-monospaced-zh_hans.ttf"
+)
 
 maud_pie_character = Charater(
     health=14,
@@ -140,7 +142,8 @@ class MaudPie(arcade.Sprite):
             \nmagic_attack:{self.player.magic_attack}\
             \nphysical_attack:{self.player.physical_attack}\
             \nmental_attack:{self.player.mental_attack}\
-            \nspeed:{self.player.speed}"
+            \nspeed:{self.player.speed}\
+            \n来段中文，看看像素字体有没有生效"
         self.imformation.x = self.center_x + 50
         self.imformation.y = self.center_y
 

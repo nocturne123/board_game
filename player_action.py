@@ -19,14 +19,27 @@ class PlayerAction:
     def __init__(self, player_data) -> None:
         self.data: PlayerData = player_data
         self.actions = []
-        self.action_path = {}
 
+    # 这一步其实完全可以用python原本的列表append方法,现在先这样写，防止后续需要对这个函数进行修改
     def add_action(self, action):
         self.actions.append(action)
 
-    def add_action_path(self, action, path):
-        if action in self.actions and path in self.actions:
-            self.action_path[action] = path
+    def add_action_chain(self, action, next_action):
+        action.next_action = next_action
+
+    def chain_of_actions(self, begin_action):
+        """执行action链
+        如果有下一个动作，将信息传递给下一个动作
+        如果没有下一个动作，则链条终止"""
+
+        if begin_action.next_action:
+            print(f"{begin_action} has next action")
+            begin_action.trigger(self.data)
+            begin_action.imforme_next_action(begin_action.next_action)
+
+            self.chain_of_actions(begin_action.next_action)
+        else:
+            begin_action.trigger(self.data)
 
     # def living_update(self):
     #     # TODO:有关收藏品的逻辑没有更新

@@ -7,35 +7,65 @@ from ENUMS.common_enums import CharaterAliveEnum
 
 
 class Action:
+    def __init__(self) -> None:
+        self.next_action = None
+
+    def trigger(self, player_data, extra_function=None):
+        if extra_function:
+            extra_function(self, player_data)
+        else:
+            self.take_action(player_data)
+
     @abstractmethod
     def take_action(self):
         pass
 
+    # 动作在生效前会把下一个动作需要的信息传递过去
+    # 这个函数非常灵活，动作链当中的动作，player_data是通过接口传来传去
+    # 大部分的动作都涉及到player_data，但除此之外的动作就由这个接口传递给下一个动作
+    def imforme_next_action(self, next_action):
+        return None
+
 
 class DecreaseHealth(Action):
-    def take_action(self, player_data: PlayerData, num: int):
-        player_data.health -= num
-        return num
+    def __init__(self) -> None:
+        super().__init__()
+        self.decrease_num = 0
+
+    def take_action(self, player_data: PlayerData):
+        player_data.health -= self.decrease_num
 
     def __repr__(self) -> str:
         return f"DecreaseHealth"
 
 
 class ReceiveDamage(Action):
-    def take_action(self, player_data: PlayerData, damage: Damage):
-        if damage.type == DamageTypeEnum.physical:
-            received_damage = damage.num - player_data.physical_defense
-        elif damage.type == DamageTypeEnum.magic:
-            received_damage = damage.num - player_data.magic_defense
-        elif damage.type == DamageTypeEnum.mental:
-            received_damage = damage.num - player_data.mental_defense
-        elif damage.type == DamageTypeEnum.real:
-            received_damage = damage.num
+    def __init__(self) -> None:
+        self.damage = None
+        self.out_put_num = 0
+
+    def set_damage(self, damage):
+        self.damage = damage
+
+    def take_action(self, player_data: PlayerData):
+        if self.damage.type == DamageTypeEnum.physical:
+            received_damage = self.damage.num - player_data.physical_defense
+        elif self.damage.type == DamageTypeEnum.magic:
+            received_damage = self.damage.num - player_data.magic_defense
+        elif self.damage.type == DamageTypeEnum.mental:
+            received_damage = self.damage.num - player_data.mental_defense
+        elif self.damage.type == DamageTypeEnum.real:
+            received_damage = self.damage.num
         # 防止伤害为负数
         if received_damage < 0:
             received_damage = 0
 
-        return received_damage
+        self.out_put_num = received_damage
+
+    def imforme_next_action(self, next_action):
+        """一般情况下，受到伤害后，下一步就是生命值减少，将减少的数字"""
+        next_action.decrease_num = self.out_put_num
+        return next_action
 
     def __repr__(self) -> str:
         return f"ReceiveDamage"
@@ -64,9 +94,13 @@ class StartTurn(Action):
 
 
 class UseCard(Action):
-    def take_action(self, card, target):
-        card.take_effect(self, target)
-        return card
+    def __init__(self) -> None:
+        super().__init__()
+        self.target = None
+
+    def take_action(self, card):
+        card.take_effect(self, self.target)
+        return
 
     def __repr__(self) -> str:
         return f"UseCard"
