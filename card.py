@@ -24,13 +24,24 @@ class Card:
     ):
         # 是否有距离限制
         self.distance_limited = True
+        self.card_identity = None
 
         # 卡牌类型
         self.card_type = card_type
 
-    def use(self, user, targets):
+    def use(self, user, target):
         # 打出卡牌和卡牌生效需要拆分开
-        self.effect(user, targets)
+        self.effect(user, target)
+
+    # 如果卡牌在抽取时有特殊效果，重写这个函数
+    def on_draw(self, user_data):
+        pass
+
+    def on_discard(self, user_data):
+        pass
+
+    def on_stolen(self, user_data):
+        pass
 
     @abstractmethod
     def effect(self, user, targets):
@@ -43,6 +54,16 @@ class Card:
 class AttackCard(Card):
     def __init__(self):
         super().__init__(card_type=CardTypeEnum.attack)
+
+
+class MagicAttackCard(AttackCard):
+    def __init__(self):
+        super().__init__()
+        self.card_identity = AttackCardTypeEnum.magic
+
+    def effect(self, user, target):
+        damage = Damage(user.data.magic_attack, DamageTypeEnum.magic)
+        target.actions.chain_of_actions(damage)
 
 
 class StealCard(Card):

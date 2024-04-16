@@ -1,5 +1,4 @@
-from pathlib import Path
+from damage import Damage, DamageTypeEnum
 
-
-font_path = Path("resources/fonts/ark-pixel-10px-proportional-zh_cn.ttf")
-print(font_path)
+damage1 = Damage(10, DamageTypeEnum.physical)
+print(damage1)

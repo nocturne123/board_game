@@ -19,6 +19,8 @@ class PlayerData:
         self.species = cha.species
         self.living_state = CharaterAliveEnum.alive
 
+        self.turn_stage = PlayerStateEnum.wait
+
         # 技能栏，分为种族技能、角色技能、装备技能
         self.species_skills = []
         self.character_skills = []

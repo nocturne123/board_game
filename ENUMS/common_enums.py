@@ -106,11 +106,9 @@ class PlayerStateEnum(enum.Enum):
 
     wait = 0
 
-    prepare = 1
-    draw = 2
-    play = 3
-    discard = 4
-    end = 5
+    draw = 1
+    play = 2
+    discard = 3
 
 
 class CardStateEnum(enum.Enum):
