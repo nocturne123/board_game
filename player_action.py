@@ -11,6 +11,39 @@ from ENUMS.common_enums import (
     CardTypeEnum,
     CardStateEnum,
 )
+from base_actions import (
+    Action,
+    DecreaseHealth,
+    ReceiveDamage,
+    LivingUpdate,
+    StartDrawState,
+    StartPlayState,
+    StartDiscardState,
+    EndDiscardState,
+    DrawCard,
+    DiscardCard,
+    UseCard,
+    Heal,
+    RollDice,
+    EarthponyRollDice,
+)
+
+DEFAUT_ACTIONS = [
+    Action,
+    DecreaseHealth,
+    ReceiveDamage,
+    LivingUpdate,
+    StartDrawState,
+    StartPlayState,
+    StartDiscardState,
+    EndDiscardState,
+    DrawCard,
+    DiscardCard,
+    UseCard,
+    Heal,
+    RollDice,
+    EarthponyRollDice,
+]
 
 
 class PlayerAction:
@@ -19,6 +52,10 @@ class PlayerAction:
     def __init__(self, player_data) -> None:
         self.data: PlayerData = player_data
         self.actions = []
+
+        # 玩家动作初始化的时候将默认动作添加进去
+        for action in DEFAUT_ACTIONS:
+            self.actions.append(action())
 
     # 这一步其实完全可以用python原本的列表append方法,现在先这样写，防止后续需要对这个函数进行修改
     def add_action(self, action):

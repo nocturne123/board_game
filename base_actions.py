@@ -20,7 +20,7 @@ class Action:
             self.reset_property()
 
     @abstractmethod
-    def take_action(self):
+    def take_action(self, player_data: PlayerData):
         pass
 
     # 动作在生效前会把下一个动作需要的信息传递过去
@@ -213,9 +213,10 @@ class UseCard(Action):
     def __init__(self) -> None:
         super().__init__()
         self.target = None
+        self.card = None
 
-    def take_action(self, player_data, card):
-        card.take_effect(player_data, self.target)
+    def take_action(self, player_data):
+        self.card.take_effect(player_data, self.target)
         return
 
     def __repr__(self) -> str:
@@ -232,6 +233,9 @@ class Heal(Action):
     def __repr__(self) -> str:
         return f"Heal"
 
+    def reset_property(self):
+        self.heal_num = 0
+
 
 class RollDice(Action):
     def __init__(self) -> None:
@@ -243,6 +247,9 @@ class RollDice(Action):
 
     def __repr__(self) -> str:
         return f"RollDice"
+
+    def reset_property(self):
+        self.dice_num = 0
 
 
 class EarthponyRollDice(RollDice):
