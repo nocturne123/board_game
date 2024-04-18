@@ -16,6 +16,28 @@ big_mac = Charater(
     species=SpeciesEnum.earth_pony,
 )
 
+sun_brest = Charater(
+    health=13,
+    magic_attack=2,
+    physical_attack=2,
+    mental_attack=1,
+    speed=1,
+    name="sun_brest",
+    collect_items=(1, 2, 3),
+    species=SpeciesEnum.pegasi,
+)
+
+derpy = Charater(
+    health=13,
+    magic_attack=0,
+    physical_attack=3,
+    mental_attack=3,
+    speed=2,
+    name="derpy",
+    collect_items=(1, 2, 3),
+    species=SpeciesEnum.pegasi,
+)
+
 mac_data = PlayerData(big_mac)
 
 A = PlayerAction(mac_data)

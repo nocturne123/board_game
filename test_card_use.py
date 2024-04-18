@@ -1,0 +1,6 @@
+"""这个文件将前期工作组合起来，实现在地图上打出一张攻击牌的效果
+具体需要实现的包括：从player_data到player_action到player到player_sprite的创建
+地图的创建
+完善卡牌的打出逻辑，把card的逻辑和card_sprite的逻辑分开
+card负责生效，card_sprite负责处理在手中、打出、打出后的逻辑
+现在还不用管game、轮次相关的逻辑，先把牌打出来一张再说"""
