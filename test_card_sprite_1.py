@@ -19,7 +19,7 @@ class CardState(Enum):
 
 
 class CardSprite(arcade.Sprite):
-    def __init__(self):
+    def __init__(self, card):
         super().__init__(
             path_or_texture="resources/card_library/playable/actions/物理攻击.png",
             hit_box_algorithm="None",

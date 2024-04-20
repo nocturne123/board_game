@@ -9,6 +9,8 @@ from ENUMS.common_enums import (
 )
 from damage import Damage
 
+from hexlogic import HexCoords, hex_to_pixel
+
 
 class PlayerData:
     def __init__(self, cha: Charater):
@@ -39,6 +41,8 @@ class PlayerData:
 
         # 玩家收集品
         self.colloctions = []
+
+        self.hex_position = HexCoords(0, 0, 0)
 
         # 玩家可否被选中，主要针对特殊状态，例如晕眩、针线提供的无敌、余晖烁烁的无敌、王冠提供的无敌
         # 根据技能描述，线轴为不会受到伤害，余晖烁烁、王冠为不能成为攻击牌目标，增加不可被攻击选中的属性

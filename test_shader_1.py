@@ -28,9 +28,8 @@ class Direction(Enum):
     RIGHT = 3
 
 
-pixel_font = arcade.load_font(
-    "resources/fonts/fusion-pixel-10px-monospaced-zh_hans.ttf"
-)
+# pixel_font =
+arcade.load_font("resources/fonts/fusion-pixel-10px-monospaced-zh_hans.ttf")
 
 maud_pie_character = Charater(
     health=14,
@@ -74,9 +73,9 @@ class MaudPie(arcade.Sprite):
         self.frame_time = 0.1
 
         self.player = maud_pie_player
-        self.imformation = arcade.Text(
+        self.information = arcade.Text(
             text="",
-            font_name=pixel_font,
+            font_name="Fusion Pixel 10px Monospaced zh_hans",
             start_x=self.center_x + 50,
             start_y=self.center_y,
             color=arcade.color.BLUE,
@@ -135,8 +134,8 @@ class MaudPie(arcade.Sprite):
         def __repr__(self):
             return f"Maud Pie at {self.position}"
 
-    def show_imformation(self):
-        self.imformation.text = f"name:{self.player.name}\
+    def show_information(self):
+        self.information.text = f"name:{self.player.name}\
             \nspecies:{self.player.species}\
             \nhealth:{self.player.health}\
             \nmagic_attack:{self.player.magic_attack}\
@@ -144,8 +143,8 @@ class MaudPie(arcade.Sprite):
             \nmental_attack:{self.player.mental_attack}\
             \nspeed:{self.player.speed}\
             \n来段中文，看看像素字体有没有生效"
-        self.imformation.x = self.center_x + 50
-        self.imformation.y = self.center_y
+        self.information.x = self.center_x + 50
+        self.information.y = self.center_y
 
 
 class MyGame(arcade.Window):
@@ -207,9 +206,14 @@ class MyGame(arcade.Window):
         self.camera_map.use()
         self.player_list.draw(pixelated=True)
         if self.player_sprite.show_text:
-            self.player_sprite.imformation.draw()
+            self.player_sprite.information.draw()
+            self.player_list.draw_hit_boxes(color=arcade.color.GREEN)
+            self.player_sprite.information.draw_hit_boxes(color=arcade.color.YELLOW)
+        else:
+            self.player_list.draw_hit_boxes(color=arcade.color.RED)
+            self.player_sprite.information.draw_hit_boxes(color=arcade.color.BLUE)
 
-        # self.shadertoy.render()
+            # self.shadertoy.render()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -251,7 +255,7 @@ class MyGame(arcade.Window):
         elif self.right_pressed and not self.left_pressed:
             self.player_sprite.center_x += 1
         self.player_sprite.update_animation()
-        self.player_sprite.show_imformation()
+        self.player_sprite.show_information()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         print(self.camera_map.position)
@@ -273,7 +277,7 @@ class MyGame(arcade.Window):
         if self.held_player:
             self.held_player.center_x += dx
             self.held_player.center_y += dy
-            self.player_sprite.imformation.draw()
+            self.player_sprite.information.draw()
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
         if self.held_player:

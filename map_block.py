@@ -9,7 +9,9 @@ from hexlogic import HexCoords, hex_to_pixel
 import arcade
 
 
-TILE_SCALING = 1
+TILE_SCALING = 2
+TILE_WIDTH = 28
+TILE_HEIGHT = -24
 
 image_x_list = range(0, 225, 32)
 image_y_list = range(0, 241, 48)
@@ -37,10 +39,14 @@ class map_block(arcade.Sprite):
             path_or_texture=map_texture,
             scale=TILE_SCALING,
             center_x=hex_to_pixel(
-                HexCoords(hex_q, hex_r, hex_s), tile_width=26, tile_height=-24
+                HexCoords(hex_q, hex_r, hex_s),
+                tile_width=TILE_SCALING * TILE_WIDTH,
+                tile_height=TILE_SCALING * TILE_HEIGHT,
             )[0],
             center_y=hex_to_pixel(
-                HexCoords(hex_q, hex_r, hex_s), tile_width=26, tile_height=-24
+                HexCoords(hex_q, hex_r, hex_s),
+                tile_width=TILE_SCALING * TILE_WIDTH,
+                tile_height=TILE_SCALING * TILE_HEIGHT,
             )[1],
         )
         # 这里横纵坐标里面的300是为了让地图居中显示，后面熟悉Camera之后使用camera将地图居中，这里就不需要再加300了
