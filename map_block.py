@@ -10,8 +10,8 @@ import arcade
 
 
 TILE_SCALING = 2
-TILE_WIDTH = 28
-TILE_HEIGHT = -24
+TILE_WIDTH = 32
+TILE_HEIGHT = -28
 
 image_x_list = range(0, 225, 32)
 image_y_list = range(0, 241, 48)

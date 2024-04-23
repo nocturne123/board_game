@@ -47,8 +47,8 @@ MAP_BLOCK_PATH = "resources/map_config/base_map_hexlogic.toml"
 arcade.load_font("resources/fonts/fusion-pixel-10px-monospaced-zh_hans.ttf")
 
 TILE_SCALING = 2
-TILE_WIDTH = 28
-TILE_HEIGHT = -24
+TILE_WIDTH = 32
+TILE_HEIGHT = -28
 
 # 地图的加载
 # 相比于test_map_2.py，这里用一个函数将地图的加载逻辑打个包，方便查看
