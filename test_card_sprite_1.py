@@ -1,8 +1,12 @@
+"""2024.4.24更新，考虑把卡牌出去的效果做到点击里面"""
+
 import arcade
 from arcade import load_texture
 from pyglet.math import Vec2
 from enum import Enum
 from card import Card, MagicAttackCard
+
+from arcade import easing
 
 SCREEN_TITLE = "Test Card Sprite"
 SCREEN_WIDTH = 1000
@@ -33,27 +37,14 @@ class CardSprite(arcade.Sprite):
 
         self.getting_bigger = False
 
-    def update_animation(self, delta_time: float = 1 / 60):
-        if self.getting_bigger:
-            if self.scale <= 0.35:
-                self.scale += 0.01
-                self.forward(5)
-
-        else:
-            if self.scale >= 0.15:
-                self.scale -= 0.03
-                if self.center_y > 0:
-                    self.center_y -= 5
-                else:
-                    self.center_y = 0
-
-    def lerp_y(self, y, speed):
-        return self.y + (speed * (y - self.y))
-
-    def move_to_y(self, y: float, speed):
-        self.center_y = self.lerp_y(y, speed)
-        if self.center_y == y:
-            return True
+    # def update_animation(self, delta_time: float = 1 / 60):
+    #     if self.getting_bigger:
+    #         ex, ey = easing.ease_position(
+    #             self.position,
+    #             (self.center_x, self.center_y + 30),
+    #             rate=180,
+    #             ease_function=easing.smoothstep,
+    #         )
 
 
 class MyGame(arcade.Window):
