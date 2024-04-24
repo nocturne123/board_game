@@ -284,7 +284,7 @@ class MyGame(arcade.Window):
             players = arcade.get_sprites_at_point((map_cords), self.player_list)
 
             if players:
-                self.held_player = players[0]
+                self.held_player = players[-1]
                 self.held_player_original_hex_position = self.held_player.hex_position
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
@@ -293,8 +293,9 @@ class MyGame(arcade.Window):
 
         # 文字显示的逻辑
         players = arcade.get_sprites_at_point((map_cords), self.player_list)
+
         if players:
-            player_sprite = players[0]
+            player_sprite = players[-1]
             data = player_sprite.player.data
             self.information.text = f"name:{data.name}\
             \nspecies:{data.species}\
@@ -311,7 +312,11 @@ class MyGame(arcade.Window):
             self.information.text = ""
 
         if blocks:
-            self.held_block = blocks[0]
+            self.held_block = blocks[-1]
+        else:
+            self.held_block = None
+
+        # 抓取玩家，移动玩家的逻辑
         if self.held_player:
             self.held_player.center_x += dx
             self.held_player.center_y += dy
@@ -322,7 +327,7 @@ class MyGame(arcade.Window):
                 map_cords = self.camera_map.get_map_coordinates((x, y))
                 blocks = arcade.get_sprites_at_point((map_cords), self.block_list)
                 if blocks:
-                    block = blocks[0]
+                    block = blocks[-1]
                     self.held_player.hex_position = block.hex_position
                     self.held_player.position = hex_to_pixel(
                         block.hex_position,

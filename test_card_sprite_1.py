@@ -44,6 +44,9 @@ class CardSprite(arcade.Sprite):
 
         self.is_held = False
 
+        # 当鼠标在卡牌上时，此属性为True，卡牌将展示黄色碰撞框
+        self.is_on_mouse = False
+
     def on_update(self, delta_time: float = 1 / 60):
         if self.easing_angle_data is not None:
             done, self.angle = easing.ease_angle_update(
@@ -95,9 +98,9 @@ class MyGame(arcade.Window):
 
         self.anchor_list = arcade.shape_list.ShapeElementList()
 
-        self.card_list.append(CardSprite())
-        self.card_list.append(CardSprite())
-        self.card_list.append(CardSprite())
+        for i in range(8):
+            self.card_list.append(CardSprite())
+
         # 根据前面的卡牌数，这里有4张牌
 
         for i in self.card_list:
@@ -150,6 +153,13 @@ class MyGame(arcade.Window):
         self.clear()
         self.card_camera.use()
         self.card_list.draw(pixelated=False)
+        for card in self.card_list:
+            if card.is_on_mouse:
+                card.draw_hit_box(color=arcade.color.YELLOW)
+            elif card.is_held:
+                card.draw_hit_box(color=arcade.color.GREEN)
+            else:
+                card.draw_hit_box(color=arcade.color.RED)
         self.anchor_list.draw()
 
     def on_update(self, delta_time):
@@ -162,7 +172,7 @@ class MyGame(arcade.Window):
             camera_cords = self.card_camera.get_map_coordinates((x, y))
             cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
             if cards:
-                card = cards[0]
+                card = cards[-1]
 
                 print(f"点击了{cards[0].position}")
                 # 点击卡牌，卡牌向上移动
@@ -215,16 +225,17 @@ class MyGame(arcade.Window):
                 card.easing_scale_data = escale
 
     # 老式的移动卡牌放大写不出来，修改为点击卡牌，卡牌向上移动
-    # def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-    #     camera_cords = self.card_camera.get_map_coordinates((x, y))
-    #     cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
-    #     if cards:
-    #         cards[0].getting_bigger = True
-    #         print(f"{cards[0].scale:.2f} at {cards[0].position}")
-    #     else:
-    #         for card in self.card_list:
-    #             card.getting_bigger = False
-    #         print(f"{self.card_list[0].position}")
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        camera_cords = self.card_camera.get_map_coordinates((x, y))
+        cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
+        if cards:
+            card = cards[-1]
+            for _ in self.card_list:
+                _.is_on_mouse = False
+            card.is_on_mouse = True
+        else:
+            for _ in self.card_list:
+                _.is_on_mouse = False
 
 
 window = MyGame()
