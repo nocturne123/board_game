@@ -279,12 +279,13 @@ class MyGame(arcade.Window):
             self.right_pressed = False
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        map_cords = self.camera_map.get_map_coordinates((x, y))
-        players = arcade.get_sprites_at_point((map_cords), self.player_list)
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            map_cords = self.camera_map.get_map_coordinates((x, y))
+            players = arcade.get_sprites_at_point((map_cords), self.player_list)
 
-        if players:
-            self.held_player = players[0]
-            self.held_player_original_hex_position = self.held_player.hex_position
+            if players:
+                self.held_player = players[0]
+                self.held_player_original_hex_position = self.held_player.hex_position
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
         map_cords = self.camera_map.get_map_coordinates((x, y))
@@ -316,28 +317,31 @@ class MyGame(arcade.Window):
             self.held_player.center_y += dy
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
-        if self.held_player:
-            map_cords = self.camera_map.get_map_coordinates((x, y))
-            blocks = arcade.get_sprites_at_point((map_cords), self.block_list)
-            if blocks:
-                block = blocks[0]
-                self.held_player.hex_position = block.hex_position
-                self.held_player.position = hex_to_pixel(
-                    block.hex_position,
-                    tile_width=TILE_SCALING * TILE_WIDTH,
-                    tile_height=TILE_SCALING * TILE_HEIGHT,
-                )
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            if self.held_player:
+                map_cords = self.camera_map.get_map_coordinates((x, y))
+                blocks = arcade.get_sprites_at_point((map_cords), self.block_list)
+                if blocks:
+                    block = blocks[0]
+                    self.held_player.hex_position = block.hex_position
+                    self.held_player.position = hex_to_pixel(
+                        block.hex_position,
+                        tile_width=TILE_SCALING * TILE_WIDTH,
+                        tile_height=TILE_SCALING * TILE_HEIGHT,
+                    )
 
-            else:
-                self.held_player.hex_position = self.held_player_original_hex_position
-                self.held_player.position = hex_to_pixel(
-                    self.held_player_original_hex_position,
-                    tile_width=TILE_SCALING * TILE_WIDTH,
-                    tile_height=TILE_SCALING * TILE_HEIGHT,
-                )
+                else:
+                    self.held_player.hex_position = (
+                        self.held_player_original_hex_position
+                    )
+                    self.held_player.position = hex_to_pixel(
+                        self.held_player_original_hex_position,
+                        tile_width=TILE_SCALING * TILE_WIDTH,
+                        tile_height=TILE_SCALING * TILE_HEIGHT,
+                    )
 
-        self.held_player = None
-        self.held_player_original_hex_position = None
+            self.held_player = None
+            self.held_player_original_hex_position = None
 
     def on_update(self, delta_time: float):
 
