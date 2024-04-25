@@ -15,9 +15,12 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
 ORIGIN_CARD_SCALE = 0.15
-OUT_CARD_SCALE = 0.27
+OUT_CARD_SCALE = 0.20
 EASING_GETOUT_ANIMATION_TIME = 0.45
 EASING_GETIN_ANIMATION_TIME = 0.25
+
+DEFAULT_DRAW_PILE_POSITION_X = 100
+DEFAULT_DRAW_PILE_POSITION_Y = SCREEN_HEIGHT / 12 * 7
 
 
 class CardState(Enum):
@@ -114,10 +117,18 @@ class MyGame(arcade.Window):
         self.draw_card_pile = None
 
     def setup(self):
+        #
         self.card_list = arcade.SpriteList()
-        self.card_list.append(CardSprite())
 
+        # 卡牌抽牌堆
         self.draw_card_pile = arcade.SpriteList()
+
+        # 给抽牌堆生成12张卡牌
+        for i in range(12):
+            card = CardSprite()
+            card.center_x = DEFAULT_DRAW_PILE_POSITION_X
+            card.center_y = DEFAULT_DRAW_PILE_POSITION_Y
+            self.draw_card_pile.append(card)
 
         self.card_camera = arcade.SimpleCamera()
         # 手牌的坐标按照左右锚点决定
@@ -130,14 +141,13 @@ class MyGame(arcade.Window):
 
         self.anchor_list = arcade.shape_list.ShapeElementList()
 
-        for i in range(8):
-            self.card_list.append(CardSprite())
+        # 生成手里的卡牌
+        for i in range(4):
+            card = CardSprite()
+            card.face_up()
+            self.card_list.append(card)
 
-        # 根据前面的卡牌数，这里有4张牌
-
-        for i in self.card_list:
-            print(i.position)
-
+    def anchor_update(self):
         # 计算手牌的锚点
         # 先获取手牌数，手牌间隔 =（右锚点-左锚点）/(手牌数+1)
         # 手牌的锚点 = 左锚点+（手牌间隔*卡牌数）
@@ -177,13 +187,13 @@ class MyGame(arcade.Window):
         )
 
         for card, anchor in zip(self.card_list, self.anchor_list):
-
             card.center_x = anchor.points[0][0]
             card.center_y = anchor.points[0][1]
 
     def on_draw(self, blend_function=None):
         self.clear()
         self.card_camera.use()
+        self.draw_card_pile.draw()
         self.card_list.draw(pixelated=False)
         for card in self.card_list:
             if card.is_on_mouse:
@@ -195,7 +205,6 @@ class MyGame(arcade.Window):
         self.anchor_list.draw()
 
     def on_update(self, delta_time):
-
         self.card_list.on_update(delta_time)
 
     # 左键点击卡牌时，卡牌向上移动
@@ -255,6 +264,9 @@ class MyGame(arcade.Window):
                     ease_function=easing.ease_out,
                 )
                 card.easing_scale_data = escale
+
+        # 更新锚点
+        self.anchor_update()
 
     # 老式的移动卡牌放大写不出来，修改为点击卡牌，卡牌向上移动
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
