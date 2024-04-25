@@ -8,6 +8,8 @@ from card import Card, MagicAttackCard
 
 from arcade import easing
 
+from pathlib import Path
+
 SCREEN_TITLE = "Test Card Sprite"
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
@@ -19,6 +21,8 @@ EASING_GETIN_ANIMATION_TIME = 0.25
 
 
 class CardState(Enum):
+    """此属性还未在CardSprite中使用，暂时保留"""
+
     in_deck = 0
     on_draw = 1
     in_hand = 2
@@ -31,21 +35,45 @@ class CardState(Enum):
 class CardSprite(arcade.Sprite):
     def __init__(self):
         super().__init__(
-            path_or_texture="resources/card_library/playable/actions/物理攻击.png",
             hit_box_algorithm="None",
         )
 
+        # 卡牌缩放
         self.scale = ORIGIN_CARD_SCALE
 
+        # 缓动数据
         self.easing_angle_data = None
         self.easing_x_data = None
         self.easing_y_data = None
         self.easing_scale_data = None
 
+        # 当卡牌被点击时，此属性为True，卡牌将展示绿色碰撞框
         self.is_held = False
 
         # 当鼠标在卡牌上时，此属性为True，卡牌将展示黄色碰撞框
         self.is_on_mouse = False
+
+        # 以下属性和方法参考solitary
+        self.is_face_up = False
+        self.face_down_texture = load_texture(
+            Path(r"resources\card_library\playable\摸牌堆.png")
+        )
+        self.face_up_texture = load_texture(
+            Path(r"resources\card_library\playable\actions\物理攻击.png")
+        )
+        self.texture = self.face_down_texture
+
+    def face_up(self):
+        self.is_face_up = True
+        self.texture = self.face_up_texture
+
+    def face_down(self):
+        self.is_face_up = False
+        self.texture = self.face_down_texture
+
+    @property
+    def is_face_down(self):
+        return not self.is_face_up
 
     def on_update(self, delta_time: float = 1 / 60):
         if self.easing_angle_data is not None:
@@ -83,9 +111,13 @@ class MyGame(arcade.Window):
 
         self.anchor_list = None
 
+        self.draw_card_pile = None
+
     def setup(self):
         self.card_list = arcade.SpriteList()
         self.card_list.append(CardSprite())
+
+        self.draw_card_pile = arcade.SpriteList()
 
         self.card_camera = arcade.SimpleCamera()
         # 手牌的坐标按照左右锚点决定
