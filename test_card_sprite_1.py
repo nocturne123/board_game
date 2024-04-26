@@ -210,6 +210,7 @@ class MyGame(arcade.Window):
     # 左键点击卡牌时，卡牌向上移动
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
         if button == arcade.MOUSE_BUTTON_LEFT:
+
             camera_cords = self.card_camera.get_map_coordinates((x, y))
             cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
             if cards:
@@ -242,6 +243,7 @@ class MyGame(arcade.Window):
                     card.easing_scale_data = escale
                 card.is_held = True
 
+            draw_pile = arcade.get_sprites_at_point((camera_cords), self.draw_card_pile)
         # 点击鼠标右键时，所有卡牌回到锚点
         if button == arcade.MOUSE_BUTTON_RIGHT:
             for card, anchor in zip(self.card_list, self.anchor_list):
