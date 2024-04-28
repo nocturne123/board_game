@@ -19,8 +19,15 @@ OUT_CARD_SCALE = 0.20
 EASING_GETOUT_ANIMATION_TIME = 0.45
 EASING_GETIN_ANIMATION_TIME = 0.25
 
+# 控制抽牌堆位置
 DEFAULT_DRAW_PILE_POSITION_X = 100
 DEFAULT_DRAW_PILE_POSITION_Y = SCREEN_HEIGHT / 12 * 7
+
+# 控制抽牌堆动画，等待时间比例
+EASING_DRAW_CARD_PILE_ANIMATION_RATE = 0.25
+
+# 控制抽牌堆动画时间,0.75秒完成一次完整抽牌动画
+EASING_DRAW_CARD_PILE_ANIMATION_TIME = 0.75
 
 
 class CardState(Enum):
@@ -243,7 +250,26 @@ class MyGame(arcade.Window):
                     card.easing_scale_data = escale
                 card.is_held = True
 
+            # 左键点击抽牌堆时，抽牌
+            # 现在这部分的逻辑会很长，后续考虑封装到函数里
             draw_pile = arcade.get_sprites_at_point((camera_cords), self.draw_card_pile)
+            if draw_pile:
+                # 测试先抽一张，后续考虑连续抽多张牌的情况
+                draw_num = 1
+                # 第一步，卡牌从牌堆中飞出，缓动到屏幕下方
+                # 注：此处卡牌飞到抽牌堆的正下方、屏幕外，不是相对于卡牌自身的下方
+                out_card_list = []
+                for i in range(draw_num):
+                    card = self.draw_card_pile.pop()
+                    ex, ey = easing.ease_position(
+                        card.position,
+                        (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
+                        time=EASING_DRAW_CARD_PILE_ANIMATION_TIME,
+                        ease_function=easing.ease_out,
+                    )
+                    card.easing_x_data = ex
+                    card.easing_y_data = ey
+
         # 点击鼠标右键时，所有卡牌回到锚点
         if button == arcade.MOUSE_BUTTON_RIGHT:
             for card, anchor in zip(self.card_list, self.anchor_list):
