@@ -73,6 +73,9 @@ class CardSprite(arcade.Sprite):
         )
         self.texture = self.face_down_texture
 
+        self.timer = 0
+        self.time_in_card_pile = 0
+
     def face_up(self):
         self.is_face_up = True
         self.texture = self.face_up_texture
@@ -86,6 +89,13 @@ class CardSprite(arcade.Sprite):
         return not self.is_face_up
 
     def on_update(self, delta_time: float = 1 / 60):
+        # 卡牌在抽牌堆中的时间
+        # 如果计时器小于卡牌在抽牌堆中的时间，不更新
+        self.timer += delta_time
+        if self.timer < self.time_in_card_pile:
+            return
+        self.timer = 0
+        self.time_in_card_pile = 0
         if self.easing_angle_data is not None:
             done, self.angle = easing.ease_angle_update(
                 self.easing_angle_data, delta_time
@@ -123,6 +133,8 @@ class MyGame(arcade.Window):
 
         self.draw_card_pile = None
 
+        self.on_held_card = None
+
     def setup(self):
         #
         self.card_list = arcade.SpriteList()
@@ -153,6 +165,53 @@ class MyGame(arcade.Window):
             card = CardSprite()
             card.face_up()
             self.card_list.append(card)
+
+        self.anchor_update()
+
+    def card_ease_update(self):
+        # 所有没有被拿住的卡牌回到锚点，被拿住的卡牌向上移动
+        for card, anchor in zip(self.card_list, self.anchor_list):
+            # 如果卡牌没有被拿住，卡牌回到锚点
+            if not card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    anchor.points[0],
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    ORIGIN_CARD_SCALE,
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
+
+            # 如果卡牌被拿住，卡牌向上移动
+            elif card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    (card.center_x, card.center_y + 100),
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=180,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    OUT_CARD_SCALE,
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
 
     def anchor_update(self):
         # 计算手牌的锚点
@@ -213,6 +272,7 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         self.card_list.on_update(delta_time)
+        self.draw_card_pile.on_update(delta_time)
 
     # 左键点击卡牌时，卡牌向上移动
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
@@ -221,46 +281,29 @@ class MyGame(arcade.Window):
             camera_cords = self.card_camera.get_map_coordinates((x, y))
             cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
             if cards:
-                card = cards[-1]
+                self.on_held_card = cards[-1]
+                self.on_held_card.is_held = True
 
                 print(f"点击了{cards[0].position}")
-                # 点击卡牌，卡牌向上移动
-                if not card.is_held:
-
-                    # 向上移动
-                    ex, ey = easing.ease_position(
-                        card.position,
-                        (card.center_x, card.center_y + 100),
-                        time=EASING_GETOUT_ANIMATION_TIME,
-                        # rate=180,
-                        ease_function=easing.ease_out,
-                    )
-                    card.easing_x_data = ex
-                    card.easing_y_data = ey
-
-                    # 放大
-                    escale = easing.ease_value(
-                        card.scale,
-                        OUT_CARD_SCALE,
-                        time=EASING_GETOUT_ANIMATION_TIME,
-                        # 这里的rate需要谨慎处理
-                        # rate=0.2,
-                        ease_function=easing.ease_out,
-                    )
-                    card.easing_scale_data = escale
-                card.is_held = True
+            elif not cards:
+                self.on_held_card = None
+            for card in self.card_list:
+                if card is not self.on_held_card:
+                    card.is_held = False
 
             # 左键点击抽牌堆时，抽牌
             # 现在这部分的逻辑会很长，后续考虑封装到函数里
             draw_pile = arcade.get_sprites_at_point((camera_cords), self.draw_card_pile)
             if draw_pile:
                 # 测试先抽一张，后续考虑连续抽多张牌的情况
-                draw_num = 1
+                draw_num = 4
                 # 第一步，卡牌从牌堆中飞出，缓动到屏幕下方
                 # 注：此处卡牌飞到抽牌堆的正下方、屏幕外，不是相对于卡牌自身的下方
-                out_card_list = []
-                for i in range(draw_num):
-                    card = self.draw_card_pile.pop()
+                # 时间分配为：卡牌飞出的时间为(1/draw_num开方)，卡牌等待的时间为(1-1/draw_num开方)
+                # 如何实现卡牌等待？
+                if draw_num == 1:
+                    card = self.draw_card_pile[-1]
+                    card.time_in_card_pile = 0
                     ex, ey = easing.ease_position(
                         card.position,
                         (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
@@ -269,45 +312,51 @@ class MyGame(arcade.Window):
                     )
                     card.easing_x_data = ex
                     card.easing_y_data = ey
+                elif draw_num > 1:
+
+                    card_fly_time = EASING_DRAW_CARD_PILE_ANIMATION_TIME * (
+                        draw_num**0.5
+                    )
+                    card_wait_time = (
+                        EASING_DRAW_CARD_PILE_ANIMATION_TIME - card_fly_time
+                    )
+                    out_card_list = []
+                    for i in range(draw_num):
+                        card = self.draw_card_pile[-i]
+                        card.time_in_card_pile = (
+                            card_wait_time * (i - 1) / (draw_num - 1)
+                        )
+                        ex, ey = easing.ease_position(
+                            card.position,
+                            (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
+                            time=card_fly_time,
+                            ease_function=easing.ease_out,
+                        )
+                        card.easing_x_data = ex
+                        card.easing_y_data = ey
 
         # 点击鼠标右键时，所有卡牌回到锚点
         if button == arcade.MOUSE_BUTTON_RIGHT:
-            for card, anchor in zip(self.card_list, self.anchor_list):
+            self.on_held_card = None
+            for card in self.card_list:
                 card.is_held = False
-                ex, ey = easing.ease_position(
-                    card.position,
-                    anchor.points[0],
-                    time=EASING_GETIN_ANIMATION_TIME,
-                    # rate=180,
-                    ease_function=easing.ease_out,
-                )
-                card.easing_x_data = ex
-                card.easing_y_data = ey
 
-                escale = easing.ease_value(
-                    card.scale,
-                    ORIGIN_CARD_SCALE,
-                    time=EASING_GETIN_ANIMATION_TIME,
-                    # rate=0.2,
-                    ease_function=easing.ease_out,
-                )
-                card.easing_scale_data = escale
-
-        # 更新锚点
+        # 先更新卡牌动画，后更新锚点
+        self.card_ease_update()
         self.anchor_update()
 
-    # 老式的移动卡牌放大写不出来，修改为点击卡牌，卡牌向上移动
-    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-        camera_cords = self.card_camera.get_map_coordinates((x, y))
-        cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
-        if cards:
-            card = cards[-1]
-            for _ in self.card_list:
-                _.is_on_mouse = False
-            card.is_on_mouse = True
-        else:
-            for _ in self.card_list:
-                _.is_on_mouse = False
+    # # 老式的移动卡牌放大写不出来，修改为点击卡牌，卡牌向上移动
+    # def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+    #     camera_cords = self.card_camera.get_map_coordinates((x, y))
+    #     cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
+    #     if cards:
+    #         card = cards[-1]
+    #         for _ in self.card_list:
+    #             _.is_on_mouse = False
+    #         card.is_on_mouse = True
+    #     else:
+    #         for _ in self.card_list:
+    #             _.is_on_mouse = False
 
 
 window = MyGame()
