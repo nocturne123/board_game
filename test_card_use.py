@@ -3,7 +3,9 @@
 地图的创建
 完善卡牌的打出逻辑，把card的逻辑和card_sprite的逻辑分开
 card负责生效，card_sprite负责处理在手中、打出、打出后的逻辑
-现在还不用管game、轮次相关的逻辑，先把牌打出来一张再说"""
+现在还不用管game、轮次相关的逻辑，先把牌打出来一张再说
+
+2024年5月13日，正式将卡牌做进来，开始打牌"""
 
 import arcade
 from arcade import load_textures, load_texture
@@ -19,6 +21,9 @@ from player_data import PlayerData
 from player import Player
 from player_action import PlayerAction
 from PIL import Image
+
+from arcade import easing
+from card import PhysicalAttackCard
 
 from map_block import (
     grass_block,
@@ -49,6 +54,16 @@ arcade.load_font("resources/fonts/fusion-pixel-10px-monospaced-zh_hans.ttf")
 TILE_SCALING = 2
 TILE_WIDTH = 32
 TILE_HEIGHT = -28
+
+# 卡牌相关全局变量
+ORIGIN_CARD_SCALE = 0.15
+OUT_CARD_SCALE = 0.20
+EASING_GETOUT_ANIMATION_TIME = 0.45
+EASING_GETIN_ANIMATION_TIME = 0.25
+
+DEFAULT_DRAW_PILE_POSITION_X = 100
+DEFAULT_DRAW_PILE_POSITION_Y = SCREEN_HEIGHT / 12 * 7
+
 
 # 地图的加载
 # 相比于test_map_2.py，这里用一个函数将地图的加载逻辑打个包，方便查看
@@ -166,6 +181,84 @@ derpy_player.data.hex_position = HexCoords(1, -2, 1)
 maud_pie_player.data.hex_position = HexCoords(3, -3, 0)
 
 
+class CardSprite(arcade.Sprite):
+    def __init__(self):
+        super().__init__(
+            hit_box_algorithm="None",
+        )
+
+        # 卡牌缩放
+        self.scale = ORIGIN_CARD_SCALE
+
+        # 缓动数据
+        self.easing_angle_data = None
+        self.easing_x_data = None
+        self.easing_y_data = None
+        self.easing_scale_data = None
+
+        # 当卡牌被点击时，此属性为True，卡牌将展示绿色碰撞框
+        self.is_held = False
+
+        # 当鼠标在卡牌上时，此属性为True，卡牌将展示黄色碰撞框
+        self.is_on_mouse = False
+
+        # 以下属性和方法参考solitary
+        self.is_face_up = False
+        self.face_down_texture = load_texture(
+            Path(r"resources\card_library\playable\摸牌堆.png")
+        )
+        self.face_up_texture = load_texture(
+            Path(r"resources\card_library\playable\actions\物理攻击.png")
+        )
+        self.texture = self.face_down_texture
+
+        self.timer = 0
+        self.time_in_card_pile = 0
+        self.card = PhysicalAttackCard()
+
+    def face_up(self):
+        self.is_face_up = True
+        self.texture = self.face_up_texture
+
+    def face_down(self):
+        self.is_face_up = False
+        self.texture = self.face_down_texture
+
+    @property
+    def is_face_down(self):
+        return not self.is_face_up
+
+    def on_update(self, delta_time: float = 1 / 60):
+        # 卡牌在抽牌堆中的时间
+        # 如果计时器小于卡牌在抽牌堆中的时间，不更新
+        self.timer += delta_time
+        if self.timer < self.time_in_card_pile:
+            return
+        self.timer = 0
+        self.time_in_card_pile = 0
+        if self.easing_angle_data is not None:
+            done, self.angle = easing.ease_angle_update(
+                self.easing_angle_data, delta_time
+            )
+            if done:
+                self.easing_angle_data = None
+
+        if self.easing_x_data is not None:
+            done, self.center_x = easing.ease_update(self.easing_x_data, delta_time)
+            if done:
+                self.easing_x_data = None
+
+        if self.easing_y_data is not None:
+            done, self.center_y = easing.ease_update(self.easing_y_data, delta_time)
+            if done:
+                self.easing_y_data = None
+
+        if self.easing_scale_data is not None:
+            done, self.scale = easing.ease_update(self.easing_scale_data, delta_time)
+            if done:
+                self.easing_scale_data = None
+
+
 class PlayerSprite(arcade.Sprite):
     def __init__(
         self,
@@ -226,6 +319,21 @@ class MyGame(arcade.Window):
 
         self.held_block = None
 
+        self.active_player = None
+
+        # 卡牌相关
+        self.card_list = None
+        self.card_camera = None
+
+        self.hand_card_anchor_left = None
+        self.hand_card_anchor_right = None
+
+        self.anchor_list = None
+
+        self.draw_card_pile = None
+
+        self.on_held_card = None
+
     def setup(self):
         self.camera_map = arcade.SimpleCamera()
         self.camera_map.position.x = -SCREEN_WIDTH / 2
@@ -236,6 +344,9 @@ class MyGame(arcade.Window):
         self.player_list.append(maud_pie_sprite)
         self.player_list.append(sun_burst_sprite)
         self.player_list.append(derpy_sprite)
+
+        # 灰琪负责打牌
+        self.active_player = maud_pie_sprite
 
         # 地图块列表
         self.block_list = load_map_block()
@@ -249,10 +360,178 @@ class MyGame(arcade.Window):
             font_name="Fusion Pixel 10px Monospaced zh_hans",
             start_x=0,
             start_y=0,
-            color=arcade.color.BLUE,
+            color=arcade.color.WHITE,
             multiline=True,
             width=200,
         )
+
+        # 以上为地图相关的初始化
+
+        # 下面是卡牌相关的初始化
+        self.card_list = arcade.SpriteList()
+
+        # 卡牌抽牌堆
+        self.draw_card_pile = arcade.SpriteList()
+
+        # 给抽牌堆生成12张卡牌
+        for i in range(12):
+            card = CardSprite()
+            card.center_x = DEFAULT_DRAW_PILE_POSITION_X
+            card.center_y = DEFAULT_DRAW_PILE_POSITION_Y
+            self.draw_card_pile.append(card)
+
+        self.card_camera = arcade.SimpleCamera()
+        # 手牌的坐标按照左右锚点决定
+        # 所以现在先不移动卡牌的相机
+        # self.card_camera.move((-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 4))
+
+        # 手牌的左右锚点
+        self.hand_card_anchor_left = Vec2(SCREEN_WIDTH / 7, SCREEN_HEIGHT / 8)
+        self.hand_card_anchor_right = Vec2(SCREEN_WIDTH / 7 * 6, SCREEN_HEIGHT / 8)
+
+        self.anchor_list = arcade.shape_list.ShapeElementList()
+
+        # 生成手里的卡牌
+        for i in range(4):
+            card = CardSprite()
+            card.face_up()
+            self.card_list.append(card)
+
+        self.anchor_update()
+
+    def card_ease_update(self):
+        # 所有没有被拿住的卡牌回到锚点，被拿住的卡牌向上移动
+        for card, anchor in zip(self.card_list, self.anchor_list):
+            # 如果卡牌没有被拿住，卡牌回到锚点
+            if not card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    anchor.points[0],
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    ORIGIN_CARD_SCALE,
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
+
+            # 如果卡牌被拿住，卡牌向上移动
+            elif card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    (card.center_x, card.center_y + 100),
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=180,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    OUT_CARD_SCALE,
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
+
+    def anchor_update(self):
+        # 计算手牌的锚点
+        # 先获取手牌数，手牌间隔 =（右锚点-左锚点）/(手牌数+1)
+        # 手牌的锚点 = 左锚点+（手牌间隔*卡牌数）
+        card_num = len(self.card_list)
+        card_spacing = (
+            self.hand_card_anchor_right.x - self.hand_card_anchor_left.x
+        ) / (card_num + 1)
+        card_center_x = [
+            self.hand_card_anchor_left.x + card_spacing * (i + 1)
+            for i in range(card_num)
+        ]
+        self.anchor_list.clear()
+        for i in card_center_x:
+
+            self.anchor_list.append(
+                arcade.shape_list.create_ellipse_filled(
+                    i, self.hand_card_anchor_right.y, 10, 10, arcade.color.YELLOW
+                )
+            )
+
+        for card, anchor in zip(self.card_list, self.anchor_list):
+            card.center_x = anchor.points[0][0]
+            card.center_y = anchor.points[0][1]
+
+        self.anchor_list.append(
+            arcade.shape_list.create_ellipse_filled(
+                self.hand_card_anchor_left.x,
+                self.hand_card_anchor_left.y,
+                10,
+                10,
+                arcade.color.BLUE,
+            )
+        )
+        self.anchor_list.append(
+            arcade.shape_list.create_ellipse_filled(
+                self.hand_card_anchor_right.x,
+                self.hand_card_anchor_right.y,
+                10,
+                10,
+                arcade.color.RED,
+            )
+        )
+
+    def card_ease_update(self):
+        # 所有没有被拿住的卡牌回到锚点，被拿住的卡牌向上移动
+        for card, anchor in zip(self.card_list, self.anchor_list):
+            # 如果卡牌没有被拿住，卡牌回到锚点
+            if not card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    anchor.points[0],
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    ORIGIN_CARD_SCALE,
+                    time=EASING_GETIN_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
+
+            # 如果卡牌被拿住，卡牌向上移动
+            elif card.is_held:
+                ex, ey = easing.ease_position(
+                    card.position,
+                    (card.center_x, card.center_y + 100),
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=180,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_x_data = ex
+                card.easing_y_data = ey
+
+                escale = easing.ease_value(
+                    card.scale,
+                    OUT_CARD_SCALE,
+                    time=EASING_GETOUT_ANIMATION_TIME,
+                    # rate=0.2,
+                    ease_function=easing.ease_out,
+                )
+                card.easing_scale_data = escale
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -284,8 +563,64 @@ class MyGame(arcade.Window):
             players = arcade.get_sprites_at_point((map_cords), self.player_list)
 
             if players:
-                self.held_player = players[-1]
-                self.held_player_original_hex_position = self.held_player.hex_position
+                # 点击到灰琪时，走移动逻辑
+                if players[-1] is self.active_player:
+                    self.held_player = players[-1]
+                    self.held_player_original_hex_position = (
+                        self.held_player.hex_position
+                    )
+                # 点击到其他玩家时，出牌
+                elif players[-1] is not self.active_player:
+                    if self.on_held_card:
+                        print("点击到其他玩家，出牌")
+                        if self.on_held_card:
+
+                            # 卡牌生效
+                            self.on_held_card.card.effect(
+                                self.active_player.player, players[-1].player
+                            )
+
+                            # 卡牌生效后，从手牌中移除
+                            self.on_held_card.is_held = False
+                            self.card_list.remove(self.on_held_card)
+                            self.on_held_card = None
+                            self.anchor_update()
+
+                            # 如果目标生命值小于0，从玩家列表中移除
+                            if players[-1].player.data.health <= 0:
+                                self.player_list.remove(players[-1])
+
+            # 卡牌逻辑
+            camera_cords = self.card_camera.get_map_coordinates((x, y))
+            cards = arcade.get_sprites_at_point((camera_cords), self.card_list)
+            if cards:
+                self.on_held_card = cards[-1]
+                self.on_held_card.is_held = True
+
+                print(f"点击了{cards[0].position}")
+            elif not cards:
+                self.on_held_card = None
+            for card in self.card_list:
+                if card is not self.on_held_card:
+                    card.is_held = False
+
+            # 抽牌堆逻辑
+            draw_pile = arcade.get_sprites_at_point((camera_cords), self.draw_card_pile)
+            if draw_pile:
+                card = self.draw_card_pile[-1]
+                self.draw_card_pile.remove(card)
+                card.face_up()
+                self.card_list.append(card)
+                self.anchor_update()
+
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            self.on_held_card = None
+            for card in self.card_list:
+                card.is_held = False
+
+        # 先更新卡牌动画，后更新锚点
+        self.card_ease_update()
+        self.anchor_update()
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
         map_cords = self.camera_map.get_map_coordinates((x, y))
@@ -367,6 +702,8 @@ class MyGame(arcade.Window):
         position = Vec2(self.view_left, self.view_bottom)
         position += self.camera_map.position
         self.camera_map.move_to(position, 1)
+        self.card_list.on_update(delta_time)
+        self.draw_card_pile.on_update(delta_time)
 
     def on_draw(self):
         """Render the screen."""
@@ -378,6 +715,17 @@ class MyGame(arcade.Window):
         self.player_list.draw()
         if self.information.text:
             self.information.draw()
+        self.card_camera.use()
+        self.draw_card_pile.draw()
+        self.card_list.draw(pixelated=False)
+        for card in self.card_list:
+            if card.is_on_mouse:
+                card.draw_hit_box(color=arcade.color.YELLOW)
+            elif card.is_held:
+                card.draw_hit_box(color=arcade.color.GREEN)
+            else:
+                card.draw_hit_box(color=arcade.color.RED)
+        self.anchor_list.draw()
 
 
 window = MyGame()

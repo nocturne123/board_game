@@ -66,6 +66,16 @@ class MagicAttackCard(AttackCard):
         target.actions.chain_of_actions(damage)
 
 
+class PhysicalAttackCard(AttackCard):
+    def __init__(self):
+        super().__init__()
+        self.card_identity = AttackCardTypeEnum.physical
+
+    def effect(self, user, target):
+        damage = Damage(user.data.physical_attack, DamageTypeEnum.physical)
+        target.data.health -= damage.num
+
+
 class StealCard(Card):
     """偷窃牌"""
 

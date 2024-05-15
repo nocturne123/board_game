@@ -225,6 +225,7 @@ class MyGame(arcade.Window):
             self.hand_card_anchor_left.x + card_spacing * (i + 1)
             for i in range(card_num)
         ]
+        self.anchor_list.clear()
         for i in card_center_x:
 
             self.anchor_list.append(
@@ -232,6 +233,10 @@ class MyGame(arcade.Window):
                     i, self.hand_card_anchor_right.y, 10, 10, arcade.color.YELLOW
                 )
             )
+
+        for card, anchor in zip(self.card_list, self.anchor_list):
+            card.center_x = anchor.points[0][0]
+            card.center_y = anchor.points[0][1]
 
         self.anchor_list.append(
             arcade.shape_list.create_ellipse_filled(
@@ -251,10 +256,6 @@ class MyGame(arcade.Window):
                 arcade.color.RED,
             )
         )
-
-        for card, anchor in zip(self.card_list, self.anchor_list):
-            card.center_x = anchor.points[0][0]
-            card.center_y = anchor.points[0][1]
 
     def on_draw(self, blend_function=None):
         self.clear()
@@ -295,45 +296,54 @@ class MyGame(arcade.Window):
             # 现在这部分的逻辑会很长，后续考虑封装到函数里
             draw_pile = arcade.get_sprites_at_point((camera_cords), self.draw_card_pile)
             if draw_pile:
+                # 2024.5.15动画全部取消，直接加入手牌
+
                 # 测试先抽一张，后续考虑连续抽多张牌的情况
-                draw_num = 4
+                # draw_num = 1
                 # 第一步，卡牌从牌堆中飞出，缓动到屏幕下方
                 # 注：此处卡牌飞到抽牌堆的正下方、屏幕外，不是相对于卡牌自身的下方
                 # 时间分配为：卡牌飞出的时间为(1/draw_num开方)，卡牌等待的时间为(1-1/draw_num开方)
                 # 如何实现卡牌等待？
-                if draw_num == 1:
-                    card = self.draw_card_pile[-1]
-                    card.time_in_card_pile = 0
-                    ex, ey = easing.ease_position(
-                        card.position,
-                        (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
-                        time=EASING_DRAW_CARD_PILE_ANIMATION_TIME,
-                        ease_function=easing.ease_out,
-                    )
-                    card.easing_x_data = ex
-                    card.easing_y_data = ey
-                elif draw_num > 1:
 
-                    card_fly_time = EASING_DRAW_CARD_PILE_ANIMATION_TIME * (
-                        draw_num**0.5
-                    )
-                    card_wait_time = (
-                        EASING_DRAW_CARD_PILE_ANIMATION_TIME - card_fly_time
-                    )
-                    out_card_list = []
-                    for i in range(draw_num):
-                        card = self.draw_card_pile[-i]
-                        card.time_in_card_pile = (
-                            card_wait_time * (i - 1) / (draw_num - 1)
-                        )
-                        ex, ey = easing.ease_position(
-                            card.position,
-                            (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
-                            time=card_fly_time,
-                            ease_function=easing.ease_out,
-                        )
-                        card.easing_x_data = ex
-                        card.easing_y_data = ey
+                # if draw_num == 1:
+                #     card = self.draw_card_pile[-1]
+                #     card.time_in_card_pile = 0
+                #     ex, ey = easing.ease_position(
+                #         card.position,
+                #         (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
+                #         time=EASING_DRAW_CARD_PILE_ANIMATION_TIME,
+                #         ease_function=easing.ease_out,
+                #     )
+                #     card.easing_x_data = ex
+                #     card.easing_y_data = ey
+                # elif draw_num > 1:
+
+                #     card_fly_time = EASING_DRAW_CARD_PILE_ANIMATION_TIME * (
+                #         draw_num**0.5
+                #     )
+                #     card_wait_time = (
+                #         EASING_DRAW_CARD_PILE_ANIMATION_TIME - card_fly_time
+                #     )
+                #     out_card_list = []
+                #     for i in range(draw_num):
+                #         card = self.draw_card_pile[-i]
+                #         card.time_in_card_pile = (
+                #             card_wait_time * (i - 1) / (draw_num - 1)
+                #         )
+                #         ex, ey = easing.ease_position(
+                #             card.position,
+                #             (DEFAULT_DRAW_PILE_POSITION_X, -SCREEN_HEIGHT / 7),
+                #             time=card_fly_time,
+                #             ease_function=easing.ease_out,
+                #         )
+                #         card.easing_x_data = ex
+                #         card.easing_y_data = ey
+
+                card = self.draw_card_pile[-1]
+                self.draw_card_pile.remove(card)
+                card.face_up()
+                self.card_list.append(card)
+                self.anchor_update()
 
         # 点击鼠标右键时，所有卡牌回到锚点
         if button == arcade.MOUSE_BUTTON_RIGHT:
